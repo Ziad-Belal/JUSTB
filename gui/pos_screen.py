@@ -177,10 +177,14 @@ class POSScreen:
 
     def print_receipt_direct(self, sale_id, sale_record):
         """
-        Auto-print receipt to a connected receipt printer (IBM) using pywin32 when available.
-        Falls back to the Windows `print` command if pywin32 is not available.
+        Auto-print receipt to a connected receipt printer using pywin32 when available.
+        Falls back gracefully if no printer is connected - saves receipt to file instead.
         """
-        receipt_lines = [f"Receipt #{sale_id} - {get_today_date()}", f"User: {self.user_name}", "-"*40]
+        receipt_lines = [
+            f"Receipt #{sale_id} - {get_today_date()}", 
+            f"User: {self.user_name}", 
+            "-"*40
+        ]
         for i in sale_record["items"]:
             line = f"{i['name']} | Qty: {i['quantity']} | {i['price']} x {i['quantity']} = {float(i['price']) * int(i['quantity']):.2f}"
             receipt_lines.append(line)
@@ -189,7 +193,39 @@ class POSScreen:
         receipt_lines.append(f"Grand Total: EGP {total:.2f}")
         receipt_lines.append("\nThank you for shopping with JustB!")
 
-        # Write to a temporary file (used by fallback and by some printers)
+        # Check if printer is available
+        printer_available = False
+        if WIN32_AVAILABLE:
+            try:
+                default_printer = win32print.GetDefaultPrinter()
+                if default_printer:
+                    printer_available = True
+            except Exception:
+                printer_available = False
+
+        # If no printer, save receipt and notify user
+        if not printer_available:
+            try:
+                # Save receipt to a receipts folder
+                receipts_folder = os.path.join(self.data_dir, "receipts")
+                if not os.path.exists(receipts_folder):
+                    os.makedirs(receipts_folder)
+                
+                receipt_filename = f"receipt_{sale_id}_{get_today_date()}.txt"
+                receipt_path = os.path.join(receipts_folder, receipt_filename)
+                
+                with open(receipt_path, 'w', encoding='utf-8') as f:
+                    f.write("\n".join(receipt_lines))
+                
+                messagebox.showwarning("No Printer", 
+                    f"Sale completed!\n\nNo printer detected. Receipt saved to:\n{receipt_path}")
+                return
+            except Exception as e:
+                messagebox.showwarning("Warning", 
+                    f"Sale completed!\n\nNo printer detected and could not save receipt: {e}")
+                return
+
+        # Write to a temporary file for printing
         temp = None
         try:
             temp = tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode='w', encoding='utf-8')
@@ -211,10 +247,19 @@ class POSScreen:
                 subprocess.run(['cmd', '/c', f'print "{temp.name}"'], capture_output=True, timeout=10)
                 messagebox.showinfo("Success", "Sale completed! Receipt printed (fallback).")
             except Exception as e:
-                messagebox.showwarning("Error", f"Sale completed but printing failed: {e}")
+                # Save receipt as backup
+                receipts_folder = os.path.join(self.data_dir, "receipts")
+                if not os.path.exists(receipts_folder):
+                    os.makedirs(receipts_folder)
+                receipt_filename = f"receipt_{sale_id}_{get_today_date()}.txt"
+                receipt_path = os.path.join(receipts_folder, receipt_filename)
+                with open(receipt_path, 'w', encoding='utf-8') as f:
+                    f.write("\n".join(receipt_lines))
+                messagebox.showwarning("Print Failed", 
+                    f"Sale completed!\n\nPrinting failed: {e}\n\nReceipt saved to:\n{receipt_path}")
 
         except Exception as e:
-            messagebox.showwarning("Error", f"Sale completed but printing failed: {e}")
+            messagebox.showwarning("Error", f"Sale completed but receipt handling failed: {e}")
         finally:
             try:
                 if temp is not None:
