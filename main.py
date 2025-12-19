@@ -8,7 +8,7 @@ DATA_DIR = r"C:\Users\A\Desktop\JustB\data"
 
 # Initialize root window
 root = tk.Tk()
-root.title("SMGS")
+root.title("JustB")
 
 # Set window icon
 icon_path = r"C:\Users\Ziad\OneDrive\Documents\SMGS\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico"
