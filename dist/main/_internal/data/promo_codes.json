@@ -1,0 +1,8 @@
+[
+    {
+        "code": "PROMO10",
+        "discount_percentage": 10,
+        "max_uses": 100,
+        "uses_left": 100
+    }
+]

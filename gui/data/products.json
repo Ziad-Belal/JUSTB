@@ -1,0 +1,4 @@
+[
+    {"barcode":"12345","name":"Product A","price":50.0,"quantity":10},
+    {"barcode":"67890","name":"Product B","price":30.0,"quantity":5}
+]
