@@ -3,7 +3,7 @@ from gui.login_screen import LoginScreen
 
 # Client PC data folder path
 #DATA_DIR = r"C:\Users\A\Desktop\JustB\data"
-DATA_DIR = r"C:\Users\Ziad\OneDrive\Documents\SMGS\gui\data"
+DATA_DIR = r"C:\Users\Ziad\JUSTB\data"
 # Initialize root window
 root = tk.Tk()
 root.title("SMGS")
