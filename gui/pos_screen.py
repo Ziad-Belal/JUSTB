@@ -3,102 +3,695 @@ import tkinter as tk
 from tkinter import messagebox, ttk, simpledialog
 from utils.helpers import load_json, save_json, get_today_date
 import os
-import tempfile
+from datetime import datetime
 
-# Try to import win32 printing libs for silent printing on Windows
+# ── Logo path (receipt printing) ───────────────────────────────────────────────
+LOGO_PATH    = r"C:\Users\Ziad\JUSTB\logo.png"
+UI_LOGO_PATH = r"C:\Users\Ziad\JUSTB\logo.png"
+
+# ── Win32 printing ─────────────────────────────────────────────────────────────
 try:
     import win32print
     import win32ui
     from win32.lib import win32con
     import win32api
-    WIN32_AVAILABLE = True
+    WIN32_AVAILABLE    = True
     WIN32API_AVAILABLE = True
 except Exception:
-    WIN32_AVAILABLE = False
+    WIN32_AVAILABLE    = False
     WIN32API_AVAILABLE = False
 
+# ── Pillow ─────────────────────────────────────────────────────────────────────
+try:
+    from PIL import Image, ImageTk
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  DESIGN TOKENS  — JustB Bright Luxury
+# ══════════════════════════════════════════════════════════════════════════════
+
+C = {
+    # Light backgrounds
+    "bg_root":    "#F7F5FF",   # soft lavender-white canvas
+    "bg_card":    "#FFFFFF",   # pure white cards
+    "bg_header":  "#FFFFFF",   # header
+    "bg_panel":   "#F0EDFF",   # soft purple panel
+    "bg_row_alt": "#FAF8FF",   # alternating row tint
+    "bg_input":   "#FFFFFF",   # input bg
+
+    # JustB brand colours (from logo)
+    "teal":       "#1BBFBF",   # J
+    "pink":       "#F0569A",   # U
+    "orange":     "#F97316",   # S
+    "purple":     "#8B5CF6",   # T
+    "green":      "#22C55E",   # B
+
+    # Text
+    "text_dark":  "#1A1035",   # near-black
+    "text_mid":   "#6B6B8A",   # mid grey
+    "text_light": "#A8A8C0",   # subtle
+
+    # Accents
+    "gold":       "#D97706",   # warm amber total
+    "border":     "#E8E4F8",   # soft border
+    "border_acc": "#C4B8F5",   # accent border
+
+    # Semantic
+    "success":    "#16A34A",
+    "danger":     "#DC2626",
+    "warning":    "#D97706",
+}
+
+# Brand letter colours list
+BRAND_COLORS = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]
+
+FONT_BRAND  = ("Georgia",   22, "bold")
+FONT_HEAD   = ("Georgia",   13, "bold")
+FONT_LABEL  = ("Segoe UI",  10)
+FONT_LABEL_B= ("Segoe UI",  10, "bold")
+FONT_ENTRY  = ("Segoe UI",  11)
+FONT_TOTAL  = ("Georgia",   20, "bold")
+FONT_SMALL  = ("Segoe UI",   9)
+FONT_BTN    = ("Segoe UI",  10, "bold")
+FONT_BTN_LG = ("Segoe UI",  13, "bold")
+FONT_SECTION= ("Segoe UI",   8, "bold")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  ESC/POS constants  (receipt — untouched)
+# ══════════════════════════════════════════════════════════════════════════════
+
+PAPER_WIDTH_DOTS   = 384
+RECEIPT_CHAR_WIDTH = 32
+
+ESC = b'\x1b'
+GS  = b'\x1d'
+
+INIT         = ESC + b'@'
+ALIGN_LEFT   = ESC + b'a\x00'
+ALIGN_CENTER = ESC + b'a\x01'
+ALIGN_RIGHT  = ESC + b'a\x02'
+BOLD_ON      = ESC + b'E\x01'
+BOLD_OFF     = ESC + b'E\x00'
+DBL_HEIGHT   = ESC + b'!\x10'
+NORMAL_SIZE  = ESC + b'!\x00'
+FEED_3       = ESC + b'd\x03'
+CUT          = GS  + b'V\x01'
+
+
+def _enc(text):
+    return text.encode('cp850', errors='replace')
+
+def _divider(char='-', w=RECEIPT_CHAR_WIDTH):
+    return _enc(char * w) + b'\n'
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  Logo → ESC/POS  (receipt — untouched)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _logo_escpos(path):
+    if not PIL_AVAILABLE or not os.path.exists(path):
+        return b''
+    try:
+        img = Image.open(path).convert('RGBA')
+        bg  = Image.new('RGB', img.size, (255, 255, 255))
+        bg.paste(img, mask=img.split()[3])
+        img = bg.convert('L')
+        ratio = PAPER_WIDTH_DOTS / img.width
+        new_h = max(1, int(img.height * ratio))
+        img   = img.resize((PAPER_WIDTH_DOTS, new_h), Image.LANCZOS)
+        img   = img.point(lambda p: 0 if p < 160 else 255, '1')
+        w_bytes = (PAPER_WIDTH_DOTS + 7) // 8
+        height  = img.height
+        header  = (GS + b'v0\x00'
+                   + bytes([w_bytes & 0xFF, (w_bytes >> 8) & 0xFF])
+                   + bytes([height   & 0xFF, (height   >> 8) & 0xFF]))
+        px   = img.load()
+        rows = bytearray()
+        for y in range(height):
+            for bx in range(w_bytes):
+                byte = 0
+                for bit in range(8):
+                    x = bx * 8 + bit
+                    if x < PAPER_WIDTH_DOTS and px[x, y] == 0:
+                        byte |= (0x80 >> bit)
+                rows.append(byte)
+        return ALIGN_CENTER + header + bytes(rows) + b'\n'
+    except Exception as e:
+        print(f"[Logo] {e}")
+        return b''
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  QR Code → ESC/POS  (receipt — untouched)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _qr_escpos(url):
+    if not PIL_AVAILABLE:
+        return b''
+    try:
+        import qrcode
+        qr = qrcode.QRCode(version=3,
+                           error_correction=qrcode.constants.ERROR_CORRECT_M,
+                           box_size=4, border=2)
+        qr.add_data(url)
+        qr.make(fit=True)
+        img      = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+        target_w = int(PAPER_WIDTH_DOTS * 0.60)
+        ratio    = target_w / img.width
+        new_h    = max(1, int(img.height * ratio))
+        img      = img.resize((target_w, new_h), Image.LANCZOS)
+        img      = img.convert('L').point(lambda p: 0 if p < 128 else 255, '1')
+        pad_left = (PAPER_WIDTH_DOTS - target_w) // 2
+        w_bytes  = (PAPER_WIDTH_DOTS + 7) // 8
+        height   = img.height
+        header   = (GS + b'v0\x00'
+                    + bytes([w_bytes & 0xFF, (w_bytes >> 8) & 0xFF])
+                    + bytes([height   & 0xFF, (height   >> 8) & 0xFF]))
+        px   = img.load()
+        rows = bytearray()
+        for y in range(height):
+            for bx in range(w_bytes):
+                byte = 0
+                for bit in range(8):
+                    x_full = bx * 8 + bit
+                    x_img  = x_full - pad_left
+                    if 0 <= x_img < target_w and px[x_img, y] == 0:
+                        byte |= (0x80 >> bit)
+                rows.append(byte)
+        return ALIGN_CENTER + header + bytes(rows) + b'\n'
+    except Exception as e:
+        print(f"[QR] {e}")
+        return b''
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  Receipt assembler  (untouched)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""):
+    W        = RECEIPT_CHAR_WIDTH
+    date_str = datetime.now().strftime("%d/%m/%Y  %H:%M")
+    raw      = bytearray()
+
+    raw += INIT
+    raw += _logo_escpos(LOGO_PATH)
+    raw += ALIGN_CENTER
+    raw += BOLD_ON + DBL_HEIGHT
+    raw += _enc("JustB") + b'\n'
+    raw += NORMAL_SIZE + BOLD_OFF
+    raw += b'\n'
+    raw += _divider('=')
+    raw += ALIGN_LEFT
+    raw += _enc(f"Receipt # : {sale_id:06d}") + b'\n'
+    raw += _enc(f"Date      : {date_str}") + b'\n'
+    raw += _enc(f"Cashier   : {cashier}") + b'\n'
+    raw += _divider('=')
+    raw += BOLD_ON
+    raw += _enc(f"{'ITEM':<20} {'QTY':>3}  {'PRICE':>6}  {'TOTAL':>7}") + b'\n'
+    raw += BOLD_OFF
+    raw += _divider('-')
+
+    subtotal = 0.0
+    MAX_NAME = 20
+    for item in sale_record["items"]:
+        name       = str(item["name"])
+        qty        = int(item["quantity"])
+        price      = float(item["price"])
+        line_total = qty * price
+        subtotal  += line_total
+        raw += _enc(f"{name[:MAX_NAME]:<20} {qty:>3}  {price:>6.2f}  {line_total:>7.2f}") + b'\n'
+        for start in range(MAX_NAME, len(name), MAX_NAME):
+            raw += _enc(f"  {name[start:start+MAX_NAME]}") + b'\n'
+
+    raw += _divider('-')
+    LW = W - 10
+    raw += ALIGN_RIGHT
+    raw += _enc(f"{'Subtotal:':>{LW}}  {subtotal:>8.2f} EGP") + b'\n'
+
+    if discount_pct > 0:
+        disc_amt = subtotal * (discount_pct / 100.0)
+        final    = subtotal - disc_amt
+        raw += _enc(f"{'Discount (' + str(int(discount_pct)) + '%):':>{LW}} -{disc_amt:>8.2f} EGP") + b'\n'
+    else:
+        final = subtotal
+
+    raw += _divider('=')
+    raw += BOLD_ON + DBL_HEIGHT
+    raw += _enc(f"{'TOTAL:':>{LW-2}}  {final:>8.2f} EGP") + b'\n'
+    raw += NORMAL_SIZE + BOLD_OFF
+
+    if promo_code:
+        raw += ALIGN_RIGHT
+        raw += _enc(f"{'Promo:':>{LW}}  {promo_code}") + b'\n'
+
+    raw += ALIGN_CENTER
+    raw += b'\n'
+    raw += _divider('~')
+    raw += _enc("Thank you for shopping at JustB!") + b'\n'
+    raw += _enc("We hope to see you again  :)") + b'\n'
+    raw += _divider('~')
+    raw += b'\n'
+    raw += _qr_escpos("https://justb-eg.com")
+    raw += ALIGN_CENTER
+    raw += _enc("Scan to visit our website!") + b'\n'
+    raw += _enc("justb-eg.com") + b'\n'
+    raw += b'\n'
+    raw += FEED_3
+    raw += CUT
+    return bytes(raw)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  UI Helpers
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _btn(parent, text, command, bg, hover, fg="#FFFFFF",
+         font=FONT_BTN, padx=18, pady=9, radius=None):
+    """Flat button with hover colour swap."""
+    b = tk.Label(parent, text=text, font=font,
+                 bg=bg, fg=fg, cursor="hand2",
+                 relief="flat", padx=padx, pady=pady)
+    b.bind("<Button-1>", lambda e: command())
+    b.bind("<Enter>",    lambda e: b.config(bg=hover))
+    b.bind("<Leave>",    lambda e: b.config(bg=bg))
+    return b
+
+
+def _entry(parent, width=24, font=FONT_ENTRY):
+    return tk.Entry(
+        parent, font=font, width=width,
+        bg=C["bg_input"], fg=C["text_dark"],
+        insertbackground=C["purple"],
+        relief="flat",
+        highlightthickness=2,
+        highlightbackground=C["border"],
+        highlightcolor=C["purple"],
+    )
+
+
+def _card(parent, bg=None, pad=16, **kw):
+    bg = bg or C["bg_card"]
+    return tk.Frame(parent, bg=bg, relief="flat",
+                    highlightthickness=1,
+                    highlightbackground=C["border"],
+                    padx=pad, pady=pad, **kw)
+
+
+def _section_label(parent, text, bg=None):
+    bg = bg or C["bg_card"]
+    tk.Label(parent, text=text, font=FONT_SECTION,
+             bg=bg, fg=C["text_light"],
+             anchor="w").pack(fill="x", pady=(0, 6))
+
+
+def _hsep(parent, bg=None):
+    tk.Frame(parent, bg=bg or C["border"], height=1).pack(fill="x", pady=8)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  POSScreen  — JustB Bright Luxury UI
+# ══════════════════════════════════════════════════════════════════════════════
 
 class POSScreen:
     def __init__(self, root, data_dir, frame_parent=None, user=None):
-        self.root = root
-        self.data_dir = data_dir
-        self.user = user or {"username": "Unknown"}
+        self.root      = root
+        self.data_dir  = data_dir
+        self.user      = user or {"username": "Unknown"}
         self.user_name = self.user.get("username", "Unknown")
-        self.frame = tk.Frame(frame_parent or root, padx=10, pady=10)
+
+        self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
         self.frame.pack(fill="both", expand=True)
 
-        self.cart = []
+        self.cart          = []
+        self._discount_pct = 0.0
+        self._promo_code   = ""
+        self._logo_img     = None   # keep reference to avoid GC
 
-        # Barcode entry
-        tk.Label(self.frame, text="Barcode:", font=("Helvetica", 12, "bold")).grid(row=0, column=0, pady=5, sticky="e")
-        self.barcode_entry = tk.Entry(self.frame, font=("Helvetica", 12))
-        self.barcode_entry.grid(row=0, column=1, pady=5, sticky="w")
+        self._build_ui()
+
+    # ─────────────────────────────────────────────────────────────────────────
+    def _build_ui(self):
+
+        # ╔══════════════════════════════════════════════════════════════╗
+        #  HEADER
+        # ╚══════════════════════════════════════════════════════════════╝
+        hdr = tk.Frame(self.frame, bg=C["bg_header"],
+                       highlightthickness=1,
+                       highlightbackground=C["border"])
+        hdr.pack(fill="x")
+
+        # ── Logo (top-left)
+        logo_frame = tk.Frame(hdr, bg=C["bg_header"])
+        logo_frame.pack(side="left", padx=(16, 0), pady=8)
+
+        if PIL_AVAILABLE and os.path.exists(UI_LOGO_PATH):
+            try:
+                raw = Image.open(UI_LOGO_PATH).convert("RGBA")
+                # Resize to 54px height keeping ratio
+                ratio  = 54 / raw.height
+                new_w  = max(1, int(raw.width * ratio))
+                raw    = raw.resize((new_w, 54), Image.LANCZOS)
+                self._logo_img = ImageTk.PhotoImage(raw)
+                tk.Label(logo_frame, image=self._logo_img,
+                         bg=C["bg_header"]).pack(side="left")
+            except Exception:
+                self._fallback_brand(logo_frame)
+        else:
+            self._fallback_brand(logo_frame)
+
+        # ── "Point of Sale" subtitle
+        tk.Label(hdr, text="Point of Sale",
+                 font=("Segoe UI", 10), bg=C["bg_header"],
+                 fg=C["text_light"]).pack(side="left", padx=(10, 0), pady=8)
+
+        # ── Right side: cashier + clock
+        right_hdr = tk.Frame(hdr, bg=C["bg_header"])
+        right_hdr.pack(side="right", padx=20, pady=8)
+
+        self.clock_lbl = tk.Label(right_hdr, font=FONT_SMALL,
+                                  bg=C["bg_header"], fg=C["text_light"])
+        self.clock_lbl.pack(side="right", padx=(12, 0))
+
+        # Switch user button
+        sw = tk.Label(right_hdr, text="⇄  Switch User",
+                      font=FONT_SMALL, bg=C["bg_header"],
+                      fg=C["text_mid"], cursor="hand2",
+                      relief="flat",
+                      highlightthickness=1,
+                      highlightbackground=C["border_acc"],
+                      padx=10, pady=5)
+        sw.pack(side="right", padx=(0, 8))
+        sw.bind("<Button-1>", lambda e: self.switch_user())
+        sw.bind("<Enter>",    lambda e: sw.config(bg=C["bg_panel"], fg=C["purple"]))
+        sw.bind("<Leave>",    lambda e: sw.config(bg=C["bg_header"], fg=C["text_mid"]))
+
+        # Cashier badge
+        badge = tk.Frame(right_hdr, bg=C["purple"], padx=10, pady=4)
+        badge.pack(side="right", padx=(0, 8))
+        tk.Label(badge, text=f"  {self.user_name}  ",
+                 font=FONT_LABEL_B, bg=C["purple"],
+                 fg="#FFFFFF").pack()
+
+        self._tick_clock()
+
+        # ╔══════════════════════════════════════════════════════════════╗
+        #  BODY  —  left (cart) + right (summary)
+        # ╚══════════════════════════════════════════════════════════════╝
+        body = tk.Frame(self.frame, bg=C["bg_root"])
+        body.pack(fill="both", expand=True, padx=14, pady=12)
+        body.columnconfigure(0, weight=3)
+        body.columnconfigure(1, weight=1, minsize=270)
+        body.rowconfigure(0, weight=1)
+
+        # ════════════════════════
+        #  LEFT COLUMN
+        # ════════════════════════
+        left = tk.Frame(body, bg=C["bg_root"])
+        left.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+        left.rowconfigure(1, weight=1)
+        left.columnconfigure(0, weight=1)
+
+        # ── Scan card ─────────────────────────────────────────────────
+        scan = _card(left, pad=14)
+        scan.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        scan.columnconfigure(1, weight=1)
+
+        # coloured top accent bar
+        tk.Frame(scan, bg=C["teal"], height=3).grid(
+            row=0, column=0, columnspan=3, sticky="ew",
+            padx=0, pady=(0, 10))
+
+        tk.Label(scan, text="SCAN / ENTER BARCODE",
+                 font=FONT_SECTION, bg=C["bg_card"],
+                 fg=C["text_light"]).grid(
+                     row=1, column=0, columnspan=3, sticky="w", pady=(0, 6))
+
+        # barcode icon label
+        tk.Label(scan, text="▦", font=("Segoe UI", 16),
+                 bg=C["bg_card"], fg=C["teal"]).grid(
+                     row=2, column=0, padx=(0, 8))
+
+        self.barcode_entry = _entry(scan, width=30)
+        self.barcode_entry.grid(row=2, column=1, sticky="ew", ipady=7)
         self.barcode_entry.bind("<Return>", lambda e: self.add_to_cart())
         self.barcode_entry.focus()
 
-        # Promo code
-        tk.Label(self.frame, text="Promo Code:", font=("Helvetica", 12, "bold")).grid(row=1, column=0, pady=5, sticky="e")
-        self.promo_entry = tk.Entry(self.frame, font=("Helvetica", 12))
-        self.promo_entry.grid(row=1, column=1, pady=5, sticky="w")
-        tk.Button(self.frame, text="Apply Promo", command=self.apply_promo, bg="green", fg="white").grid(row=1, column=2, padx=5)
+        _btn(scan, "  ADD  ", self.add_to_cart,
+             C["teal"], "#159F9F",
+             font=FONT_BTN, padx=18, pady=7).grid(
+                 row=2, column=2, padx=(10, 0))
 
-        # Add product button -> behaves like pressing Enter: checks barcode then asks quantity only
-        tk.Button(self.frame, text="Add Product", command=self.add_to_cart, bg="blue", fg="white").grid(row=0, column=2, padx=5)
+        # ── Cart treeview card ────────────────────────────────────────
+        tree_card = tk.Frame(left, bg=C["bg_card"],
+                             highlightthickness=1,
+                             highlightbackground=C["border"])
+        tree_card.grid(row=1, column=0, sticky="nsew")
+        tree_card.rowconfigure(1, weight=1)
+        tree_card.columnconfigure(0, weight=1)
 
-        # Cart treeview
-        columns = ("Name", "Qty", "Unit Price", "Total")
-        self.tree = ttk.Treeview(self.frame, columns=columns, show="headings", selectmode="browse")
-        for col in columns:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", width=120)
-        self.tree.grid(row=2, column=0, columnspan=3, pady=10, sticky="nsew")
+        # Cart sub-header
+        ch = tk.Frame(tree_card, bg=C["bg_panel"], padx=14, pady=10)
+        ch.grid(row=0, column=0, columnspan=2, sticky="ew")
 
-        # grid stretch
-        self.frame.grid_rowconfigure(2, weight=1)
-        self.frame.grid_columnconfigure(1, weight=1)
+        # rainbow dot row
+        dot_frame = tk.Frame(ch, bg=C["bg_panel"])
+        dot_frame.pack(side="left")
+        for col in BRAND_COLORS:
+            tk.Label(dot_frame, text="●", font=("Segoe UI", 8),
+                     bg=C["bg_panel"], fg=col).pack(side="left", padx=1)
+        tk.Label(ch, text="  CART",
+                 font=FONT_SECTION, bg=C["bg_panel"],
+                 fg=C["text_mid"]).pack(side="left")
+        self.item_count_lbl = tk.Label(ch, text="0 items",
+                                        font=FONT_SMALL,
+                                        bg=C["bg_panel"], fg=C["purple"])
+        self.item_count_lbl.pack(side="right")
 
-        self.total_label = tk.Label(self.frame, text="Grand Total: EGP 0.00", font=("Helvetica", 14, "bold"))
-        self.total_label.grid(row=3, column=0, columnspan=3, pady=10)
+        # Treeview style
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("JB.Treeview",
+                         background=C["bg_card"],
+                         foreground=C["text_dark"],
+                         fieldbackground=C["bg_card"],
+                         rowheight=38,
+                         font=("Segoe UI", 10),
+                         borderwidth=0, relief="flat")
+        style.configure("JB.Treeview.Heading",
+                         background=C["bg_panel"],
+                         foreground=C["text_mid"],
+                         font=("Segoe UI", 9, "bold"),
+                         relief="flat", borderwidth=0)
+        style.map("JB.Treeview",
+                  background=[("selected", C["bg_panel"])],
+                  foreground=[("selected", C["purple"])])
+        style.layout("JB.Treeview",
+                     [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        # Buttons
-        tk.Button(self.frame, text="Finalize Sale", command=self.finalize_sale, bg="green", fg="white").grid(row=4, column=0, pady=10)
-        tk.Button(self.frame, text="Clear Cart", command=self.clear_cart, bg="red", fg="white").grid(row=4, column=1, pady=10)
+        cols = ("Name", "Qty", "Unit Price", "Total")
+        self.tree = ttk.Treeview(tree_card, columns=cols,
+                                  show="headings", selectmode="browse",
+                                  style="JB.Treeview")
+        cw = {"Name": 290, "Qty": 60, "Unit Price": 110, "Total": 110}
+        for col in cols:
+            self.tree.heading(col, text=col.upper())
+            self.tree.column(col, anchor="center",
+                              width=cw[col], minwidth=cw[col])
+        self.tree.tag_configure("even", background=C["bg_card"])
+        self.tree.tag_configure("odd",  background=C["bg_row_alt"])
 
-    def _products_path(self):
-        return os.path.join(self.data_dir, "products.json")
+        vsb = ttk.Scrollbar(tree_card, orient="vertical",
+                             command=self.tree.yview)
+        self.tree.configure(yscrollcommand=vsb.set)
+        self.tree.grid(row=1, column=0, sticky="nsew")
+        vsb.grid(row=1,  column=1, sticky="ns")
 
-    def _sales_path(self):
-        return os.path.join(self.data_dir, "sales.json")
+        # ════════════════════════
+        #  RIGHT COLUMN
+        # ════════════════════════
+        right = tk.Frame(body, bg=C["bg_root"])
+        right.grid(row=0, column=1, sticky="nsew")
+        right.columnconfigure(0, weight=1)
+        right.rowconfigure(2, weight=1)
+
+        # ── Promo card ────────────────────────────────────────────────
+        promo_card = _card(right, pad=14)
+        promo_card.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        promo_card.columnconfigure(0, weight=1)
+
+        # pink accent bar
+        tk.Frame(promo_card, bg=C["pink"], height=3).pack(
+            fill="x", pady=(0, 10))
+
+        _section_label(promo_card, "PROMO CODE")
+
+        row_p = tk.Frame(promo_card, bg=C["bg_card"])
+        row_p.pack(fill="x")
+        row_p.columnconfigure(0, weight=1)
+
+        self.promo_entry = _entry(row_p, width=14)
+        self.promo_entry.grid(row=0, column=0, sticky="ew", ipady=6)
+
+        _btn(row_p, "APPLY", self.apply_promo,
+             C["pink"], "#D0457F",
+             font=FONT_BTN, padx=14, pady=6).grid(
+                 row=0, column=1, padx=(8, 0))
+
+        self.promo_status = tk.Label(promo_card, text="",
+                                      font=FONT_SMALL,
+                                      bg=C["bg_card"],
+                                      fg=C["success"],
+                                      anchor="w")
+        self.promo_status.pack(fill="x", pady=(6, 0))
+
+        # ── Totals card ───────────────────────────────────────────────
+        tot_card = _card(right, pad=16)
+        tot_card.grid(row=1, column=0, sticky="ew", pady=(0, 10))
+        tot_card.columnconfigure(1, weight=1)
+
+        # orange accent bar
+        tk.Frame(tot_card, bg=C["orange"], height=3).grid(
+            row=0, column=0, columnspan=2, sticky="ew", pady=(0, 12))
+
+        tk.Label(tot_card, text="ORDER SUMMARY",
+                 font=FONT_SECTION, bg=C["bg_card"],
+                 fg=C["text_light"]).grid(
+                     row=1, column=0, columnspan=2,
+                     sticky="w", pady=(0, 10))
+
+        # Subtotal
+        tk.Label(tot_card, text="Subtotal",
+                 font=FONT_LABEL, bg=C["bg_card"],
+                 fg=C["text_mid"]).grid(row=2, column=0, sticky="w", pady=4)
+        self.subtotal_lbl = tk.Label(tot_card, text="EGP 0.00",
+                                      font=FONT_LABEL_B,
+                                      bg=C["bg_card"], fg=C["text_dark"])
+        self.subtotal_lbl.grid(row=2, column=1, sticky="e", pady=4)
+
+        # Discount
+        tk.Label(tot_card, text="Discount",
+                 font=FONT_LABEL, bg=C["bg_card"],
+                 fg=C["text_mid"]).grid(row=3, column=0, sticky="w", pady=4)
+        self.discount_lbl = tk.Label(tot_card, text="—",
+                                      font=FONT_LABEL_B,
+                                      bg=C["bg_card"], fg=C["success"])
+        self.discount_lbl.grid(row=3, column=1, sticky="e", pady=4)
+
+        # Separator
+        tk.Frame(tot_card, bg=C["border"], height=1).grid(
+            row=4, column=0, columnspan=2, sticky="ew", pady=10)
+
+        # Total
+        tk.Label(tot_card, text="TOTAL",
+                 font=("Segoe UI", 9, "bold"),
+                 bg=C["bg_card"], fg=C["text_mid"]).grid(
+                     row=5, column=0, sticky="w")
+        self.total_lbl = tk.Label(tot_card, text="EGP 0.00",
+                                   font=FONT_TOTAL,
+                                   bg=C["bg_card"], fg=C["gold"])
+        self.total_lbl.grid(row=5, column=1, sticky="e")
+
+        # ── Spacer ────────────────────────────────────────────────────
+        tk.Frame(right, bg=C["bg_root"]).grid(row=2, column=0, sticky="nsew")
+
+        # ── Action buttons ────────────────────────────────────────────
+        acts = tk.Frame(right, bg=C["bg_root"])
+        acts.grid(row=3, column=0, sticky="ew")
+        acts.columnconfigure(0, weight=1)
+
+        # Finalize — green full-width, tall, prominent
+        fin = tk.Frame(acts, bg=C["green"],
+                       highlightthickness=2,
+                       highlightbackground=C["success"])
+        fin.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        fin_lbl = tk.Label(fin,
+                           text="✦  FINALIZE SALE  ✦",
+                           font=FONT_BTN_LG,
+                           bg=C["green"], fg="#FFFFFF",
+                           cursor="hand2",
+                           padx=0, pady=14)
+        fin_lbl.pack(fill="x")
+        fin_lbl.bind("<Button-1>", lambda e: self.finalize_sale())
+        fin_lbl.bind("<Enter>",    lambda e: fin_lbl.config(bg="#16A34A"))
+        fin_lbl.bind("<Leave>",    lambda e: fin_lbl.config(bg=C["green"]))
+
+        # Clear cart — subtle outlined
+        clr_lbl = tk.Label(acts,
+                            text="CLEAR CART",
+                            font=FONT_BTN,
+                            bg=C["bg_card"], fg=C["text_mid"],
+                            cursor="hand2",
+                            relief="flat",
+                            highlightthickness=1,
+                            highlightbackground=C["border_acc"],
+                            padx=0, pady=9)
+        clr_lbl.grid(row=1, column=0, sticky="ew")
+        clr_lbl.bind("<Button-1>", lambda e: self.clear_cart())
+        clr_lbl.bind("<Enter>",    lambda e: clr_lbl.config(bg=C["bg_panel"]))
+        clr_lbl.bind("<Leave>",    lambda e: clr_lbl.config(bg=C["bg_card"]))
+
+        # ── Footer tagline ────────────────────────────────────────────
+        tk.Label(self.frame,
+                 text="justb-eg.com  ·  Stationery & Gifts",
+                 font=("Segoe UI", 8),
+                 bg=C["bg_root"], fg=C["text_light"]).pack(
+                     side="bottom", pady=5)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    def _fallback_brand(self, parent):
+        """Show coloured JUSTB letters if logo file not found."""
+        for letter, color in zip("JUSTB", BRAND_COLORS):
+            tk.Label(parent, text=letter,
+                     font=FONT_BRAND,
+                     bg=C["bg_header"], fg=color).pack(side="left")
+
+    def _tick_clock(self):
+        now = datetime.now().strftime("%a  %d %b  %H:%M")
+        self.clock_lbl.config(text=now)
+        self.frame.after(30000, self._tick_clock)
+
+    # ── helpers ───────────────────────────────────────────────────────────────
+    def _products_path(self): return os.path.join(self.data_dir, "products.json")
+    def _sales_path(self):    return os.path.join(self.data_dir, "sales.json")
+
+    # ── cart logic ────────────────────────────────────────────────────────────
 
     def add_to_cart(self):
-        """Add product to cart: check barcode exists -> ask only for quantity -> ensure stock limits."""
         barcode = self.barcode_entry.get().strip()
         if not barcode:
             return
-
         products = load_json(self._products_path())
-        product = next((p for p in products if str(p.get("barcode", "")) == barcode), None)
+        product  = next((p for p in products
+                         if str(p.get("barcode", "")) == barcode), None)
         if not product:
-            messagebox.showerror("Error", "Product not in inventory. Add it first in Products tab.")
+            messagebox.showerror("Not Found",
+                "Product not in inventory.\nAdd it first in the Products tab.")
             self.barcode_entry.delete(0, tk.END)
             return
 
-        # Available and already-in-cart quantities
-        available_qty = int(product.get("quantity", 0))
-        in_cart_qty = sum(item["quantity"] for item in self.cart if item["barcode"] == barcode)
-        remaining = max(0, available_qty - in_cart_qty)
+        available = int(product.get("quantity", 0))
+        in_cart   = sum(i["quantity"] for i in self.cart
+                        if i["barcode"] == barcode)
+        remaining = max(0, available - in_cart)
         if remaining <= 0:
-            messagebox.showinfo("Info", f"Cannot add more. Only {available_qty} available.")
+            messagebox.showinfo("Out of Stock",
+                f"Maximum stock reached ({available} units).")
             self.barcode_entry.delete(0, tk.END)
             return
 
-        # Ask how many to add (bulk add) - only quantity prompt
-        qty = simpledialog.askinteger("Quantity", f"How many to add? (max {remaining})", minvalue=1, maxvalue=remaining, parent=self.frame)
+        qty = simpledialog.askinteger(
+            "Quantity",
+            f"How many units?\n(max {remaining} available)",
+            minvalue=1, maxvalue=remaining, parent=self.frame)
         if qty is None:
             self.barcode_entry.delete(0, tk.END)
             return
 
-        # Add / increase in cart
         for item in self.cart:
             if item["barcode"] == barcode:
                 item["quantity"] += qty
@@ -108,10 +701,10 @@ class POSScreen:
                 return
 
         self.cart.append({
-            "barcode": product["barcode"],
-            "name": product["name"],
-            "price": float(product["price"]),
-            "quantity": qty
+            "barcode":  product["barcode"],
+            "name":     product["name"],
+            "price":    float(product["price"]),
+            "quantity": qty,
         })
         self.update_tree()
         self.update_total()
@@ -120,149 +713,163 @@ class POSScreen:
     def update_tree(self):
         for i in self.tree.get_children():
             self.tree.delete(i)
-        for item in self.cart:
-            total = float(item["price"]) * int(item["quantity"])
-            self.tree.insert("", "end", values=(item["name"], item["quantity"], f"{float(item['price']):.2f}", f"{total:.2f}"))
+        for idx, item in enumerate(self.cart):
+            t   = float(item["price"]) * int(item["quantity"])
+            tag = "even" if idx % 2 == 0 else "odd"
+            self.tree.insert("", "end", tags=(tag,), values=(
+                item["name"], item["quantity"],
+                f"EGP {float(item['price']):.2f}",
+                f"EGP {t:.2f}"))
+        count = len(self.cart)
+        self.item_count_lbl.config(
+            text=f"{count} item{'s' if count != 1 else ''}")
 
-    def update_total(self, discount=0):
-        total = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
-        total_after_discount = total * (1 - float(discount)/100.0)
-        self.total_label.config(text=f"Grand Total: EGP {total_after_discount:.2f}")
+    def update_total(self, discount=None):
+        if discount is not None:
+            self._discount_pct = discount
+        subtotal = sum(float(i["price"]) * int(i["quantity"])
+                       for i in self.cart)
+        disc_amt = subtotal * (self._discount_pct / 100.0)
+        final    = subtotal - disc_amt
+
+        self.subtotal_lbl.config(text=f"EGP {subtotal:.2f}")
+        if disc_amt > 0:
+            self.discount_lbl.config(
+                text=f"- EGP {disc_amt:.2f}", fg=C["success"])
+        else:
+            self.discount_lbl.config(text="—", fg=C["text_light"])
+        self.total_lbl.config(text=f"EGP {final:.2f}")
 
     def apply_promo(self):
-        code = self.promo_entry.get().strip()
-        promo_path = os.path.join(self.data_dir, "promo_codes.json")
-        promos = load_json(promo_path)
-        promo = next((p for p in promos if p.get("code") == code and int(p.get("uses_left", 0)) > 0), None)
+        code   = self.promo_entry.get().strip()
+        promos = load_json(os.path.join(self.data_dir, "promo_codes.json"))
+        promo  = next((p for p in promos
+                       if p.get("code") == code
+                       and int(p.get("uses_left", 0)) > 0), None)
         if not promo:
-            messagebox.showerror("Error", "Invalid promo code")
+            self.promo_status.config(
+                text="✗  Invalid or expired code", fg=C["danger"])
             return
-        self.update_total(discount=float(promo.get("discount_percentage", 0)))
-        messagebox.showinfo("Success", f"Promo applied: {promo.get('discount_percentage', 0)}% off")
+        pct = float(promo.get("discount_percentage", 0))
+        self._promo_code = code
+        self.update_total(discount=pct)
+        self.promo_status.config(
+            text=f"✓  {int(pct)}% discount applied!", fg=C["success"])
 
     def finalize_sale(self):
         if not self.cart:
+            messagebox.showinfo("Empty Cart", "Add items to the cart first.")
             return
 
-        # Decrease inventory
         products = load_json(self._products_path())
         for item in self.cart:
-            prod = next((p for p in products if str(p.get("barcode", "")) == str(item["barcode"])), None)
+            prod = next((p for p in products
+                         if str(p.get("barcode", "")) == str(item["barcode"])),
+                        None)
             if prod:
-                prod["quantity"] = max(0, int(prod.get("quantity", 0)) - int(item["quantity"]))
+                prod["quantity"] = max(
+                    0, int(prod.get("quantity", 0)) - int(item["quantity"]))
         save_json(self._products_path(), products)
 
-        # Save sale
-        sales = load_json(self._sales_path())
-        sale_id = len(sales) + 1
-        total = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
+        sales    = load_json(self._sales_path())
+        sale_id  = len(sales) + 1
+        subtotal = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
+        disc_amt = subtotal * (self._discount_pct / 100.0)
+        final    = subtotal - disc_amt
+
         sale_record = {
-            "id": sale_id,
-            "user": self.user_name,
-            "items": self.cart,
-            "total": total,
-            "date": get_today_date()
+            "id":           sale_id,
+            "user":         self.user_name,
+            "items":        list(self.cart),
+            "subtotal":     round(subtotal, 2),
+            "discount_pct": self._discount_pct,
+            "discount_amt": round(disc_amt, 2),
+            "total":        round(final, 2),
+            "promo_code":   self._promo_code,
+            "date":         get_today_date(),
         }
         sales.append(sale_record)
         save_json(self._sales_path(), sales)
 
-        # Print receipt directly (NO SAVE POPUP)
-        self.print_receipt_direct(sale_id, sale_record)
-        self.clear_cart()
+        receipt_bytes = build_receipt(
+            sale_id, sale_record,
+            cashier      = self.user_name,
+            discount_pct = self._discount_pct,
+            promo_code   = self._promo_code,
+        )
+        self._send_to_printer(sale_id, receipt_bytes)
 
-    def clear_cart(self):
-        self.cart = []
+        self.cart          = []
+        self._discount_pct = 0.0
+        self._promo_code   = ""
+        self.promo_entry.delete(0, tk.END)
+        self.promo_status.config(text="")
         self.update_tree()
         self.update_total()
 
-    def print_receipt_direct(self, sale_id, sale_record):
-        """
-        Auto-print receipt to a connected receipt printer using pywin32 when available.
-        Falls back gracefully if no printer is connected - saves receipt to file instead.
-        """
-        receipt_lines = [
-            f"Receipt #{sale_id} - {get_today_date()}", 
-            f"User: {self.user_name}", 
-            "-"*40
-        ]
-        for i in sale_record["items"]:
-            line = f"{i['name']} | Qty: {i['quantity']} | {i['price']} x {i['quantity']} = {float(i['price']) * int(i['quantity']):.2f}"
-            receipt_lines.append(line)
-        total = sale_record["total"]
-        receipt_lines.append("-"*40)
-        receipt_lines.append(f"Grand Total: EGP {total:.2f}")
-        receipt_lines.append("\nThank you for shopping with JustB!")
+    def clear_cart(self):
+        self.cart          = []
+        self._discount_pct = 0.0
+        self._promo_code   = ""
+        self.promo_entry.delete(0, tk.END)
+        self.promo_status.config(text="")
+        self.update_tree()
+        self.update_total()
 
-        # Check if printer is available
-        printer_available = False
+    # ── switch user ───────────────────────────────────────────────────────────────
+
+    def switch_user(self):
+        if self.cart:
+            if not messagebox.askyesno(
+                "Switch User",
+                "You have items in the cart.\nAre you sure you want to switch users?\nThe current cart will be cleared."):
+                return
+        # Destroy everything in root and relaunch login
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        # Re-import and launch login screen
+        from gui.login_screen import LoginScreen
+        LoginScreen(self.root, self.data_dir)
+
+    # ── printing ──────────────────────────────────────────────────────────────
+
+    def _send_to_printer(self, sale_id, raw_bytes):
+        printer_name = None
         if WIN32_AVAILABLE:
             try:
-                default_printer = win32print.GetDefaultPrinter()
-                if default_printer:
-                    printer_available = True
-            except Exception:
-                printer_available = False
-
-        # If no printer, save receipt and notify user
-        if not printer_available:
-            try:
-                # Save receipt to a receipts folder
-                receipts_folder = os.path.join(self.data_dir, "receipts")
-                if not os.path.exists(receipts_folder):
-                    os.makedirs(receipts_folder)
-                
-                receipt_filename = f"receipt_{sale_id}_{get_today_date()}.txt"
-                receipt_path = os.path.join(receipts_folder, receipt_filename)
-                
-                with open(receipt_path, 'w', encoding='utf-8') as f:
-                    f.write("\n".join(receipt_lines))
-                
-                messagebox.showwarning("No Printer", 
-                    f"Sale completed!\n\nNo printer detected. Receipt saved to:\n{receipt_path}")
-                return
-            except Exception as e:
-                messagebox.showwarning("Warning", 
-                    f"Sale completed!\n\nNo printer detected and could not save receipt: {e}")
-                return
-
-        # Write to a temporary file for printing
-        temp = None
-        try:
-            temp = tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode='w', encoding='utf-8')
-            temp.write("\n".join(receipt_lines))
-            temp.close()
-
-            # Try win32api for silent printing
-            if WIN32API_AVAILABLE:
-                try:
-                    win32api.ShellExecute(0, "print", temp.name, None, ".", 0)
-                    messagebox.showinfo("Success", "Sale completed! Receipt printed.")
-                    return
-                except Exception as e:
-                    print("win32api print failed:", e)
-
-            # Fallback: use the Windows print command
-            import subprocess
-            try:
-                subprocess.run(['cmd', '/c', f'print "{temp.name}"'], capture_output=True, timeout=10)
-                messagebox.showinfo("Success", "Sale completed! Receipt printed (fallback).")
-            except Exception as e:
-                # Save receipt as backup
-                receipts_folder = os.path.join(self.data_dir, "receipts")
-                if not os.path.exists(receipts_folder):
-                    os.makedirs(receipts_folder)
-                receipt_filename = f"receipt_{sale_id}_{get_today_date()}.txt"
-                receipt_path = os.path.join(receipts_folder, receipt_filename)
-                with open(receipt_path, 'w', encoding='utf-8') as f:
-                    f.write("\n".join(receipt_lines))
-                messagebox.showwarning("Print Failed", 
-                    f"Sale completed!\n\nPrinting failed: {e}\n\nReceipt saved to:\n{receipt_path}")
-
-        except Exception as e:
-            messagebox.showwarning("Error", f"Sale completed but receipt handling failed: {e}")
-        finally:
-            try:
-                if temp is not None:
-                    os.remove(temp.name)
+                printer_name = win32print.GetDefaultPrinter()
             except Exception:
                 pass
+
+        if printer_name and WIN32_AVAILABLE:
+            try:
+                h = win32print.OpenPrinter(printer_name)
+                try:
+                    win32print.StartDocPrinter(h, 1, ("JustB Receipt", None, "RAW"))
+                    win32print.StartPagePrinter(h)
+                    win32print.WritePrinter(h, raw_bytes)
+                    win32print.EndPagePrinter(h)
+                    win32print.EndDocPrinter(h)
+                finally:
+                    win32print.ClosePrinter(h)
+                messagebox.showinfo("Sale Complete",
+                    "Sale saved & receipt printed!")
+                return
+            except Exception as e:
+                messagebox.showwarning("Sale Complete",
+                    f"Sale saved!\n\nPrinter could not print.\nError: {e}")
+                return
+
+        messagebox.showinfo("Sale Complete",
+            "Sale saved successfully!\n\nNo printer detected.\n"
+            "Connect your printer to print receipts.")
+
+    def _save_fallback(self, sale_id, raw_bytes):
+        try:
+            folder = os.path.join(self.data_dir, "receipts")
+            os.makedirs(folder, exist_ok=True)
+            fname = f"receipt_{sale_id:06d}_{get_today_date()}.bin"
+            with open(os.path.join(folder, fname), 'wb') as f:
+                f.write(raw_bytes)
+        except Exception:
+            pass

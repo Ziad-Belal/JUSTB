@@ -84,8 +84,15 @@ class ProductManagementScreen:
             self.tree.delete(i)
         
         # Add products to table
+        # Use the barcode as the iid (item ID) so we can always retrieve the exact
+        # original string barcode later — Tkinter would otherwise cast numeric-looking
+        # barcodes to int, stripping leading zeros and breaking the lookup.
         for p in products:
-            self.tree.insert("", "end", values=(p["barcode"], p["name"], p["price"], p.get("quantity", 0)))
+            barcode_str = str(p["barcode"])
+            # iid must be unique; prefix with "bc_" to avoid any Tkinter iid conflicts
+            iid = "bc_" + barcode_str
+            self.tree.insert("", "end", iid=iid,
+                             values=(barcode_str, p["name"], p["price"], p.get("quantity", 0)))
         
         # Update results label
         total = len(self.all_products)
@@ -190,7 +197,7 @@ class ProductManagementScreen:
             products = load_json(products_path)
 
             # Check if barcode already exists
-            existing = next((p for p in products if p["barcode"] == barcode), None)
+            existing = next((p for p in products if str(p["barcode"]) == str(barcode)), None)
             if existing:
                 messagebox.showerror("Error", "Product with this barcode already exists! Use Edit to modify it.")
                 return
@@ -222,8 +229,11 @@ class ProductManagementScreen:
             return
 
         # Get current product data
-        current_values = self.tree.item(selected[0])["values"]
-        old_barcode = str(current_values[0])
+        # Read barcode from the iid (prefixed with "bc_") to avoid the Tkinter bug
+        # where numeric-looking barcodes get cast to int (losing leading zeros etc.)
+        iid = selected[0]
+        old_barcode = iid[3:] if iid.startswith("bc_") else iid  # strip "bc_" prefix
+        current_values = self.tree.item(iid)["values"]
         old_name = current_values[1]
         old_price = current_values[2]
         old_qty = current_values[3]
@@ -284,15 +294,15 @@ class ProductManagementScreen:
             products = load_json(products_path)
 
             # Check if new barcode conflicts with another product
-            if new_barcode != old_barcode:
-                conflict = next((p for p in products if p["barcode"] == new_barcode), None)
+            if str(new_barcode) != str(old_barcode):
+                conflict = next((p for p in products if str(p["barcode"]) == str(new_barcode)), None)
                 if conflict:
                     messagebox.showerror("Error", "Another product already has this barcode!")
                     return
 
             # Find and update the product
             for p in products:
-                if p["barcode"] == old_barcode:
+                if str(p["barcode"]) == str(old_barcode):
                     p["barcode"] = new_barcode
                     p["name"] = new_name
                     p["price"] = new_price
@@ -318,12 +328,12 @@ class ProductManagementScreen:
         products_path = self._products_path()
         products = load_json(products_path)
 
-        # Collect barcodes to remove
+        # Collect barcodes to remove — read from iid to avoid numeric cast bug
         barcodes_to_remove = set()
         for sel in selected:
-            vals = self.tree.item(sel)["values"]
-            if vals:
-                barcodes_to_remove.add(str(vals[0]))
+            iid = sel
+            barcode = iid[3:] if iid.startswith("bc_") else iid
+            barcodes_to_remove.add(barcode)
 
         # Filter products
         new_products = [p for p in products if str(p.get("barcode", "")) not in barcodes_to_remove]
@@ -340,6 +350,8 @@ class ProductManagementScreen:
 
         try:
             for sel in selected:
+                iid = sel
+                barcode = iid[3:] if iid.startswith("bc_") else iid
                 vals = self.tree.item(sel)["values"]
                 if not vals:
                     continue
@@ -347,7 +359,7 @@ class ProductManagementScreen:
                     f"Product\n"
                     f"-------\n"
                     f"Name: {vals[1]}\n"
-                    f"Barcode: {vals[0]}\n"
+                    f"Barcode: {barcode}\n"
                     f"Price: {vals[2]}\n"
                     f"Quantity: {vals[3]}\n"
                 )
