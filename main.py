@@ -3,7 +3,7 @@ from gui.login_screen import LoginScreen
 import os
 
 # Client PC data folder path
-DATA_DIR = r"c:\Users\Ziad\JUSTBforTesting\data"
+DATA_DIR = r"C:\Users\Ziad\JUSTB\gui\data"
 
 
 # Initialize root window
@@ -11,7 +11,7 @@ root = tk.Tk()
 root.title("JustB")
 
 # Set window icon
-icon_path = r"C:\Users\Ziad\OneDrive\Documents\SMGS\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico"
+icon_path = r"C:\Users\Ziad\JUSTB\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico"
 if os.path.exists(icon_path):
     try:
         root.iconbitmap(icon_path)
@@ -26,4 +26,6 @@ LoginScreen(root, DATA_DIR)
 # Start GUI loop
 root.mainloop()
 
-#r"C:\Users\20102\Desktop\JustB\data" this is the original path I will use when the project runs after the testing.
+#r"C:\Users\A\Desktop\JUSTB\data" this is the original path I will use when the project runs after the testing.
+#here is the command for execution :
+#python -m PyInstaller --onefile --windowed --icon="C:\Users\Ziad\JUSTB\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico" --add-data "gui;gui" --add-data "utils;utils" --name "JustB" main.py
