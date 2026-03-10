@@ -1,4 +1,6902 @@
 [
-    {"barcode":"12345","name":"Product A","price":50.0,"quantity":10},
-    {"barcode":"67890","name":"Product B","price":30.0,"quantity":5}
+    {
+        "barcode": "8991761162521",
+        "name": "Faber castell الوان خشب 12 جريب",
+        "price": 105.0,
+        "quantity": 40
+    },
+    {
+        "barcode": "430001944131",
+        "name": "لعبة عربية exhost smash",
+        "price": 320.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "672552451571",
+        "name": "Real Guitar toy جيتار لعبة",
+        "price": 350.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "430001944155",
+        "name": "Yogo Boys Dog كلب يوجو (ولاد)",
+        "price": 350.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "430001944162",
+        "name": "Yogo Unicorn كلب يوجو (بنات)",
+        "price": 350.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "672552409329",
+        "name": "Transformers Mars (s)ترانسفورمرز مارس ص",
+        "price": 300.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "672552411629",
+        "name": "Mars Transformers Big مارس ترانسفورمرز كبير",
+        "price": 320.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "430001944070",
+        "name": "Bumper Spin طبق طاير",
+        "price": 280.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "2233445566772",
+        "name": "Iron man (shein)",
+        "price": 450.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4895824111225",
+        "name": "cat hair clip توكة قطة للحفلات",
+        "price": 25.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "6224010608511",
+        "name": "Ring frisbee طبق طائر",
+        "price": 30.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6224010608542",
+        "name": "disk frisbee طبق طائر",
+        "price": 30.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6224010608733",
+        "name": "star frisbee طبق طائر",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6224010608955",
+        "name": "food container 2.5 L حافظة طعام",
+        "price": 135.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6948441641687",
+        "name": "JBL  jb 38",
+        "price": 280.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6975742434526",
+        "name": "INKAX power bank 10000mAh",
+        "price": 445.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6972169858768",
+        "name": "VIDVIE  power bank 10000 mAh",
+        "price": 480.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "000013900513",
+        "name": "JOYROOM power bank 10000 mAh",
+        "price": 570.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6957013601073",
+        "name": "PZX power bank 10400 mAh",
+        "price": 265.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6957013602315",
+        "name": "KINGLEEN power bank 10000 mAh",
+        "price": 265.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8340506879963",
+        "name": "Smart Watch s9 ULTRA",
+        "price": 690.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5651321568271",
+        "name": "ENC headset Air 39 green",
+        "price": 210.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8920233220810",
+        "name": "TUNE FLEX head set S6",
+        "price": 280.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4895224182924",
+        "name": "LOVE eye soft light",
+        "price": 200.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6925281968679",
+        "name": "JBL pure bass head set",
+        "price": 270.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6842356465584",
+        "name": "P47M head set",
+        "price": 175.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6989532512530",
+        "name": "P47 ROHS head set",
+        "price": 155.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6724081413637",
+        "name": "START cable  type-c to iphone 1M",
+        "price": 120.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6941237102676",
+        "name": "JOYROOM data caple C  1.2M",
+        "price": 195.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6920220725825",
+        "name": "X PLUS OPTIMUS cable Micro",
+        "price": 43.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6971741737293",
+        "name": "VEDNMENV pro  2.4A cable",
+        "price": 27.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6720650801102",
+        "name": "DOLPHIN USB TO type C cable",
+        "price": 25.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6954176814968",
+        "name": "XFAST charger N70",
+        "price": 50.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6966884625422",
+        "name": "OTG USB converter",
+        "price": 12.0,
+        "quantity": 38
+    },
+    {
+        "barcode": "4895224182498",
+        "name": "BIKIT MONSTER باند مضاد للتاموس",
+        "price": 55.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6532676986639",
+        "name": "MINI HOLDER",
+        "price": 15.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "6951202937189",
+        "name": "X-Plus CARD READER USB",
+        "price": 15.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6945879795258",
+        "name": "TWO IN One OTG line",
+        "price": 40.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6998568414121",
+        "name": "B12  HEAD set pink",
+        "price": 245.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6903603012279",
+        "name": "PLOKAMA video-making kit",
+        "price": 350.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224010608689",
+        "name": "Bread & cakes cover حافظ للمخبوزات و الكيك",
+        "price": 320.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6224010608016",
+        "name": "Tray صانيه",
+        "price": 140.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6712190906201",
+        "name": "SAVE 2 in1 charger",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8681241073002",
+        "name": "faber castell COLOUR PENCILS    الوان خشب 12 صغير",
+        "price": 50.0,
+        "quantity": 31
+    },
+    {
+        "barcode": "8681241072944",
+        "name": "Feber castell COLOUR PENCILS (6)  الوان خشب",
+        "price": 37.0,
+        "quantity": 32
+    },
+    {
+        "barcode": "8690826165247",
+        "name": "Faber castell  COLOUR PENCILS  الوان خشب 24 علبه معدن",
+        "price": 315.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8681241106113",
+        "name": "Faber castell COLOUR PENCILS    الوان خشب 36 عادي",
+        "price": 297.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8901180741023",
+        "name": "Faber castell  الوان شمع + كتاب تلوين",
+        "price": 175.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8681241106175",
+        "name": "Faber castell COLOUR PENCILS    الوان خشب 48",
+        "price": 396.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8690826123155",
+        "name": "Faber castell  الوان خشب مائيه 12",
+        "price": 148.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "0720307000024",
+        "name": "Faber castell  الوان خشب مائيه 24 لون",
+        "price": 297.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8681241106083",
+        "name": "Faber castell COLOUR PENCILS   الوان خشب عادي 24",
+        "price": 199.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "8681241072975",
+        "name": "Faber castell COLOUR PENCILS   الوان خشب عادي 12",
+        "price": 99.0,
+        "quantity": 33
+    },
+    {
+        "barcode": "8681241099057",
+        "name": "Faber castell COLOUR PENCILS   الوان خشب 12 جامبو",
+        "price": 185.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "4005402013975",
+        "name": "faber castell   رول تلوين 3 متر",
+        "price": 280.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8690826119936",
+        "name": "Faber castell  شنطة الوان متعدده",
+        "price": 558.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4005402015450",
+        "name": "Faber castell  الوان خشب جريب 10+3 ميتاليك",
+        "price": 220.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4005402019106",
+        "name": "faber castell  الوان خشب 12 باستل سباركل صاج",
+        "price": 440.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6941288739111",
+        "name": "KEYROAD COLOUR PENCILS   الوان خشب 12",
+        "price": 88.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6954884546854",
+        "name": "KEYROAD COLOUR PENCILS    الوان خشب 24",
+        "price": 165.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4007817015551",
+        "name": "STAEDTLEAR COLOUR PENCILS   الوان خشب 24",
+        "price": 270.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511425159",
+        "name": "CARIOCA COLOUR PENCILS    الوان خشب مثلثه 12",
+        "price": 118.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "8003511403812",
+        "name": "CARIOCA COLOUR PENCILS    الوان خشب 24",
+        "price": 235.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511427955",
+        "name": "CARIOCA  COLOUR PENCILS  الوان خشب 36",
+        "price": 275.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511427870",
+        "name": "CARIOCA COLOUR PENCILS   الوان خشب 24",
+        "price": 190.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8003511427931",
+        "name": "CARIOCA  COLOUR PENCILS  الوان خشب 12",
+        "price": 95.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511429881",
+        "name": "CARIOCA  الوان بريحه و ختامه 8",
+        "price": 250.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511431822",
+        "name": "CARIOCA  الوان ماجيك 10",
+        "price": 180.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "8003511427535",
+        "name": "CARIOCA BIRELLO  الوان فلوماستر 12",
+        "price": 190.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8003511430320",
+        "name": "CARIOCA الوان فلوماستر باستل 8",
+        "price": 180.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8003511422691",
+        "name": "CARIOCA  ( 6 ) pens (12)colors الوان فلوماستر لونين",
+        "price": 120.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511429379",
+        "name": "CARIOCA  الوان فلوماستر فرشه 10",
+        "price": 190.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4007817315361",
+        "name": "STAEDTLER  الوان فلوماستر جامبو 12",
+        "price": 275.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511405663",
+        "name": "CARIOKA  الوان فلوماستر جامبو 18",
+        "price": 250.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8003511405694",
+        "name": "CARIOKA  الوان فلوماستر جامبو 12",
+        "price": 170.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8003511405687",
+        "name": "CARIOCA  الوان فلوماستر جامبو 6",
+        "price": 110.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "8003511405496",
+        "name": "CARIOCA  الوان فلوماستر 6",
+        "price": 75.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511406158",
+        "name": "CARIOCA JOY  الوان فلوماستر 24",
+        "price": 210.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8412027000512",
+        "name": "JOVI  الوان مائيه 6",
+        "price": 120.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8003511054014",
+        "name": "CARIOCA  الوان مائيه 24",
+        "price": 220.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8003511040017",
+        "name": "CARIOCA  الوان مائيه 12",
+        "price": 135.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6972332442787",
+        "name": "ANDLOSYA  الوان مائيه 16",
+        "price": 35.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6972332442770",
+        "name": "ANDLOSYA  الوان مائيه 12",
+        "price": 35.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "8690826250080",
+        "name": "FABER CASTELL  الوان مائيه 8",
+        "price": 85.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "8003511428785",
+        "name": "CARIOCA  اقلام وايت بورد 4",
+        "price": 100.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "8003511429218",
+        "name": "CARIOCA  اقلام وايت بورد 6",
+        "price": 150.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "8003511409562",
+        "name": "CARIOCA  الوان ملابس 6",
+        "price": 175.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "8003511429201",
+        "name": "CARIOCA  اقلام وايت بورد 8",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8003511429096",
+        "name": "CARIOCA  الوان ملابس 10",
+        "price": 220.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4005401595076",
+        "name": "FABER CASTELL   قلم ملابس",
+        "price": 60.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221237955770",
+        "name": "KEYROAD   باستل بوستر 6 قلم تخين",
+        "price": 190.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221237955763",
+        "name": "KEYROAD   ميتاليك بوستر قلم تخين 6",
+        "price": 190.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6941288711933",
+        "name": "KEYROAD  الوان خشب ميتاليك 6",
+        "price": 45.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6941288711957",
+        "name": "KEYROAD   الوان خشب باستل 6",
+        "price": 35.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6941288711940",
+        "name": "KEYROAD NEON   الوان خشب فسفوري 6",
+        "price": 30.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4007817241059",
+        "name": "STAEDTLER   اويل باستل 16 قلم",
+        "price": 220.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4006608200787",
+        "name": "STAEDTLER   اويل باستل 12",
+        "price": 220.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8801456170710",
+        "name": "DONG-A   اويل باستل 24",
+        "price": 115.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8006919000744",
+        "name": "PRIMO   شمع مثلث 6",
+        "price": 60.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "8006919000737",
+        "name": "PRIMO  شمع مثلث 12",
+        "price": 110.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8003511001162",
+        "name": "CARIOCA 12الوان اكريليك",
+        "price": 220.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "8412027001038",
+        "name": "JOVI  صلصال 15 قطعه",
+        "price": 240.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8412027001014",
+        "name": "JOVI  صلصال 6 قطعه",
+        "price": 115.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8412027002875",
+        "name": "JOVI  صلصال بالقطعه",
+        "price": 32.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "8901180208915",
+        "name": "FABER CASTELL  صلصال 8 قطع",
+        "price": 38.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8901180208922",
+        "name": "FABER CASTELL  صلصال 12 قطعه",
+        "price": 60.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "8901180208939",
+        "name": "FABER CASTELL  صلصال 8 قطع باشكال",
+        "price": 79.0,
+        "quantity": 27
+    },
+    {
+        "barcode": "8901180208946",
+        "name": "FABER CASTELL   صلصال 12 قطعه باشكال",
+        "price": 89.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6222024079006",
+        "name": "PEEKABOO  صلصال بالقطعه",
+        "price": 17.5,
+        "quantity": 4
+    },
+    {
+        "barcode": "4005404816208",
+        "name": "FABER CASTELL  طقم 4 فرشه",
+        "price": 165.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8901180144022",
+        "name": "FABER CASTELL  طقم 4 فرشه",
+        "price": 150.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6941288711667",
+        "name": "KEYROAD  طقم 5 فرشه",
+        "price": 95.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6941288724278",
+        "name": "KEYROAD   طقم 4 فرشه",
+        "price": 75.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6941288711674",
+        "name": "KEYROAD   طقم فرش اشكال",
+        "price": 80.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221237955701",
+        "name": "KEYROAD  طقم فرش اطفال 3 قطع",
+        "price": 120.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "9555684614520",
+        "name": "FABER CASTELL  طقم الوان  جاف 10",
+        "price": 190.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4007817888018",
+        "name": "STAEDTLER   الوان مائيه 12",
+        "price": 340.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "X002ECZTK1",
+        "name": "CARIOCA   اويل باستل 12",
+        "price": 155.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8003511428150",
+        "name": "CARIOCA   الوان فلوماستر امنه علي الاطفال",
+        "price": 300.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559293699",
+        "name": "BODY MIST  BATH & BODY   بخاخ عطري 125 مل",
+        "price": 390.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "667559294139",
+        "name": "BATH & BODY LOTION (a thousand wishes)  باث & بودي بودي لوشن",
+        "price": 390.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559293675",
+        "name": "BATH & BODY WORKS CREAM (a thousand wishes )   بودي كريم باث & بودي",
+        "price": 390.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "896364002930",
+        "name": "OLAPLEX  no8   اولابليكس رقم 8",
+        "price": 1250.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "8809598452350",
+        "name": "COSRX CLEANSER GEL (150)ml   كوزركس جل منظف",
+        "price": 990.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "769915191004",
+        "name": "ORDINARY  AHA 30% BHA 2%   مقشر",
+        "price": 950.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "769915194951",
+        "name": "ORDINARY   Niacinamide 10% + Zink 1%",
+        "price": 999.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "667556804416",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml(a thousand wishes)",
+        "price": 850.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "769915233490",
+        "name": "ORDINARY  hyaluronic Acid 2% + B5  حمض الهيلارونك",
+        "price": 850.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "769915190977",
+        "name": "ORDINARY  Glycolic Acid 7% toning solution    سائل تناغم البشره",
+        "price": 999.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "769915193862",
+        "name": "ORDINARY  Salicylic Acid  2%   حمض الساليسيك",
+        "price": 999.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "769915194043",
+        "name": "ORDINARY  Retinol 1%   حمض الريتنول",
+        "price": 1150.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "8809409342382",
+        "name": "MEDI-PEEL CREEM   كريم ترطيب",
+        "price": 350.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6925466291530",
+        "name": "MAYCREATE  SPRAY    سبراي مرطب",
+        "price": 300.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6971764150130",
+        "name": "DR.RASHEL  VITAMIN-C     محلول فيتامين سي",
+        "price": 200.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4897066420189",
+        "name": "VIVIPROPROFESSIONAL MAKE UP HD CONCEALER",
+        "price": 400.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4800888196514",
+        "name": "REXONA - DOVE   مزيل عرق",
+        "price": 180.0,
+        "quantity": 41
+    },
+    {
+        "barcode": "8690604081431",
+        "name": "FLORMAR EYE LINER",
+        "price": 30.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6903072262205",
+        "name": "KLSS BEAUTY BROW SET",
+        "price": 120.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6972760826623",
+        "name": "KAPEINE EYE SHADOW",
+        "price": 240.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221105413142",
+        "name": "CYBELE EYE SHADOW",
+        "price": 150.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6931904283494",
+        "name": "SENSORY PARTY BLUSHER POWDER STICK",
+        "price": 195.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6975711050221",
+        "name": "XIAOYUMI BLUSHER BOWDER",
+        "price": 180.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6942344602127",
+        "name": "SHAQINUO POWDER BLUSHER STICK",
+        "price": 120.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "077802006660",
+        "name": "WET N WILD CREME LIPLINER PENCIL",
+        "price": 50.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "3607342923904",
+        "name": "RIMMEL MASCARA EXTRA 3D LASH",
+        "price": 165.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "5012874101054",
+        "name": "RIMMEL MASCARA EXTRA SUPER LASH",
+        "price": 185.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "8714100597347",
+        "name": "VASELINE LIP THERAPY (20g)",
+        "price": 150.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8718114642871",
+        "name": "VASELINE LIP THERAPY (20g) cocoa butter",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602779",
+        "name": "ESSENTIALS BLUSH STLCK (BLUSH )",
+        "price": 140.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602816",
+        "name": "ESSENTIALS BLUSH STICK (PEACH SUNSET )",
+        "price": 140.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6224010602809",
+        "name": "ESSENTIALS BLUSH STICK (DARK RUBY)",
+        "price": 140.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602762",
+        "name": "ESSENTIALS BLUSH STICK (CANDY ROSE)",
+        "price": 140.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602830",
+        "name": "ESSENTIALS SHIMMER BALM (PINK)",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602847",
+        "name": "ESSENTIALS SHIMMER BALM(GOLD)",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602977",
+        "name": "ESSENTIALS GLOSS TEMPTATION (REDWOOD)",
+        "price": 250.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224010602670",
+        "name": "ESSENTIALSGLOSS TEMPTATION (BARBIE PINK)",
+        "price": 250.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224010602311",
+        "name": "ESSENTIALS GLOSS TEMPTATION (MOON GLAZE)",
+        "price": 250.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224010602335",
+        "name": "ESSENTIALS GLOSS TEMPTATION (MOCHA)",
+        "price": 250.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6224010602953",
+        "name": "ESSENTIALS GLOSS TENPTATION (ROSEWOOD)",
+        "price": 250.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010602731",
+        "name": "ESSENTIALS GLOSS TEMPTATION (RUSTY BROWN)",
+        "price": 250.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "3378872105602",
+        "name": "SEPHORA EYEBROW",
+        "price": 320.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6922965190685",
+        "name": "EVER BEAUTY 3D TATTOO EYELINER",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221105002476",
+        "name": "CYBELE DESIRE SUPERSTAY SUPEMATTE LIPSTICK (NUDE)",
+        "price": 220.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6221105002537",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (CARAMEL NUDE)",
+        "price": 220.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221105002551",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (TERRACOTTA)",
+        "price": 220.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221105002407",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (NUDE ROSE)",
+        "price": 220.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221105002490",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (BURLY WOOD)",
+        "price": 220.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221105002544",
+        "name": "CYBELE DESIRE SUPERSTAY SUERMATTE LIPSTICK (MAHOGANY)",
+        "price": 220.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221105002438",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPTICK (RASPBERRY)",
+        "price": 220.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221105002513",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (FUSCHIA)",
+        "price": 220.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221105002421",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (CITY RED)",
+        "price": 220.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6221105002469",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSLICK (DARK MAGENTA)",
+        "price": 220.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6223003241872",
+        "name": "TANK BOTTLE 750ML",
+        "price": 140.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223003245283",
+        "name": "TANK TRITAN BOTTLE 800ML",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223003245290",
+        "name": "TANK TRITAN BOTTEL 800ML",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788109",
+        "name": "TANK SUPER COOL MINI 650ML",
+        "price": 190.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6223003244194",
+        "name": "TANK TRITAN BOTTEL 550ML",
+        "price": 110.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223003244187",
+        "name": "TANK TRITAN BOTTEL550(PINK)",
+        "price": 110.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "8699038117310",
+        "name": "HEREVIN WATER BOTTEL 750ML",
+        "price": 120.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "8699038117334",
+        "name": "HEREVIN WATER BOTTEL750ML",
+        "price": 120.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6221133012355",
+        "name": "DESIGN ORIGINALS WORLD TRAVELER COLORING BOOK",
+        "price": 160.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133008358",
+        "name": "ADULT COLORING STRESS RELIEVING PATTERNS",
+        "price": 250.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221133021999",
+        "name": "DESIGN ORIGINALS UNICORNS NOTEBOOK DOODLES COLORING&ACTIVITY BOOKكتاب تلوين يوني كورن",
+        "price": 200.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133021432",
+        "name": "DESIGN ORIGINALS AMAZING ME NOTEBOOKDOODLES COLORING&ACTIVITY BOOKكتاب تلوين مدهش",
+        "price": 200.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221133340342",
+        "name": "DISNEY TIGGER &POOH COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133013147",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221133008006",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133007146",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133009140",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133008280",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133013154",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221133008013",
+        "name": "DISNEY COLORING BOOK",
+        "price": 75.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6223003097455",
+        "name": "PRIMA WHITEBOARD MARKER(red)",
+        "price": 10.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6223003097448",
+        "name": "PRIMA WHITEBOARD MARKER (black)",
+        "price": 10.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "6223003099442",
+        "name": "PRIMA WHITEBOARD MARKER (green)",
+        "price": 10.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "9556452012807",
+        "name": "YOSOGO WHITEBOARD MARKER (red)",
+        "price": 15.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "8003511304201",
+        "name": "CARIOCA WGITEBOARD MARKER",
+        "price": 25.0,
+        "quantity": 44
+    },
+    {
+        "barcode": "9557007512094",
+        "name": "UNK 500 WHIEBOARD MARKER (red)",
+        "price": 15.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "9557007130007",
+        "name": "UNIK 310 WHITEBOARD",
+        "price": 8.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "6224007206201",
+        "name": "ROTO WHITEBOARD MARKER",
+        "price": 10.0,
+        "quantity": 27
+    },
+    {
+        "barcode": "4902778511282",
+        "name": "UNI CORRECTION PEN",
+        "price": 60.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6950126118032",
+        "name": "ANDLOSYA GROUP CORRECTION PENاندلوسيه كوريكتور",
+        "price": 7.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "9557007912092",
+        "name": "UNIK 90 PERMANENT MARKER",
+        "price": 15.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "4007817321492",
+        "name": "STAEDTLER PERMANENT MARKER (blue)",
+        "price": 45.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "4007817049778",
+        "name": "STAEDTLER TEXTSURFER CLASSIC",
+        "price": 35.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "3086129999750",
+        "name": "BIC PERMANENT MARKER",
+        "price": 45.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4005401504511",
+        "name": "FABER CASTELL PERMANENT",
+        "price": 45.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4988427390316",
+        "name": "YOKEN CALLIGRAPHY PEN",
+        "price": 40.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4988427390293",
+        "name": "YOKEN CALLIGRAPHY PEN",
+        "price": 40.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4902505511196",
+        "name": "PILOT PERMANENT MARKER 400",
+        "price": 45.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4902505511110",
+        "name": "PILOT PERMANENT MARKER 100",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224007206072",
+        "name": "ROTO FINELINER",
+        "price": 10.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "4902778254745",
+        "name": "UNI PIN FINE LINE",
+        "price": 47.5,
+        "quantity": 11
+    },
+    {
+        "barcode": "4005401554882",
+        "name": "FABER CASTELL FINE LINE",
+        "price": 30.0,
+        "quantity": 39
+    },
+    {
+        "barcode": "6976164377125",
+        "name": "POWER COLOUR PENCILS",
+        "price": 35.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6943572700050",
+        "name": "COCO ERASER",
+        "price": 4.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "8906073771002",
+        "name": "DOMS POSTER COLOURS (6)",
+        "price": 130.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8904411808625",
+        "name": "DOMS ACRYLIC COLOURS (6)",
+        "price": 130.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8801456191159",
+        "name": "DONG-A DOOLY POSTER COLORS (6)",
+        "price": 152.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8801456191166",
+        "name": "DONG-A DOOLY POSTER COLORS (12)",
+        "price": 300.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8901180105016",
+        "name": "FAPER CASTELL FABRIC COLOURS CLASSIC (6)",
+        "price": 175.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6223003094645",
+        "name": "PRIMA MECHANICAL PENCILLEADS 2B/0.5MM",
+        "price": 10.0,
+        "quantity": 31
+    },
+    {
+        "barcode": "6223003094522",
+        "name": "PRIMA MECHANICAL PENCIL LEADS HB/0.9",
+        "price": 10.0,
+        "quantity": 33
+    },
+    {
+        "barcode": "6223003094614",
+        "name": "PRIMA MECHANICAL PENCIL LEADS B/0.7",
+        "price": 10.0,
+        "quantity": 66
+    },
+    {
+        "barcode": "8802203018255",
+        "name": "DONG-A XQ MECHANICAL PENCIL LEADS 2B/0.9",
+        "price": 10.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4007817304648",
+        "name": "STAEDTLER PERMANENT  MARKER (black)",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6942109517215",
+        "name": "M&G MECHANICAL PENCIL LEADS B/0.7",
+        "price": 10.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6942109517420",
+        "name": "M&G MECHANICAL PENCIL LEADS HB/0.7",
+        "price": 10.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "8802203018200",
+        "name": "XQ MECHANICAL PENCIL LEADS B/0.5MM",
+        "price": 10.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "8802203018170",
+        "name": "XQ MECHANICAL PENCIL LEADS HB/0.5",
+        "price": 10.0,
+        "quantity": 54
+    },
+    {
+        "barcode": "4007817777015",
+        "name": "STAEDTLER MECHANICAL PENCIL (0.5)",
+        "price": 50.0,
+        "quantity": 40
+    },
+    {
+        "barcode": "4007817777084",
+        "name": "STAEDTLER MECHANICAL PENCIL(0.5)",
+        "price": 50.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "6941025152074",
+        "name": "M&G MECHANICAL PENCIL (0.7)",
+        "price": 25.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6941025152050",
+        "name": "M&G MECHANICAL PENCIL (0.5)",
+        "price": 25.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4007817771020",
+        "name": "STAEDTLER MECHANICAL PENCIL (1.3)",
+        "price": 99.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6936965458478",
+        "name": "M&G MECHANICAL PENCIL (0.7)",
+        "price": 45.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6933256618573",
+        "name": "FABER CASTELL MECHANICAL PENCIL (0.7)",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6933256618566",
+        "name": "FABER CASTELL MECHANICAL (0.5)",
+        "price": 45.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "3501178407709",
+        "name": "ROTRING TIKKY GRIP MECHANICAL (0.7)",
+        "price": 185.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "3501170770504",
+        "name": "ROTRING TIKKY MECHANICAL (0.5)",
+        "price": 185.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "3501170770542",
+        "name": "ROTRING TIKKY GRIP MECHANICAL (0.5)",
+        "price": 185.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4902778913949",
+        "name": "UNI-BALL MITSUBISHI PENCIL (FINE)",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4902778913765",
+        "name": "UNI-BALL MITSUBISHI PENCIL (MICRO)",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4902778914014",
+        "name": "UNI-BALL MITSUBISHI PENCIL ORANGE (FINE)",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4902778913956",
+        "name": "UNI-BALL MITSUBISHI PENCIL BLUE (FINE)",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4902778913994",
+        "name": "UNI-BALL MITSUBISHI PENCIL LIGHT BLUE (FINE)",
+        "price": 50.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4902778914021",
+        "name": "UNI-BALL MITSUBISHI PENCIL WINE RED (FINE)",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221105410929",
+        "name": "CYBELE JUMBO MATIC CONCEALER (01 LIGHT BEIGE)",
+        "price": 160.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8854500000556",
+        "name": "KIDDY CLAY (160G)كيدي صلصال",
+        "price": 25.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "8901180703014",
+        "name": "FABER-CASTELL CRAFT SCISSORS (3CUTS)فابر كاسل مقص",
+        "price": 155.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8901180702017",
+        "name": "FABER-CASTELL CRAFT SCISSORS (2CUTS)فابر كاسل مقص",
+        "price": 110.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "8901180701027",
+        "name": "FABER-CASTELL EASY CUT SCISSORS فابر كاستل مقص",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8901180701034",
+        "name": "FABER-CASTELL CLEAN CUT SCISSORSفابر كاستل مقص",
+        "price": 60.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "2568546816564",
+        "name": "HAMU HAMU SCISSORSمقص",
+        "price": 17.5,
+        "quantity": 4
+    },
+    {
+        "barcode": "6954884578527",
+        "name": "KEYROAD KIDS PRO SCISSORS  كيروود مقص اطفال",
+        "price": 35.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6954884578510",
+        "name": "KEYROAD KIDS PRO SCISSORS كيروود مقص اطفال",
+        "price": 35.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6954884598853",
+        "name": "KEYROAD SNIP SNAP SCISSORSكيروود مقص اطفال",
+        "price": 95.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221133023658",
+        "name": "MAAT COLORING BOOKماعت كتاب تلوين",
+        "price": 110.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4895224182863",
+        "name": "PLAY TIVE COLOURING BOOK WITH WATER PEN",
+        "price": 95.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6926646800900",
+        "name": "TODAYS PERMANENT MARKER",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6921734940759",
+        "name": "DELI THINK PERMANENT MARKER",
+        "price": 30.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224007206041",
+        "name": "ROTO PERMANENT MARKER",
+        "price": 10.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "6223003094690",
+        "name": "PRIMA PERMANENT MARKER",
+        "price": 10.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4007817328859",
+        "name": "STAEDTLER WHITEBOARD MARKER",
+        "price": 45.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4007817314203",
+        "name": "STAEDTLER WHITEBOARD MARKER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6222004199601",
+        "name": "MIGOS ELASTIC PLASTER (20 PCS)",
+        "price": 30.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6222004100423",
+        "name": "MIGOS UNIVERSAL PLASTER (20 PCS)",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6223003734008",
+        "name": "URE-AID PLASTER FOR KIDS (20 PCS)",
+        "price": 40.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "6222023896901",
+        "name": "URE-AID WATERPROOF (10 PCS)",
+        "price": 35.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6941288725886",
+        "name": "KEYROAD HIGHLGHTER",
+        "price": 20.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6941288725985",
+        "name": "KEYROAD HIGHLIGHTER (purple)",
+        "price": 20.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6941288725923",
+        "name": "KEYROAD HIGHLIGHTER(green)",
+        "price": 20.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4549526608773",
+        "name": "CASIO FX-991 ES PLUS",
+        "price": 1150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4549526608667",
+        "name": "CASIO FX-82ES PLUS",
+        "price": 895.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4549526608735",
+        "name": "CASIO FX-95ES PLUS",
+        "price": 1150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4971850091387",
+        "name": "CASIO HL-815L",
+        "price": 190.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4971850091400",
+        "name": "CASIO HL-815",
+        "price": 190.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4971850091486",
+        "name": "CASIO HL-4A",
+        "price": 175.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4971850169291",
+        "name": "CASIO HL-820LV",
+        "price": 199.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4971850094340",
+        "name": "CASIO HL-820LV",
+        "price": 199.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4971850094296",
+        "name": "CASIO LC-160LV",
+        "price": 215.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4549526608759",
+        "name": "CASIO FX-570ES PLUS",
+        "price": 1150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6222016407992",
+        "name": "ANDLOSYA GROUP (424-2)",
+        "price": 95.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6222016407985",
+        "name": "ANDLOSYA GROUP (424-3)",
+        "price": 105.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8888021205077",
+        "name": "ENERGIZER ALKALINE POWER (AA2)",
+        "price": 85.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "8888021205398",
+        "name": "ENERGIZER ALKALINE POWER (AAA2)",
+        "price": 85.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6223001580256",
+        "name": "EVEREADY SUPER HEAVY DUTY (AA)4PACK",
+        "price": 60.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "6223001580270",
+        "name": "EVEREADY SUPER HEAVY DUTY (AAA) 4PACK",
+        "price": 60.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "6223001580485",
+        "name": "EVEREADY HEAVY DUTY (AA)4 PACK",
+        "price": 50.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "6223001580874",
+        "name": "EVEREADY HEAVY DUTY (AAA)4 PACK",
+        "price": 50.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "4971850092766",
+        "name": "CASIO SX-300P",
+        "price": 549.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4549526604379",
+        "name": "CASIO MP-12R",
+        "price": 950.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4549526600401",
+        "name": "CASIO  MJ-120D PLUS",
+        "price": 800.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4971850089278",
+        "name": "CASIO MJ-12D",
+        "price": 800.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4971850091677",
+        "name": "CASIO MH-12",
+        "price": 799.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4549526614002",
+        "name": "CASIO FX-991 ES PLUS PINK",
+        "price": 1149.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4549526617065",
+        "name": "CASIO SL-310UC",
+        "price": 499.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4549526603754",
+        "name": "CASIO SL-310UC -YG",
+        "price": 499.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4549526603785",
+        "name": "CASIO SL-310-GN",
+        "price": 499.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6223003097189",
+        "name": "PRIMA COLOURED PENS (8)",
+        "price": 30.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "6223003097196",
+        "name": "PRIMA COLOURED PENS (12)",
+        "price": 45.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6223003094768",
+        "name": "PRIMA COLOURED PENS (5)",
+        "price": 20.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "8692404100718",
+        "name": "PENSAN TRIBALL COLOURED PENS (8)",
+        "price": 100.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4007817048245",
+        "name": "STAEDTLER MARS LUMOGRAPH JUMBO (4B)",
+        "price": 65.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4007817048238",
+        "name": "STAEDTLER MARS LUMOGRAPH JUMBO (2B)",
+        "price": 65.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4007817048221",
+        "name": "STAEDTLER MARS LUMOGRAPH JUMBO",
+        "price": 65.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4005401119005",
+        "name": "FABER-CASTELL JUMBO GRIP PENCIL",
+        "price": 65.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "4005401193043",
+        "name": "FABER-CASTELL JUMBO PENCIL(4B)",
+        "price": 55.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4711678073741",
+        "name": "Y-PLUS JUMBO PENCIL (HB)",
+        "price": 20.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6959023914976",
+        "name": "PENGUIN JUMBO TRIPPED PENCIL",
+        "price": 20.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6954884599782",
+        "name": "KEYROAD JUMBO PENCIL (HB)",
+        "price": 13.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "8003511433406",
+        "name": "CARIOCA TITA COLORED PENCILS (12)",
+        "price": 120.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8003511321437",
+        "name": "CARIOCA PENCIL (HB2)كاريوكا قلم رصاص",
+        "price": 8.5,
+        "quantity": 110
+    },
+    {
+        "barcode": "8003511321420",
+        "name": "CARIOCA PENCIL (B1)",
+        "price": 8.5,
+        "quantity": 91
+    },
+    {
+        "barcode": "8003511321451",
+        "name": "CARIOCA PENCIL (H3)",
+        "price": 8.5,
+        "quantity": 33
+    },
+    {
+        "barcode": "8003511321413",
+        "name": "CARIOCA PENCIL (2B)",
+        "price": 8.5,
+        "quantity": 106
+    },
+    {
+        "barcode": "8681241073552",
+        "name": "FABER-CASTELL PENCIL (B)",
+        "price": 8.5,
+        "quantity": 44
+    },
+    {
+        "barcode": "8681241073514",
+        "name": "FABER-CASTELL PENCIL (HB)",
+        "price": 8.5,
+        "quantity": 27
+    },
+    {
+        "barcode": "8681241073590",
+        "name": "FABER-CASTELL PENCIL (2B)فابر كاستل قلم رصاص بأستيكه",
+        "price": 8.5,
+        "quantity": 42
+    },
+    {
+        "barcode": "8681241073392",
+        "name": "FABER-CASTELL PENCIL (HB)فابر كاستل قلم رصاص",
+        "price": 8.0,
+        "quantity": 65
+    },
+    {
+        "barcode": "8681241073477",
+        "name": "FABER-CASTELL PENCIL (2B)فابر كاستل قلم رصاص",
+        "price": 8.0,
+        "quantity": 93
+    },
+    {
+        "barcode": "6938247137972",
+        "name": "VIOLIN PENCILS (HB)قلم رصاص",
+        "price": 3.0,
+        "quantity": 54
+    },
+    {
+        "barcode": "1",
+        "name": "test",
+        "price": 100.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6221105002445",
+        "name": "CYBELE DESIRE SUPERSTAY SUPERMATTE LIPSTICK (Cranberry)",
+        "price": 220.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6951201522416",
+        "name": "TOY STICKERS",
+        "price": 10.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "3378872126362",
+        "name": "SEPHORA VIVID EARTH EYE PAIETTE",
+        "price": 650.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3378872126355",
+        "name": "SEPHORA VIVID EARTH EYE PAIETTE",
+        "price": 650.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4005401314820",
+        "name": "FABER CASTELL MECHANICAL (1.4)",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4005401314844",
+        "name": "FABER CASTELL MECHANICAL(1.4)pink",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "9023800208392",
+        "name": "KORES whiteboard marker",
+        "price": 55.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4005401548072",
+        "name": "FABER CASTELL HIGHLIGHTER  فابر كاستل هايلايتر",
+        "price": 25.0,
+        "quantity": 183
+    },
+    {
+        "barcode": "4007817011454",
+        "name": "STAEDTLER NORIS COLOUR (12)ستدلر الوان خشب",
+        "price": 165.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8003511427863",
+        "name": "CARIOCA TITA triangular (12)كاريوكا الوان خشب",
+        "price": 95.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6223003099404",
+        "name": "PRIMA COLOUR PENCILS (12)  بريما الوان خشب",
+        "price": 20.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6223003099527",
+        "name": "PRIMA COLOUR PENCILS (12)بريما الوان خشب",
+        "price": 15.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "4005401516101",
+        "name": "FABER CASTELL GRIP FINEPEN (10)فابر كاستل فاين لاين",
+        "price": 300.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4005401546047",
+        "name": "FABER CASTELL HIGHLIGHTER (4)فابر كاستل طقم هايلايتر",
+        "price": 120.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4005401546610",
+        "name": "FABER CASTELL highlighter metallic فابر كاسل هايلايتر ميتاليك",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4005401546672",
+        "name": "FABER CASTELL HIGHLIGHTER PASTELLفابر كاستل هايلايتر باستل",
+        "price": 30.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "9556089005876",
+        "name": "FABER CASTELL HIGHLIGHTER MARKER فابر كاستل هايلايتر رفيع",
+        "price": 30.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "8003511428686",
+        "name": "CARIOCA MINI HIGHLIGHTER (4) كاريوكا ميني هايلايتر",
+        "price": 110.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "8003511430986",
+        "name": "CARIOCA MEMOLIGHT (4) كاريوكا هايلايتر",
+        "price": 140.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788930",
+        "name": "SPOTLINER GIGHLIGHTER سبوت لاينر هايلايتر",
+        "price": 10.0,
+        "quantity": 27
+    },
+    {
+        "barcode": "6953571200772",
+        "name": "ZUIXUA COLOUR  GEL INK BEN 0.5(12)الوان جاف",
+        "price": 130.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4455667788906",
+        "name": "BIC brite liner highlighter بيك هايلايتر",
+        "price": 30.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4455667788907",
+        "name": "MOLIN FAINELINER  مولين سن ريشه 0.4",
+        "price": 25.0,
+        "quantity": 28
+    },
+    {
+        "barcode": "6954884577681",
+        "name": "KEYROAD FIBER MARKER (12) كيرود الوان فلوماستر",
+        "price": 55.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6954884578558",
+        "name": "KEYROAD FIBER MARKER (6)كيرود الوان فلوماستر",
+        "price": 30.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6223003090593",
+        "name": "PRIMA FIBER MARKER (6)بريما الوان فلوماستر",
+        "price": 35.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6971479810114",
+        "name": "KEEP SMILING ACRYLIC COLOR (12)الوان اكريليك",
+        "price": 150.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8003511427474",
+        "name": "CARIOCA ACQUARELL(12)كاريوكا فلوماستر",
+        "price": 165.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6941288711711",
+        "name": "KEYROAD FLAT PLASTIC BRUSH (3)كيروود فرش",
+        "price": 45.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "8901180292242",
+        "name": "FABER CASTELL WAX CRAYONS (24) فابر كاستل الوان شمع",
+        "price": 165.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8901180240120",
+        "name": "FABER CASTELL JUMBO WAX CRAYONS (12)فابر كاستل الوان شمع جامبو",
+        "price": 109.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "8901180200506",
+        "name": "FABER CASTELL WAX CRAYONS (16) فابر كاستل الوان شمع",
+        "price": 69.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "2395584286691",
+        "name": "WKW COLORED SAND (250)mlرمله ملونه",
+        "price": 35.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "3720749361219",
+        "name": "WKW COLORED SAND (500)ml رمله ملونه",
+        "price": 65.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6986156001556",
+        "name": "bRIVER ROCKS COLORED SAND (250g) رمله ملونه",
+        "price": 40.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4455667788931",
+        "name": "MOVING CIAY SAND (500g) صلصال رملي",
+        "price": 175.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4455667788932",
+        "name": "COLOURED SAND FOR CHILDREN (100g) صلصال رملي",
+        "price": 40.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "2213478194614",
+        "name": "WKW COLORED GLITTER (150)mlجليتر الوان",
+        "price": 40.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788933",
+        "name": "CARIOCA STAMPERELLO كاريوكا قلم فلوماستر بختامه",
+        "price": 30.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6975254198534",
+        "name": "باكيت فوم عادي A4",
+        "price": 25.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6975254198541",
+        "name": "باكيب فوم جليتر",
+        "price": 40.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788934",
+        "name": "فرخ فوم A4 جليتر",
+        "price": 8.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "6220100456901",
+        "name": "تايجر فوم اشكال",
+        "price": 10.0,
+        "quantity": 46
+    },
+    {
+        "barcode": "6199439002076",
+        "name": "داي ارت فوم اشكال DAY ART",
+        "price": 15.0,
+        "quantity": 55
+    },
+    {
+        "barcode": "6902345020528",
+        "name": "DAY TOYS cute cartoon hand glasses نضاره وفوم",
+        "price": 25.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6923543205142",
+        "name": "CRAFT MATERIAL فوم شكل انسان",
+        "price": 65.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8901180712207",
+        "name": "FABER CASTELL grip ruler (30cm)فابر كاسل مسطره",
+        "price": 20.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "8901180706404",
+        "name": "FABER CASTELL lineal ruler (15cm)فابر كاسل مسطره",
+        "price": 15.0,
+        "quantity": 23
+    },
+    {
+        "barcode": "8901180635049",
+        "name": "FABER CASTELL (4)فابر كاسل ادوات هندسيه",
+        "price": 40.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4711678077053",
+        "name": "Y-PLUS ruler 4in1 (30cm)",
+        "price": 83.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4711678080275",
+        "name": "Y-PLUS maths set (8)",
+        "price": 185.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6941288743439",
+        "name": "KEYROAD maths set",
+        "price": 110.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6942375480039",
+        "name": "AOSDU maths set",
+        "price": 55.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "6941507536118",
+        "name": "SHUANG HONG maths set",
+        "price": 55.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788926",
+        "name": "PRECISION CHENCHI COMPAS",
+        "price": 35.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "8901269007002",
+        "name": "ADORO RULER (30cm)ادورو مسطره",
+        "price": 15.0,
+        "quantity": 33
+    },
+    {
+        "barcode": "4455667788921",
+        "name": "QUEEN RULER كوين مسطره فن",
+        "price": 7.0,
+        "quantity": 41
+    },
+    {
+        "barcode": "6934563000099",
+        "name": "MIMISHU RULER (20cm)مسطره",
+        "price": 10.0,
+        "quantity": 82
+    },
+    {
+        "barcode": "6223003098728",
+        "name": "P{RIMA RULER (20cm)بريما مسطره مربعات",
+        "price": 5.0,
+        "quantity": 46
+    },
+    {
+        "barcode": "6223003098778",
+        "name": "PRIMA NEON ROLER (20cm) بريما مسطره نيون",
+        "price": 5.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "6223003095840",
+        "name": "PRIMA RULER (20cm)بريما مسطره بماسك",
+        "price": 10.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "6955741980200",
+        "name": "FUTURE RULER (20cm) مسطره سيليكون",
+        "price": 5.0,
+        "quantity": 28
+    },
+    {
+        "barcode": "4455667788925",
+        "name": "TANDARD RULER (30cm) مسطره مربعات",
+        "price": 5.0,
+        "quantity": 45
+    },
+    {
+        "barcode": "4455667788923",
+        "name": "METAL RULER (20cm)مطره معدن",
+        "price": 7.5,
+        "quantity": 34
+    },
+    {
+        "barcode": "4455667788924",
+        "name": "METAL RULER (30cm)مسطره معدن",
+        "price": 10.0,
+        "quantity": 28
+    },
+    {
+        "barcode": "4455667788927",
+        "name": "RULER pharaonic letters (30cm)مسطره حروف فرعونيه",
+        "price": 10.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "9555132056353",
+        "name": "TA TIAN AI RULER (30cm)مسطره سيليكون",
+        "price": 10.0,
+        "quantity": 38
+    },
+    {
+        "barcode": "6931040218336",
+        "name": "FLEXY triangle فليكسي مثلث",
+        "price": 5.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4455667788935",
+        "name": "TRIANGLE مثلث بلاستيك",
+        "price": 5.0,
+        "quantity": 46
+    },
+    {
+        "barcode": "6903104021633",
+        "name": "XIAO NI BA LULER (30cm) 3in1 مسطره سيليكون",
+        "price": 12.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6903104021626",
+        "name": "XIAO NI BA RULER (20cm)2in1 مسطره سيليكون",
+        "price": 10.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6223003095819",
+        "name": "PRIMA GONIOMETRO (12cm) بريما منقله",
+        "price": 10.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "4455667788922",
+        "name": "منقله بلاستيك لينه",
+        "price": 5.0,
+        "quantity": 70
+    },
+    {
+        "barcode": "6949830500288",
+        "name": "COKAI RULER (20cm) مسطره دوائر مقاسات مختلفه",
+        "price": 35.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6949830505832",
+        "name": "STATIONERY DESION RULER مسطره لرسم اشكال فنيه",
+        "price": 20.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8904313908553",
+        "name": "ISOMARS HUMAN FIGURE -MALE مسطره شكل انسان",
+        "price": 75.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "8906081275028",
+        "name": "ISOMARS GEOMETRICAL SHAPES  مسطره",
+        "price": 45.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788920",
+        "name": "QUEEN (ref2009)مسطره للعلوم",
+        "price": 10.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6221236545064",
+        "name": "MINTRA BATIQUE DISPLAY BOOK 40 viewsمنترا فايل",
+        "price": 44.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221236959014",
+        "name": "MINTRA BATIQUE DISPLAY BOOK 20 VIEWS منترا فايل",
+        "price": 36.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788936",
+        "name": "POWER report cover (A4)باور فايل مسطره",
+        "price": 7.0,
+        "quantity": 87
+    },
+    {
+        "barcode": "6972545170491",
+        "name": "MIDGO DISPLAY BOOK 40pockets ميدجو فايل",
+        "price": 70.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6919022800403",
+        "name": "MIDGO CLEAR BOOK  40page ميدجو فايل",
+        "price": 35.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6905174200185",
+        "name": "PLASTIC FILE",
+        "price": 44.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6972545172129",
+        "name": "S&A DOCUMENT BAG سمير وعلي فايل كبسوله",
+        "price": 25.0,
+        "quantity": 14
+    },
+    {
+        "barcode": "6223003097882",
+        "name": "PRIMA FILE بريما فايل كبسوله",
+        "price": 9.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "6223003097158",
+        "name": "PRIMA FILE بريما فايل شفاف",
+        "price": 10.0,
+        "quantity": 53
+    },
+    {
+        "barcode": "4455667788929",
+        "name": "PLASTIC FILE (pink -whait)فايل كبسوله",
+        "price": 12.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "6221129012079",
+        "name": "S&A RING BINDER سميروعلي بايندر",
+        "price": 90.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221236542766",
+        "name": "MINTRA 3 flap folder",
+        "price": 15.0,
+        "quantity": 46
+    },
+    {
+        "barcode": "6975396360295",
+        "name": "VENDE PLATE CLAMP سناده ورق",
+        "price": 40.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6972545170583",
+        "name": "فايل سوسته (A3)",
+        "price": 25.0,
+        "quantity": 45
+    },
+    {
+        "barcode": "6972545170576",
+        "name": "فايل سوسته (B4)",
+        "price": 25.0,
+        "quantity": 38
+    },
+    {
+        "barcode": "4455667788928",
+        "name": "binder بايندر صغير",
+        "price": 70.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788937",
+        "name": "binder بايندر متوسط",
+        "price": 72.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788918",
+        "name": "binder بايندر كبير",
+        "price": 90.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788919",
+        "name": "مادن فايل كبسوله",
+        "price": 12.0,
+        "quantity": 39
+    },
+    {
+        "barcode": "6221129015896",
+        "name": "S&A U FILE (80mic)",
+        "price": 3.0,
+        "quantity": 195
+    },
+    {
+        "barcode": "6221129015902",
+        "name": "S&A U FILE (110mic)",
+        "price": 4.0,
+        "quantity": 197
+    },
+    {
+        "barcode": "6936314711353",
+        "name": "POWER U FILE",
+        "price": 2.0,
+        "quantity": 279
+    },
+    {
+        "barcode": "6222002211435",
+        "name": "YASSIN U FILE (40mic)",
+        "price": 2.0,
+        "quantity": 148
+    },
+    {
+        "barcode": "4455667788101",
+        "name": "TABLET  LCD 8.5",
+        "price": 80.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788102",
+        "name": "كور فوم بيضاء 4 قطع",
+        "price": 35.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4455667788103",
+        "name": "كور فوم بيضاء 2 قطعه",
+        "price": 35.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788104",
+        "name": "كور فوم بيضاء 6 قطع",
+        "price": 25.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6221236183020",
+        "name": "MINTRA Bag 18L",
+        "price": 580.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6221236055433",
+        "name": "MINTRA Bag 10L",
+        "price": 240.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6221133014090",
+        "name": "DISNEY Bag",
+        "price": 600.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6221133014311",
+        "name": "DISNEY LUNCH Bag",
+        "price": 220.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "6221133015745",
+        "name": "DISNEY PENSIL CASE",
+        "price": 120.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "6221236094517",
+        "name": "MINTRA PENSIL CASE",
+        "price": 50.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221236055105",
+        "name": "MINTRA PENSIL CASE",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6941288727804",
+        "name": "KEYROAD PENSIL CASE كيرود مقلمه سيليكون",
+        "price": 275.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6952516905468",
+        "name": "PENCIL CASE مقلمه",
+        "price": 20.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6224009864362",
+        "name": "M-DESIGN Lunch Box (0.6L) blue",
+        "price": 100.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224009864386",
+        "name": "M-DESIGN Lunch Box (0.6L)",
+        "price": 100.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223008751321",
+        "name": "M-DESIGN Lunch Set (1.6L) Orange",
+        "price": 310.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223008751314",
+        "name": "M-DESIGN  Lunch Set (1.6L)Pink",
+        "price": 310.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223008751284",
+        "name": "M-DESIGN Lunch Set (1.1L)Pink",
+        "price": 280.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223008750898",
+        "name": "M-DESIGN Lunch Set (1.1L) Black",
+        "price": 280.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221236035558",
+        "name": "MINTRA BOX (450)ml",
+        "price": 25.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6721229112117",
+        "name": "TRAVEL SOAP BOX",
+        "price": 15.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4455667788105",
+        "name": "MINTRA BOX",
+        "price": 20.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010608122",
+        "name": "HEROPLAST Lunch Box",
+        "price": 75.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6224010608696",
+        "name": "HEROPLAST TABLET ORGANIZER",
+        "price": 95.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788106",
+        "name": "HEROPLAST GRINDER",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224010608344",
+        "name": "HEROPLAST Lemon Squeezer",
+        "price": 55.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224011813037",
+        "name": "HEROPLAST Toothbrush  Travel case علبه فرشه اسنان",
+        "price": 35.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010608450",
+        "name": "HEROPLAST shoehorn لبيسه جزم",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224009798131",
+        "name": "LAMSA PLAST 2 BOTTLE (1.5L)",
+        "price": 70.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788107",
+        "name": "LAMSA BOTTLE (1.5L)",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010608504",
+        "name": "HEROPLAST Picnic box",
+        "price": 79.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224010608726",
+        "name": "صانيه مدوره",
+        "price": 75.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224010608719",
+        "name": "HEROPLAS plate with saucers",
+        "price": 140.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224010608405",
+        "name": "6 اطباق شكل قلب",
+        "price": 75.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224010608283",
+        "name": "طبق للتسالي والتقشير",
+        "price": 105.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224011813594",
+        "name": "HEROPLAST  shelf organizer",
+        "price": 95.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224011813020",
+        "name": "HEROPLAST shelf organizer",
+        "price": 95.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4455667788108",
+        "name": "TANK super cool (650)ml",
+        "price": 200.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788968",
+        "name": "bottle acrylic (2000ml)   زجاجه اكريليك",
+        "price": 250.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788969",
+        "name": "bottle acrylic (1200ml)      زجاجه اكريليك",
+        "price": 220.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4455667788970",
+        "name": "bottle acrylic (800ml)   زجاجه اكريليك",
+        "price": 135.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "4455667788971",
+        "name": "bottle acrylic (500ml)     زجاجه اكريليك",
+        "price": 100.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4455667788972",
+        "name": "bottle acrylic (300ml)   زجاجه اكريليك",
+        "price": 70.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788973",
+        "name": "Bottle with case زجاجه بجراب",
+        "price": 115.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4895224171812",
+        "name": "bottle    زجاجه شكل قرون غزال",
+        "price": 200.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "4895224171904",
+        "name": "bottle    زجاجه بالعاب ف الغطاء",
+        "price": 200.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788976",
+        "name": "bottle    زجاجه بغطاء كوره",
+        "price": 180.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4895224171317",
+        "name": "مج بطوط  شفاف",
+        "price": 220.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4895224171300",
+        "name": "bottle    زجاجه غامقه بشفاطه",
+        "price": 200.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221133399982",
+        "name": "capybook (28)كراسه 28 ورقه صفحه وصفحه",
+        "price": 8.0,
+        "quantity": 90
+    },
+    {
+        "barcode": "6221133399975",
+        "name": "capybook (28)كراسه 28 ورقه مسطره",
+        "price": 8.0,
+        "quantity": 1028
+    },
+    {
+        "barcode": "6221133400169",
+        "name": "capybook (28)كراسه 28 ورقه سيس",
+        "price": 8.0,
+        "quantity": 33
+    },
+    {
+        "barcode": "6221133400015",
+        "name": "capybook (28)كراسه 28ورقه 9 اسطر",
+        "price": 8.0,
+        "quantity": 200
+    },
+    {
+        "barcode": "6221133399999",
+        "name": "capybook (28)كراسه 28ورقه مربعات كبيره",
+        "price": 8.0,
+        "quantity": 480
+    },
+    {
+        "barcode": "6221133400008",
+        "name": "capybook (28)كراسه 28 ورقه مربعات صغيره",
+        "price": 8.0,
+        "quantity": 80
+    },
+    {
+        "barcode": "6221133400237",
+        "name": "capybook (28)كراسه 28 ورقه 3 اسطر",
+        "price": 8.0,
+        "quantity": 220
+    },
+    {
+        "barcode": "6221133400046",
+        "name": "capybook (40)  كراسه 40 ورقه مسطر",
+        "price": 10.0,
+        "quantity": 1070
+    },
+    {
+        "barcode": "6221133400084",
+        "name": "capybook (40)  كراسه 40 ورقه 9 اسطر",
+        "price": 10.0,
+        "quantity": 249
+    },
+    {
+        "barcode": "6221133400060",
+        "name": "capybook (40)  كراسه 40ورقه مربعات كبيره",
+        "price": 10.0,
+        "quantity": 269
+    },
+    {
+        "barcode": "6221133011747",
+        "name": "capybook (40) كراسه 40 ورقه صفحه وصفحه",
+        "price": 10.0,
+        "quantity": 170
+    },
+    {
+        "barcode": "6221133400114",
+        "name": "capybook (60) كشكول مسطر",
+        "price": 15.0,
+        "quantity": 637
+    },
+    {
+        "barcode": "6221133400176",
+        "name": "capybook (60)كشكول سطرين",
+        "price": 15.0,
+        "quantity": 439
+    },
+    {
+        "barcode": "6221133401210",
+        "name": "capybook (60)  كشكول3 اسطر",
+        "price": 15.0,
+        "quantity": 270
+    },
+    {
+        "barcode": "6221133400121",
+        "name": "capybook (60) كشكول صفحه وصفحه",
+        "price": 15.0,
+        "quantity": 470
+    },
+    {
+        "barcode": "6221133401203",
+        "name": "capybook (60) كشكول سيس",
+        "price": 15.0,
+        "quantity": 80
+    },
+    {
+        "barcode": "6221133400138",
+        "name": "capybook (64)كشكول 64 ورقه رسم بياني",
+        "price": 18.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6221133400183",
+        "name": "capybook (80) كشكول مسطر",
+        "price": 18.0,
+        "quantity": 330
+    },
+    {
+        "barcode": "6221133400244",
+        "name": "capybook (80) كشكول سطرين",
+        "price": 18.0,
+        "quantity": 169
+    },
+    {
+        "barcode": "6221133011761",
+        "name": "capybook (80) كشكول  مربعات كبيره",
+        "price": 18.0,
+        "quantity": 120
+    },
+    {
+        "barcode": "6221133400022",
+        "name": "سكيتش رسم صغير",
+        "price": 13.0,
+        "quantity": 250
+    },
+    {
+        "barcode": "6221133400305",
+        "name": "سكيتش رسم كبير",
+        "price": 15.0,
+        "quantity": 149
+    },
+    {
+        "barcode": "6221133400053",
+        "name": "سكيتش رسم كبير سلك 40 ورقه",
+        "price": 45.0,
+        "quantity": 80
+    },
+    {
+        "barcode": "7734581211601",
+        "name": "سكيتش الوان سلك",
+        "price": 25.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6222016407312",
+        "name": "كشكول 100ورقه مسطر",
+        "price": 20.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221133347075",
+        "name": "(A4) capybook (40) كشكول  مسطر",
+        "price": 20.0,
+        "quantity": 258
+    },
+    {
+        "barcode": "6221133347082",
+        "name": "(A4) capybook (40)  كشكول مربعات صغيره",
+        "price": 22.0,
+        "quantity": 90
+    },
+    {
+        "barcode": "6221133011785",
+        "name": "(A4) capybook (60) كشكول مربعات كبيره",
+        "price": 30.0,
+        "quantity": 120
+    },
+    {
+        "barcode": "6221133401418",
+        "name": "(A4) capybook (60)  كشكول مسطر",
+        "price": 25.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "6221133401395",
+        "name": "(A4) capybook (60)  كشكول سطرين",
+        "price": 30.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221133011808",
+        "name": "(A4) capybook (60)  كشكول 9 اسطر",
+        "price": 30.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6221133401500",
+        "name": "(A4) capybook (80) كشكول مسطر",
+        "price": 32.0,
+        "quantity": 65
+    },
+    {
+        "barcode": "6221133011822",
+        "name": "(A4) capybook (100) كشكول مربعات صغيره",
+        "price": 39.0,
+        "quantity": 30
+    },
+    {
+        "barcode": "6221133401425",
+        "name": "(A4) capybook (100) كشكول مسطر",
+        "price": 37.0,
+        "quantity": 40
+    },
+    {
+        "barcode": "6221133400152",
+        "name": "كشكول سلك 80 ورقه (A5)",
+        "price": 30.0,
+        "quantity": 32
+    },
+    {
+        "barcode": "6221133400206",
+        "name": "كشول سلك 100 ورقه مسطر(A5)",
+        "price": 35.0,
+        "quantity": 55
+    },
+    {
+        "barcode": "6221133401531",
+        "name": "كشكول سلك 140ورقه (A5)",
+        "price": 45.0,
+        "quantity": 39
+    },
+    {
+        "barcode": "6221133400510",
+        "name": "كشكول سلك 200 ورقه (A5)",
+        "price": 55.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "6221133346979",
+        "name": "كشكول سلك 80 ورقه مسطر(A4)",
+        "price": 40.0,
+        "quantity": 36
+    },
+    {
+        "barcode": "6221133401470",
+        "name": "كشكول 100ورقه مسطر (A4)",
+        "price": 45.0,
+        "quantity": 24
+    },
+    {
+        "barcode": "6221133401401",
+        "name": "كشكول سلك 100ورقه سطرين (A4)",
+        "price": 50.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "6221133400817",
+        "name": "كشكول سلك 80 ورقه مربعات(A5)",
+        "price": 30.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "6221133400824",
+        "name": "كشكول 100ورقه مربعات صغيره (A5)",
+        "price": 35.0,
+        "quantity": 48
+    },
+    {
+        "barcode": "6221133347105",
+        "name": "كشكول 250 ورقه مسطر(A4)",
+        "price": 125.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6221133024969",
+        "name": "هالو كشكول 140ورقه مسطر (A4)",
+        "price": 85.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221133025003",
+        "name": "مودز كشكول 60ورقه مسطر",
+        "price": 30.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "6221133025010",
+        "name": "مودز كشكول سلك 80 ورقه",
+        "price": 35.0,
+        "quantity": 14
+    },
+    {
+        "barcode": "6221133025096",
+        "name": "هالو كشكول سلك 80ورقه (A4)",
+        "price": 58.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221133025102",
+        "name": "هالو كشكول سلك 100 ورقه (A4)",
+        "price": 65.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6221133401487",
+        "name": "كشكول سلك 140ورقه مسطر (A4)",
+        "price": 65.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221129503584",
+        "name": "ROTRING روترينج ورق كلك",
+        "price": 130.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6224003587359",
+        "name": "مالتي اوفيس ورق فلوسكاب مفرد 100 ورقه",
+        "price": 45.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "6222016404038",
+        "name": "الاندلسيه ورقه فلوسكاب مفرد 90 ورقه",
+        "price": 30.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6222002211558",
+        "name": "ياسين ورق ابيض 140جرام",
+        "price": 100.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224003587144",
+        "name": "مالتي اوفيس 40",
+        "price": 23.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5602024988088",
+        "name": "مالتني اوفيس ورق تصوير (80g)A4",
+        "price": 185.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6975254198084",
+        "name": "فرخ فوم عادي",
+        "price": 25.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "6975254198558",
+        "name": "فرخ فوم جليتر",
+        "price": 40.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "4455667788112",
+        "name": "فرخ الاندلسيه الوان",
+        "price": 25.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4455667788110",
+        "name": "فرخ فبيريانو ابيض",
+        "price": 30.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4455667788113",
+        "name": "اندلسيه ورق مقوي (A4)الوان 180 جرام",
+        "price": 0.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "4455667788111",
+        "name": "فرخ فيبريانو الوان",
+        "price": 39.5,
+        "quantity": 46
+    },
+    {
+        "barcode": "8003511427993",
+        "name": "كاريوكا اقلام رصاص من غير استيكه 6 اقلام",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511427962",
+        "name": "كاريوكا 4 اقلام رصاص باستيكه",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6940087010094",
+        "name": "باور اقلام رصاص +برايه 12 قلم",
+        "price": 55.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4007817117040",
+        "name": "ستدلر قلم رصاص جامبو للتابلت",
+        "price": 80.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4005401190011",
+        "name": "فابر كاسل قلم رصاص مستورد",
+        "price": 25.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6223001411123",
+        "name": "جيلسي اقلام رصاص",
+        "price": 2.5,
+        "quantity": 182
+    },
+    {
+        "barcode": "6941288746256",
+        "name": "كيروود برايه و استيكه",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8680869420540",
+        "name": "SERVEبرايه و استيكه",
+        "price": 140.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788114",
+        "name": "كاريوكا 2 قلم رصاص باستيكه",
+        "price": 18.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4455667788115",
+        "name": "كاريوكا 3 اقلام رصاص باستيكه",
+        "price": 24.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4455667788116",
+        "name": "كاريوكا 6 اقلام رصاص باستيكه",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6976164397772",
+        "name": "باور قلم رصاص باستيكه (2B)",
+        "price": 3.0,
+        "quantity": 87
+    },
+    {
+        "barcode": "4455667788117",
+        "name": "moslalo eternal pencil",
+        "price": 20.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223003090203",
+        "name": "بريما قلم رصاص (2B)",
+        "price": 3.0,
+        "quantity": 30
+    },
+    {
+        "barcode": "4711678075820",
+        "name": "Y-PLUS قلم رصاص باستيكه(HB)",
+        "price": 10.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "8003511427979",
+        "name": "كاريوكا قلم رصاص باستيكه (HB)",
+        "price": 9.5,
+        "quantity": 42
+    },
+    {
+        "barcode": "4455667788118",
+        "name": "yalong pencil  يالونج قلم رصاص جامبو",
+        "price": 15.0,
+        "quantity": 21
+    },
+    {
+        "barcode": "4455667788908",
+        "name": "shanpie permanent marker (fine point)",
+        "price": 25.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6954884595050",
+        "name": "PENCIL GRIP",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4455667788232",
+        "name": "جلاد بينك(A5)",
+        "price": 7.0,
+        "quantity": 54
+    },
+    {
+        "barcode": "445566778822",
+        "name": "جلاد موف (A5)",
+        "price": 7.0,
+        "quantity": 39
+    },
+    {
+        "barcode": "445566778824",
+        "name": "جلاد سيموني(A5)",
+        "price": 7.0,
+        "quantity": 49
+    },
+    {
+        "barcode": "4455667788119",
+        "name": "جلاد احمر (A5)",
+        "price": 7.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "445566778821",
+        "name": "جلاد اصفر (A5)",
+        "price": 7.0,
+        "quantity": 100
+    },
+    {
+        "barcode": "445566778820",
+        "name": "جلاد اخضر (A5)",
+        "price": 7.0,
+        "quantity": 55
+    },
+    {
+        "barcode": "445566778825",
+        "name": "جلاد بني (A5)",
+        "price": 7.0,
+        "quantity": 38
+    },
+    {
+        "barcode": "445566778826",
+        "name": "جلاد شفاف (A5)",
+        "price": 7.0,
+        "quantity": 98
+    },
+    {
+        "barcode": "445566778827",
+        "name": "جلاد بيج (A5)",
+        "price": 7.0,
+        "quantity": 78
+    },
+    {
+        "barcode": "445566778828",
+        "name": "جلاد ابيض (A5)",
+        "price": 7.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "445566778829",
+        "name": "جلاد ازرق (A5",
+        "price": 7.0,
+        "quantity": 44
+    },
+    {
+        "barcode": "445566778831",
+        "name": "جلاد بني (A4)",
+        "price": 10.0,
+        "quantity": 96
+    },
+    {
+        "barcode": "445566778832",
+        "name": "جلاد ازرق (A4)",
+        "price": 10.0,
+        "quantity": 133
+    },
+    {
+        "barcode": "445566778833",
+        "name": "جلاد احمر (A4)",
+        "price": 10.0,
+        "quantity": 30
+    },
+    {
+        "barcode": "445566778834",
+        "name": "جلاد اخضر (A4)",
+        "price": 10.0,
+        "quantity": 71
+    },
+    {
+        "barcode": "445566778835",
+        "name": "جلاد شفاف (A4)",
+        "price": 10.0,
+        "quantity": 66
+    },
+    {
+        "barcode": "445566778836",
+        "name": "جلاد ابيض (A4)",
+        "price": 10.0,
+        "quantity": 30
+    },
+    {
+        "barcode": "445566778837",
+        "name": "جلاد اصفر (A4)",
+        "price": 10.0,
+        "quantity": 82
+    },
+    {
+        "barcode": "445566778838",
+        "name": "جلاد بينك (A4)",
+        "price": 10.0,
+        "quantity": 49
+    },
+    {
+        "barcode": "445566778839",
+        "name": "جلاد بيج (A4)",
+        "price": 10.0,
+        "quantity": 30
+    },
+    {
+        "barcode": "6942109506141",
+        "name": "M&G M7(0.7)قلم جاف",
+        "price": 10.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "6942109551134",
+        "name": "M&G C1 (0.7)قلم جاف ازرق",
+        "price": 10.0,
+        "quantity": 36
+    },
+    {
+        "barcode": "6224007206003",
+        "name": "روتو رابيد فلو قلم جبل ازرق (0.7)",
+        "price": 7.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6224007206393",
+        "name": "روتو ليكويد بول قلم جاف (0.7)",
+        "price": 5.0,
+        "quantity": 51
+    },
+    {
+        "barcode": "9556089431897",
+        "name": "FABER CASTELL ball pen (0.7) فابر كاستل قلم جاف اسود",
+        "price": 20.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "9556089431613",
+        "name": "FABER CASTELL ball pen (1.0)فابر كاستل قلم جاف ازرق",
+        "price": 20.0,
+        "quantity": 35
+    },
+    {
+        "barcode": "9556089005456",
+        "name": "FABER CASTELL  cx7 (0.7) فابر كاستل قلم جاف ازرق",
+        "price": 20.0,
+        "quantity": 45
+    },
+    {
+        "barcode": "9556089004541",
+        "name": "FABER CASTELL GRIP x7 (0.7)فابر كاستل قلم جاف احمر",
+        "price": 20.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "9556089004565",
+        "name": "FABER CASTELL GRIPx7(0.7)فابر كاستل قلم جاف اسود",
+        "price": 20.0,
+        "quantity": 73
+    },
+    {
+        "barcode": "9556089004558",
+        "name": "FABER CASTELL GRIP x7(0.7)فار كاستل قلم جاف ازرق",
+        "price": 20.0,
+        "quantity": 42
+    },
+    {
+        "barcode": "9556089004596",
+        "name": "FABER CASTELL GRIPx7(0.7)فابر كاستل قلم جاف ازرق",
+        "price": 20.0,
+        "quantity": 34
+    },
+    {
+        "barcode": "9556089004602",
+        "name": "FABER CASTELL GRIPx7(0.7)فابر كاسل قلم جاف اسود",
+        "price": 20.0,
+        "quantity": 39
+    },
+    {
+        "barcode": "9556089004589",
+        "name": "FABER CASTELL GRIPx7(0.7)فابر كاستل قلم جاف احمر",
+        "price": 20.0,
+        "quantity": 18
+    },
+    {
+        "barcode": "9555684646576",
+        "name": "FABER CASTELL RX GEL (0.7) pink فابر كاستل قلم جيل بينك",
+        "price": 30.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8904106851967",
+        "name": "PENTONIC بينتونك جاف ازرق",
+        "price": 25.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "6954010281314",
+        "name": "قلم جاف بيتمسح (0.5)",
+        "price": 15.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8904106854005",
+        "name": "PENTONIC بينتونيك جاف اسود",
+        "price": 25.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6973511061010",
+        "name": "قلم جاف 10 الوان",
+        "price": 35.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6954884596606",
+        "name": "KEYROAD fountain pen blue ink كيرود قلم حبر ازرق +2غيار للحبر",
+        "price": 65.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223003099701",
+        "name": "PRIMA I PEN",
+        "price": 15.0,
+        "quantity": 31
+    },
+    {
+        "barcode": "8692404224025",
+        "name": "PENSAN MY-TECH (0.7) black بينسان قلم جاف اسود",
+        "price": 8.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8692404224131",
+        "name": "PENSAN MY_TECH green (0.7)بينسان قلم اخضر",
+        "price": 8.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "8692404901582",
+        "name": "PENSAN SOFT GEL red (0.7)بيسان قلم جيل احمر",
+        "price": 15.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8802203047743",
+        "name": "DONG-A GELSTREM red (0.7) دونجا قلم جيل احمر",
+        "price": 15.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8802203048320",
+        "name": "DONG-A  Q-KNOCK (0.7)دونجا قلم جيل ازرق",
+        "price": 15.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6938247161533",
+        "name": "YALONG SOFT INK PEN",
+        "price": 17.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "4455667788140",
+        "name": "PRIMA FORMA blue بريما فورما ازرق",
+        "price": 5.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "4455667788141",
+        "name": "PRIMA FORMA bluck بريما فورما اسود",
+        "price": 5.0,
+        "quantity": 42
+    },
+    {
+        "barcode": "4455667788142",
+        "name": "PRIMA FORMA red بريما فورما احمر",
+        "price": 5.0,
+        "quantity": 40
+    },
+    {
+        "barcode": "6223003098773",
+        "name": "PRIMA ORA fine بريما اورا ازرق",
+        "price": 5.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6223003098780",
+        "name": "PRIMA NOVA blue بريما نوفا ازرق",
+        "price": 5.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "6223003095321",
+        "name": "PRIMA FORSA blue بريما ازرق",
+        "price": 5.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4455667788145",
+        "name": "PRIMA SOLO blue بريما سولو ازرق",
+        "price": 5.0,
+        "quantity": 32
+    },
+    {
+        "barcode": "4455667788146",
+        "name": "PRIMA SOLO black بريما سولو اسود",
+        "price": 5.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "6224003587236",
+        "name": "مالتي اوفيس 40 ورقه 3 اسطر (A4)",
+        "price": 25.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "3678563987969",
+        "name": "جلاد كتب داتي اللصق",
+        "price": 5.0,
+        "quantity": 139
+    },
+    {
+        "barcode": "4455667788147",
+        "name": "PRIMA SOLO red بريما سولو احمر",
+        "price": 5.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "4455667788130",
+        "name": "PRIMA SOLO GREEN بريما سولو اخضر",
+        "price": 5.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "4455667788148",
+        "name": "قلم جاف بيتمسح",
+        "price": 5.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788149",
+        "name": "PENSAN TRIBALL green (1.0)بينسان تريبول اخضر",
+        "price": 8.5,
+        "quantity": 12
+    },
+    {
+        "barcode": "4455667788967",
+        "name": "NOT BOOK PORTABLE CUP (380)ml",
+        "price": 135.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6970620570280",
+        "name": "برايه شكل عنب",
+        "price": 5.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4455667788915",
+        "name": "برايه شكل ارنب",
+        "price": 5.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4455667788913",
+        "name": "استيكه شكل قلم",
+        "price": 5.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4455667788916",
+        "name": "SMART CUP LED (500)ml",
+        "price": 200.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788917",
+        "name": "VACUUM INSULATION CUP (380)ml",
+        "price": 180.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788912",
+        "name": "زجاجه اكريليك (1000) ml",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788910",
+        "name": "ICE BOTTLE",
+        "price": 265.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659345083",
+        "name": "BATH&BODY WORKS diamond shimmer mist(145)ml (vanilla bean noel)",
+        "price": 950.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "667659311439",
+        "name": "BATH&BODY shimmer fizz body lotion (vanilla bean noel) (100g)",
+        "price": 950.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "667659357086",
+        "name": "BATH& BODY WORKS  BODY MIST(winter candy apple) (236)ml",
+        "price": 950.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "667559300601",
+        "name": "BATH&BODY WORKS BODY MIST (75)ml",
+        "price": 420.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "085715321442",
+        "name": "GUESS BODY MIST (250)ml",
+        "price": 900.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224002472847",
+        "name": "ESSENTIALLS BODY SPLASH (100)ml",
+        "price": 250.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6221129000045",
+        "name": "سكيتش فابريانو ابيض",
+        "price": 66.0,
+        "quantity": 23
+    },
+    {
+        "barcode": "6221129000106",
+        "name": "سكيتش فابريانو الوان",
+        "price": 85.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "8809598453654",
+        "name": "COSRX SNAIL MUCIN GEL CLEANSER (50)ml كوزريكس منظف للوجه",
+        "price": 375.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8809416470009",
+        "name": "COSRX SNAIL 96 MUCIN POWER ESSENCE (100)ml كوزريكس سيروم للوجه",
+        "price": 950.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8809416470016",
+        "name": "COSRX SNAIL 92 ALL IN ONE CREAM (100g)كوزريكس كريم",
+        "price": 950.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8712561705189",
+        "name": "VASELINE SPRAY MOISTURIZER(cocoa radiant) (190)ml فازلين سبراي مرطب للجسم",
+        "price": 299.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "305210232518",
+        "name": "VASELINE LIP THERAPY (7g) cocoa butter",
+        "price": 179.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "305210464728",
+        "name": "VASELINE LIP THERAY (7g) creame burle",
+        "price": 179.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "305210231597",
+        "name": "VASELINE LIP THERAPY (7g)rosy",
+        "price": 179.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6291105153270",
+        "name": "VASELINE LIP THERAPY (4.8g) rosy",
+        "price": 195.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6291105153287",
+        "name": "VASELINE LIP THERAPY (4.8g) aloe vera",
+        "price": 195.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4895224187769",
+        "name": "شنطه للميكاب كبيره",
+        "price": 170.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677817",
+        "name": "شنطه ميكاب صغيره",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677801",
+        "name": "مسدس بلالين",
+        "price": 400.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677802",
+        "name": "دبدوب",
+        "price": 250.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "3344556677803",
+        "name": "علبه ادوات البدكير",
+        "price": 150.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "3344556677804",
+        "name": "محفظه رجالي كبيره",
+        "price": 185.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677805",
+        "name": "محفظه رجالي صغيره",
+        "price": 120.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "3344556677806",
+        "name": "بوك حريمي كبير",
+        "price": 135.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "3344556677807",
+        "name": "بوك حريمي صغير",
+        "price": 80.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "3344556677808",
+        "name": "برفان رجالي عالي الجوده",
+        "price": 225.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "3344556677809",
+        "name": "عبوه بخاخ متعدد الاستخدام (50) مل",
+        "price": 38.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "3344556677810",
+        "name": "برفان (30)مل",
+        "price": 90.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "3344556677811",
+        "name": "برفان (80) مل",
+        "price": 250.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677812",
+        "name": "برفان (100) مل",
+        "price": 350.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "3344556677813",
+        "name": "فرش للميكاب",
+        "price": 30.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "3344556677814",
+        "name": "بيوتي بلندر صغيره(قطعتين)",
+        "price": 20.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "3344556677815",
+        "name": "بيوتي بلندر ( 3 قطع)",
+        "price": 30.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677816",
+        "name": "بيوتي بلندر (4 قطع)",
+        "price": 30.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "3344556677818",
+        "name": "برايه للمكياج",
+        "price": 15.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6978177660843",
+        "name": "PAZT eyeliner stamp pen ( natural black )",
+        "price": 195.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566701",
+        "name": "AIYI eyebrow pencil",
+        "price": 125.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566702",
+        "name": "EDUTE AL ICE eyebrow",
+        "price": 90.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "2233445566703",
+        "name": "BMBN mascara curly 5D",
+        "price": 180.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566704",
+        "name": "JULYSTAR lip gelly",
+        "price": 320.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "2233445566705",
+        "name": "FEBBLE lips makeup",
+        "price": 250.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "2233445566706",
+        "name": "VICTORIA KEY jelly tint stick 3in1",
+        "price": 175.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6977310520488",
+        "name": "DAWANG ROSE JELLY TINT STICK (4)",
+        "price": 320.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566707",
+        "name": "LANGMANNI lipstick",
+        "price": 130.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "2233445566708",
+        "name": "LANGMANNI lipstick",
+        "price": 120.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566709",
+        "name": "روج كبسوله ابيض",
+        "price": 25.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "2233445566711",
+        "name": "روج كبسوله بني",
+        "price": 35.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "2233445566710",
+        "name": "روج كبسوله",
+        "price": 30.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "2233445566712",
+        "name": "DRAGON RANEE lip gloss",
+        "price": 70.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6972437471231",
+        "name": "NVXKISS lip gloss",
+        "price": 50.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "2233445566714",
+        "name": "FELRBNNER lipstick",
+        "price": 65.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "2233445566715",
+        "name": "DRAGON RANEE lipstick",
+        "price": 75.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "2233445566718",
+        "name": "NAGARAKU Lashes",
+        "price": 40.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566716",
+        "name": "ARDELL Lashes",
+        "price": 50.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566717",
+        "name": "3D Lashes",
+        "price": 30.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566719",
+        "name": "SHAQINUO dreamy shine lip gloss",
+        "price": 75.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "2233445566720",
+        "name": "VOUO liquid blush 2in1",
+        "price": 240.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6942344623931",
+        "name": "SHAQINUO glow moisturizing lip gloss set",
+        "price": 250.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6977159822545",
+        "name": "BMBN lip extreme volume",
+        "price": 175.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566721",
+        "name": "SHAQINUO moiturizing lip gloss",
+        "price": 99.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566722",
+        "name": "VALLEY NET lipliner pencil",
+        "price": 85.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "2233445566723",
+        "name": "FACE SECRET lipliner pencil",
+        "price": 85.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "2233445566724",
+        "name": "PUDAIER LIPPIE PENCIL",
+        "price": 75.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "2233445566725",
+        "name": "DAVIS eyeliner pencil",
+        "price": 75.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "2233445566726",
+        "name": "SVMY EYELINER",
+        "price": 45.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "2233445566728",
+        "name": "MILAI  EYELINER 2in1",
+        "price": 25.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "2233445566727",
+        "name": "BONJOUR  EYE&LIP LINER",
+        "price": 30.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "6221104006024",
+        "name": "سيلفي ميكرا كولون (M) بيج",
+        "price": 80.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104006079",
+        "name": "سيلفي ليكرا كولون (M)اسود",
+        "price": 80.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104006420",
+        "name": "سيلفي ليكرا كولون (XL) بيج",
+        "price": 80.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104006475",
+        "name": "سيلفي ليكرا كولون (XL)اسود",
+        "price": 80.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104006277",
+        "name": "سيلفي ليكرا كولون (L)اسود",
+        "price": 80.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6221104006222",
+        "name": "سيلفي ليكرا كولون (L)بيج",
+        "price": 80.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004679",
+        "name": "سيلفي فوال كولون (M)اسود",
+        "price": 65.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004686",
+        "name": "سيلفي فوال كولون (M)فيميه",
+        "price": 65.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004631",
+        "name": "سيلفي فوال كولون (M) بيج",
+        "price": 65.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004884",
+        "name": "سيلفي فوال كولون (L) فيميه",
+        "price": 65.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221104004839",
+        "name": "سيلفي فوال كولون (L)بيج",
+        "price": 65.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221104004877",
+        "name": "سيلفي فوال كولون (L)اسود",
+        "price": 65.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221104005089",
+        "name": "سيلفي فوال كولون (XL)فيميه",
+        "price": 65.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104005034",
+        "name": "سيلفي فوال كولون (XL)بيج",
+        "price": 65.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104005072",
+        "name": "سيلفي فوال كولون (XL) اسود",
+        "price": 65.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6221104016382",
+        "name": "سيلفي بيتس قدم بيج",
+        "price": 10.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6221104016436",
+        "name": "سيلفي بيتس قدم اسود",
+        "price": 10.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221104036175",
+        "name": "سوكيت استريتش اسود",
+        "price": 13.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221104036182",
+        "name": "سوكيت استريتش بيج",
+        "price": 13.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221104018225",
+        "name": "ستريتش طويل بيج",
+        "price": 24.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104018270",
+        "name": "ستريتش طويل اسود",
+        "price": 24.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004235",
+        "name": "فوال طويل بيج",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004280",
+        "name": "فوال طويل فيميه",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004273",
+        "name": "فوال طويل اسود",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6221104004037",
+        "name": "فوال قصير بيج",
+        "price": 20.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221104025964",
+        "name": "فوال سوكيت اسود",
+        "price": 17.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221104025971",
+        "name": "فوال سوكيت بيج",
+        "price": 17.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6221104026169",
+        "name": "فوال سوكيت بيج1",
+        "price": 17.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6221104026152",
+        "name": "فوال سوكيت فيميه",
+        "price": 17.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6221104018089",
+        "name": "سيلفي ستريتش قصير  فيميه",
+        "price": 17.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6221104018072",
+        "name": "سيلفي ستريتش قصير اسود/بيج",
+        "price": 17.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "5566778899101",
+        "name": "ميداليه جزمه (ايرفورس )",
+        "price": 50.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899102",
+        "name": "ميداليه ملا نهايه",
+        "price": 80.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899103",
+        "name": "ميداليه قلاوظ",
+        "price": 70.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899104",
+        "name": "ميداليه كوتش عربيه",
+        "price": 120.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899105",
+        "name": "ميداليه كائن محول",
+        "price": 120.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899106",
+        "name": "ميداليه ماتور",
+        "price": 80.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899107",
+        "name": "بومه ابيض",
+        "price": 500.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899108",
+        "name": "بومه قلب",
+        "price": 300.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899109",
+        "name": "ورده",
+        "price": 190.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "5566778899110",
+        "name": "مخده",
+        "price": 300.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899111",
+        "name": "عربيه",
+        "price": 250.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899112",
+        "name": "دماغ",
+        "price": 1200.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899113",
+        "name": "منظم لوصله الشاحن",
+        "price": 160.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "4895224183334",
+        "name": "NOTEBOOK (A4)",
+        "price": 85.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6990456980022",
+        "name": "NOTE BOOK",
+        "price": 120.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6930204100623",
+        "name": "NOTE BOOK GLITTER",
+        "price": 70.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "14125119",
+        "name": "MA BLOCK NOTE",
+        "price": 40.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6221190008292",
+        "name": "SASCO BLOCK NOTE",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6222010912546",
+        "name": "MAOINA BLOCK NO)ME (A5) 50 sheets",
+        "price": 17.5,
+        "quantity": 5
+    },
+    {
+        "barcode": "4895224183327",
+        "name": "NOTEBOOK",
+        "price": 70.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4895224183341",
+        "name": "NOTEBOOK (B5)",
+        "price": 75.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6947283473449",
+        "name": "S&A NOTE BOOK (BEAR)",
+        "price": 120.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788903",
+        "name": "NOTEBOOK",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6946659700936",
+        "name": "AOPAI STICKY NOTES (76mm x127mm) 100 sheets",
+        "price": 28.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "6942310500143",
+        "name": "XING LI STICKY NOTES (76 x101mm)100sheets",
+        "price": 25.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6942310500211",
+        "name": "XING LI STICKY NOTES (101 x152mm)100sheets",
+        "price": 39.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6942310506428",
+        "name": "XINGLI STICKY NOTES (76 x101mm)100sheets",
+        "price": 23.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "4712759211557",
+        "name": "STICK'N NOTES (76 x127mm) 100sheets",
+        "price": 35.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4712759214046",
+        "name": "STICK'N NOTES(76 x 101mm)100 seets",
+        "price": 30.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4712759211519",
+        "name": "STICK'N NOTES (76x101mm)100sheets",
+        "price": 30.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4712759210079",
+        "name": "STICK'N NOTES (76 x76mm)100 sheets",
+        "price": 23.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6972061463459",
+        "name": "ZHENG HAO STICKY NOTES (76 x76mm)",
+        "price": 89.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6972423488199",
+        "name": "HELLO LOVE stick notes",
+        "price": 65.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6972423488182",
+        "name": "HAPPY sticky notes",
+        "price": 65.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6972423478060",
+        "name": "LUCK",
+        "price": 65.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6972423400238",
+        "name": "UNICORN STICKY NOTES SET",
+        "price": 35.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6972423009349",
+        "name": "DINOSAUR stick notes",
+        "price": 35.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6972423478077",
+        "name": "STICKY NOTES (152 x 88mm)",
+        "price": 35.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6958581320298",
+        "name": "MEIDAO STICK MARKER",
+        "price": 35.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "9791216888940",
+        "name": "STARBURST STICKY NOTE",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6972768488973",
+        "name": "PET STICKY NOTES 50 sheets",
+        "price": 30.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6957792000197",
+        "name": "Z STICKY NOTES 100sheets",
+        "price": 15.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6972423478053",
+        "name": "POST IT NOTE",
+        "price": 30.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6957792003204",
+        "name": "POST IT NOTES 50sheets",
+        "price": 20.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6972423478084",
+        "name": "LUCKY -GOOD STICKY NOTES",
+        "price": 30.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "4712759260111",
+        "name": "STICK'N PUP-UP FLAGS (50)",
+        "price": 20.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "4712759260067",
+        "name": "STICK'N POP-UP FLAGS (130)",
+        "price": 35.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6920230512033",
+        "name": "KADISI",
+        "price": 30.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6972854794265",
+        "name": "KEDEMI 5x20 memo paper",
+        "price": 10.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6972168445167",
+        "name": "ستيكي نوت اسهم",
+        "price": 10.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6921684000091",
+        "name": "S&A ستيكي نوت اسهم",
+        "price": 10.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6986257355657",
+        "name": "STICKERS 7D (MOVIE TICET )",
+        "price": 35.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "696551698794",
+        "name": "EVA FASHION STICKERS",
+        "price": 35.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6948899661121",
+        "name": "ستيكر اشكال",
+        "price": 8.0,
+        "quantity": 32
+    },
+    {
+        "barcode": "6965263482267",
+        "name": "YIDA STICKER DINOSAURE",
+        "price": 35.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6975276765546",
+        "name": "DAY STICKERS",
+        "price": 10.0,
+        "quantity": 26
+    },
+    {
+        "barcode": "6961615909951",
+        "name": "LOVELY & FUN  STICKERS",
+        "price": 5.0,
+        "quantity": 63
+    },
+    {
+        "barcode": "4455667788904",
+        "name": "Tiany Stickers",
+        "price": 25.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "6922227304003",
+        "name": "PAINT MARKER",
+        "price": 25.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "4455667788905",
+        "name": "NETALIC marker",
+        "price": 50.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "1100011003270",
+        "name": "وايت بورد صغيره",
+        "price": 12.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6941985210289",
+        "name": "PHOENIX CANVAS (25x30 cm",
+        "price": 180.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788909",
+        "name": "KEEP SMILING canvas(25x35)",
+        "price": 105.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "210255563393",
+        "name": "كراسه قص ولزق",
+        "price": 10.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "6222002210711",
+        "name": "كارت بحث 100 ورقه",
+        "price": 40.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8901238311963",
+        "name": "كانجو دباسه",
+        "price": 115.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6956554654654",
+        "name": "باور دبابيس دباسه (24/)",
+        "price": 10.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "4893055002039",
+        "name": "ايجل دباسه (12ورقه)",
+        "price": 120.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6935664121010",
+        "name": "مادن دبابيس دباسه (model)",
+        "price": 7.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4455667788901",
+        "name": "بشاوره سمايل",
+        "price": 10.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4455667788980",
+        "name": "KLM بابيس (24/6)",
+        "price": 8.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "8901238910036",
+        "name": "كانجرو دبابيس دباسه (24/6)",
+        "price": 20.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "8901238310126",
+        "name": "كانجرو دباسه صغيره",
+        "price": 65.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "4455667788981",
+        "name": "HOMESING STAPLE REMOVER",
+        "price": 15.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6935664121041",
+        "name": "مادن دبابيس نحاس",
+        "price": 10.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "9023800431011",
+        "name": "KORESS دبابيس دباسه نحاس",
+        "price": 12.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "9023800430618",
+        "name": "KORES (33mm) 20 clips  مشبك ورق",
+        "price": 5.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "9023800430625",
+        "name": "KORES100 clips (50mm)مشبك ورق",
+        "price": 40.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6927873611680",
+        "name": "S&A 20 CLIPS  (50mm)",
+        "price": 12.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "4455667788982",
+        "name": "PRINTY ختامه",
+        "price": 100.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6930616600018",
+        "name": "BINDER CLIPS (51mm)",
+        "price": 7.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "6930616600025",
+        "name": "BINDER CLIPS (41mm)",
+        "price": 5.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "4455667788983",
+        "name": "PLUS CLIPS (25mm)",
+        "price": 3.0,
+        "quantity": 72
+    },
+    {
+        "barcode": "4015000401838",
+        "name": "PRITT glue stick",
+        "price": 30.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "4455667788984",
+        "name": "PRITT glue stick green",
+        "price": 30.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4015000435741",
+        "name": "PRITT GLITTER GLUE STICK (2)pcs",
+        "price": 120.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4026700380705",
+        "name": "UHU (35ml) صمغ لكافه الاغراض",
+        "price": 71.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "4026700407563",
+        "name": "UHU (20ml) صمغ لكافه الاغراض",
+        "price": 35.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4026700403732",
+        "name": "UHU (33ml)special + allplast",
+        "price": 150.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4026700401806",
+        "name": "UHU PEGA PEN (50ml)",
+        "price": 55.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "8003511427689",
+        "name": "CARIOCA school glue white glue  (100g)",
+        "price": 42.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "9557109006125",
+        "name": "ELITE صمغ (50ml)",
+        "price": 10.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6941288762850",
+        "name": "KEYROAD COLOURFUL GLUE (90g)",
+        "price": 65.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6970625427046",
+        "name": "كانجرو غراء ابيض (60ملي)",
+        "price": 15.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6941288762843",
+        "name": "KEYROADلزق جليتر لؤلوي 6 قطع",
+        "price": 80.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "8003511421106",
+        "name": "CARIOCA GLITTER GLUE 6 pcs",
+        "price": 150.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "8901180201060",
+        "name": "FABER-CASTELL glitter glue 6 pcs",
+        "price": 100.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4026700408157",
+        "name": "UHU (125 ml)لاصق لكافه الاغراض",
+        "price": 230.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "8901860051374",
+        "name": "FEVICOL SUPER GLUE",
+        "price": 10.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "4026700376203",
+        "name": "UHU SUPER GLUE (3g) لاصق سائل قوي للغايه",
+        "price": 85.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4026700376258",
+        "name": "UHU CONTACT LIQUID (30g)ماده لاصقه فائقه القوه",
+        "price": 180.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "9557109010313",
+        "name": "ELITE ADHESIVE-TACK (50g)",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "9556089791755",
+        "name": "FABER CASTELL tack it (75g)",
+        "price": 79.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "9555684655608",
+        "name": "FABER CASTELL tack it(30g)",
+        "price": 42.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "9555684655639",
+        "name": "FABER CASTELL tack it white (30g)",
+        "price": 42.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6223010472306",
+        "name": "لصق دوكو سويديه 1 بوصه",
+        "price": 35.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6223010472290",
+        "name": "لصق دوكو برفكت اصفر",
+        "price": 20.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6920224376122",
+        "name": "ايفرجرين دبل فيس (12mm)",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6920224376184",
+        "name": "ايفرجرين دبل فيس (18mm)",
+        "price": 30.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "9556089794503",
+        "name": "FABER CASTELL CREATIVE TACK IT (50g)",
+        "price": 85.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "6223010473631",
+        "name": "لصق دوكو برتقالي 1 بوصه",
+        "price": 20.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6721497001946",
+        "name": "WEI LIAN مسدس شمع",
+        "price": 85.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4455667788985",
+        "name": "مادن لاصق دوكو عريض",
+        "price": 38.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4455667788986",
+        "name": "لصق دوكو اصفر صغير",
+        "price": 15.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "4455667788987",
+        "name": "جرين واي دبل فيس كبير",
+        "price": 25.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "44556677889988",
+        "name": "جرين واي دبل فيس صغير",
+        "price": 15.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "44556677889989",
+        "name": "شمع مسدس صغير الوان (8) قطع",
+        "price": 45.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "8593565889118",
+        "name": "ورق قريشه للف الهدايا",
+        "price": 25.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4455667788990",
+        "name": "شمع مسدس الوان صغير",
+        "price": 7.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "4455667788991",
+        "name": "بكره شريط ستان",
+        "price": 35.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788992",
+        "name": "شريط لف هدايا",
+        "price": 20.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "4455667788994",
+        "name": "ورق قريشه للف الهدايا",
+        "price": 100.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788995",
+        "name": "بكره لزق الوان",
+        "price": 5.0,
+        "quantity": 60
+    },
+    {
+        "barcode": "6682838968727",
+        "name": "ASKAR شمع ارقام",
+        "price": 15.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6965999611221",
+        "name": "شمع هابي بسكينه بلاستيك",
+        "price": 35.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6986171123622",
+        "name": "شمع هابي حلزوني (6)",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8712364615357",
+        "name": "شمع هابي (12) قطعه",
+        "price": 30.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6926592641824",
+        "name": "شمع هابي (24) قطعه",
+        "price": 35.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6972105913230",
+        "name": "PARTY CANDLE شمع ارقام بلاستيك",
+        "price": 35.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "6920854123318",
+        "name": "BIRTHDAY CANDELE شمع ارقام",
+        "price": 15.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6291100715428",
+        "name": "TROOPER SPRAY PAINT",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6291100713011",
+        "name": "ASINACO SPRAY PAINT",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "6291100713004",
+        "name": "ASINACO SPRAY PAINT (PREMIUM GRADE (400ml)",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "0635341513058",
+        "name": "HI STICK SPRAY PAINTS",
+        "price": 50.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899114",
+        "name": "UNDURU SPRAY PAINT",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "3344556677819",
+        "name": "ايكيا شمع بريحه (5 شمعات )",
+        "price": 30.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "5566778899115",
+        "name": "قطعتين ( كلاب او قطط )",
+        "price": 119.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "5566778899116",
+        "name": "صبار 4 قطع",
+        "price": 150.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899117",
+        "name": "كلاب ابيض 4 قطع",
+        "price": 140.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899118",
+        "name": "فيل ازرق 4قطع",
+        "price": 130.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899119",
+        "name": "بط صغير 5 قطع",
+        "price": 85.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "5566778899120",
+        "name": "(5) قطع كلاب + (2) قطعه دهبي",
+        "price": 260.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899121",
+        "name": "تنين ابيض",
+        "price": 65.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899122",
+        "name": "(8) قطع بقر اشكال",
+        "price": 320.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899123",
+        "name": "ارنب + فازه",
+        "price": 95.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899124",
+        "name": "(7) قطع اشكال",
+        "price": 95.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899125",
+        "name": "بيكمون اورنج (6)",
+        "price": 125.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899126",
+        "name": "بطه كبيره +10 بط صغيرين",
+        "price": 390.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "556677889927",
+        "name": "بيت+ 10 كلاب",
+        "price": 460.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899128",
+        "name": "ديناصور بلبانه",
+        "price": 95.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "5566778899129",
+        "name": "كرومي + كيتي",
+        "price": 100.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899130",
+        "name": "ميداليه دبدوب ارنب",
+        "price": 220.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899131",
+        "name": "ميداليه قطع غيار عربيات",
+        "price": 65.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899132",
+        "name": "متوسيكل سيليكون",
+        "price": 120.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899133",
+        "name": "ميداليه لابوبو",
+        "price": 135.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899134",
+        "name": "مياليه قطط/متوسيكل",
+        "price": 50.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "5566778899135",
+        "name": "جزره فوم",
+        "price": 20.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "5566778899136",
+        "name": "ميداليه كائن فضائي",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899137",
+        "name": "دلايه شكل سيف",
+        "price": 25.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899138",
+        "name": "حلق للبطن",
+        "price": 75.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899139",
+        "name": "حلق للبطن ساده",
+        "price": 65.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899140",
+        "name": "حلق مناخير",
+        "price": 25.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899141",
+        "name": "اكسسوارات عده",
+        "price": 10.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "5566778899142",
+        "name": "حلق بلاستيك 4 اشكال",
+        "price": 145.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "9010714001713",
+        "name": "ميداليه متوسيكل ريدبول",
+        "price": 140.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "2233445566729",
+        "name": "Bob PIN كارت بنس للشعر",
+        "price": 25.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "2233445566730",
+        "name": "مجموعه توك متنوعه (40) توكه",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "2233445566731",
+        "name": "توكه استيك ريش",
+        "price": 25.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "2233445566732",
+        "name": "توكه استيك صغيره",
+        "price": 10.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "2233445566733",
+        "name": "توكه قماش استيك صغيره  اسود/ الوان",
+        "price": 15.0,
+        "quantity": 26
+    },
+    {
+        "barcode": "2233445566734",
+        "name": "توك قماش استيك الوان 3 توك",
+        "price": 17.5,
+        "quantity": 25
+    },
+    {
+        "barcode": "4895224171157",
+        "name": "بيكوس توكه للشعر 12 توكه",
+        "price": 55.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4895224171188",
+        "name": "بيكوس توك للشعر اسود/ الوان",
+        "price": 30.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "6221105005811",
+        "name": "CYBELE nail lacquer",
+        "price": 70.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "4059729195715",
+        "name": "ESSENCE gel nail polish",
+        "price": 90.0,
+        "quantity": 31
+    },
+    {
+        "barcode": "3614220000527",
+        "name": "RIMMEL",
+        "price": 70.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "6991211321609",
+        "name": "BRUSH-ON NAIL GLUE",
+        "price": 25.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6941105588526",
+        "name": "اظافر  اطفال",
+        "price": 40.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6900327196674",
+        "name": "اظافر مربعه",
+        "price": 50.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6995542481032",
+        "name": "br 24اظافر اكريليك",
+        "price": 50.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "2233445566735",
+        "name": "اظافر مضيئه",
+        "price": 55.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "2233445566736",
+        "name": "اظافر طويله لامعه",
+        "price": 50.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "6933256654953",
+        "name": "برايه مكتب بلاستيك",
+        "price": 190.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6933256640543",
+        "name": "FABER CASTELL single hole sharpener برايه",
+        "price": 55.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6954884595364",
+        "name": "KEYROAD DUO SHARPY sharpener",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6941288786269",
+        "name": "KEYROAD JELLY GEL SHARPENER",
+        "price": 60.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6933256648532",
+        "name": "FABER CASTELL mini box sharpener (2)",
+        "price": 50.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6933256645999",
+        "name": "FABER CASTELL mini box sharpener",
+        "price": 19.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6933256640628",
+        "name": "FABER CASTELL grip sharpener",
+        "price": 57.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6954884598136",
+        "name": "KEYROAD metal sharpener",
+        "price": 20.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6954884546410",
+        "name": "KEYROAD PUMPY sharpener",
+        "price": 60.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6932149429906",
+        "name": "KEYROAD easy grip sharpener",
+        "price": 20.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "6954884598105",
+        "name": "KEYROAD metal sharpener (2)",
+        "price": 25.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6933256637741",
+        "name": "FABER CASTELL ERASER and SARPENER",
+        "price": 70.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6933256637673",
+        "name": "FABER CASTELL jelly sharpener",
+        "price": 30.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "4711678071730",
+        "name": "Y-PLUS faye sharpener",
+        "price": 35.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "4005401871033",
+        "name": "FABER CASTELL GRIP ERASER",
+        "price": 40.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4005401871040",
+        "name": "FABER CASTELL GRIP ERASER",
+        "price": 40.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6933256626288",
+        "name": "FABER CASTELL ERASER PEN",
+        "price": 75.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "745604214698",
+        "name": "KEYROAD ERASER WAVE",
+        "price": 18.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "9555684687319",
+        "name": "FABER CASTELL HAPPY JUNGLE ERASER (2)",
+        "price": 35.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6939219086663",
+        "name": "MILITARY ERASERS",
+        "price": 30.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "6939219090134",
+        "name": "XIAOMILI ERASER",
+        "price": 30.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "8809443784483",
+        "name": "استيكه موزه",
+        "price": 20.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "6954884574451",
+        "name": "KEYROAD WINDMILL ERASER",
+        "price": 20.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "6954884598990",
+        "name": "KEYROAD SPINNER ERASER",
+        "price": 30.0,
+        "quantity": 8
+    },
+    {
+        "barcode": "8908000034716",
+        "name": "DOMS استيكه (5)",
+        "price": 25.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6930377508011",
+        "name": "OZZE ERASER PEN",
+        "price": 20.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "6930377506000",
+        "name": "استيكه غيار للقلم (12)",
+        "price": 12.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "8904411802173",
+        "name": "DOMS mini E-RACER ERASER",
+        "price": 10.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5400141902389",
+        "name": "استيكه يوني كورن",
+        "price": 7.0,
+        "quantity": 14
+    },
+    {
+        "barcode": "9556089012249",
+        "name": "FABER CASTELL ERASER RED",
+        "price": 10.0,
+        "quantity": 42
+    },
+    {
+        "barcode": "9556089885300",
+        "name": "FABER CASTELL ERASER WHITE",
+        "price": 10.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "9556089899307",
+        "name": "FABER CASTELL ERASER BLACK",
+        "price": 10.0,
+        "quantity": 33
+    },
+    {
+        "barcode": "9556089006842",
+        "name": "FABER CASTELL BLUE",
+        "price": 10.0,
+        "quantity": 23
+    },
+    {
+        "barcode": "9555684693266",
+        "name": "FABER CASTELL DUST ROLLS TOGETHER",
+        "price": 15.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "9556089007870",
+        "name": "FABER CASTELL shaped eraserv",
+        "price": 20.0,
+        "quantity": 40
+    },
+    {
+        "barcode": "9555684655547",
+        "name": "FABER CASTELL oval eraser",
+        "price": 32.0,
+        "quantity": 40
+    },
+    {
+        "barcode": "9555684642394",
+        "name": "FABER CASTELL ERASER",
+        "price": 25.0,
+        "quantity": 24
+    },
+    {
+        "barcode": "9555684606099",
+        "name": "FABER CASTELL ERASER (red)",
+        "price": 15.0,
+        "quantity": 41
+    },
+    {
+        "barcode": "9556089889209",
+        "name": "FABER CASTELL ERASER (black )",
+        "price": 15.0,
+        "quantity": 44
+    },
+    {
+        "barcode": "9556089885201",
+        "name": "FABER CASTELL ERASER (white )",
+        "price": 15.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "9556089006828",
+        "name": "FABER CASTELL ERASER (blue)",
+        "price": 15.0,
+        "quantity": 44
+    },
+    {
+        "barcode": "4007817524053",
+        "name": "STAEDTLER ERASER",
+        "price": 15.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6955929401541",
+        "name": "DAIMARSE برايه 3 عين",
+        "price": 20.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "6972004130028",
+        "name": "KATOON",
+        "price": 15.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "9556089721189",
+        "name": "FABER CASTELL استيكه",
+        "price": 24.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "9555684655486",
+        "name": "FABER CASTELL TRI ERASER",
+        "price": 50.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "9556089716406",
+        "name": "FABER CASTELL INK ERASER",
+        "price": 10.0,
+        "quantity": 12
+    },
+    {
+        "barcode": "6982021172055",
+        "name": "الاندلوسيه برايه بخزان",
+        "price": 7.0,
+        "quantity": 30
+    },
+    {
+        "barcode": "6900850278144",
+        "name": "برايه شكل فواكه",
+        "price": 7.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "4711678072515",
+        "name": "Y-PLUS  برايه",
+        "price": 10.0,
+        "quantity": 28
+    },
+    {
+        "barcode": "4711678054498",
+        "name": "Y-PLUS SPEEDER برايه",
+        "price": 10.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6927055601683",
+        "name": "مادن فرش صغيره",
+        "price": 3.0,
+        "quantity": 69
+    },
+    {
+        "barcode": "8006951911152",
+        "name": "بايب +عيون",
+        "price": 30.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6920230321109",
+        "name": "عيون متحركه",
+        "price": 20.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "7616321312031",
+        "name": "CRAFTLAND عصيان ملونه",
+        "price": 45.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6975254198572",
+        "name": "CRAFT عصيان خسب ساده",
+        "price": 18.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6975254198565",
+        "name": "CRAFT عصيان ملونه",
+        "price": 20.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "4711678071365",
+        "name": "Y-PLUS برايه",
+        "price": 7.0,
+        "quantity": 44
+    },
+    {
+        "barcode": "4711678074410",
+        "name": "Y-PLUS OWL برايه بومه",
+        "price": 23.0,
+        "quantity": 23
+    },
+    {
+        "barcode": "4007593055017",
+        "name": "ياسين برايه معدن",
+        "price": 10.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "8901180834008",
+        "name": "FABER CASTELL METAL SHARPENER doubie hole",
+        "price": 30.0,
+        "quantity": 38
+    },
+    {
+        "barcode": "4455667788993",
+        "name": "FABER CASTELL برايه ممعدن",
+        "price": 20.0,
+        "quantity": 25
+    },
+    {
+        "barcode": "6429310021323",
+        "name": "بكره ورق تسعير",
+        "price": 10.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6222010305782",
+        "name": "اساتيك",
+        "price": 15.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "6251001213010",
+        "name": "فاين مناديل",
+        "price": 3.0,
+        "quantity": 27
+    },
+    {
+        "barcode": "6223014650397",
+        "name": "white wit wipes (KENZO)  2",
+        "price": 5.0,
+        "quantity": 16
+    },
+    {
+        "barcode": "6223014650427",
+        "name": "white wet wipes (cool water)  2",
+        "price": 5.0,
+        "quantity": 23
+    },
+    {
+        "barcode": "8432164247625",
+        "name": "ORAMO headset",
+        "price": 260.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455639",
+        "name": "(P9)HEADSET",
+        "price": 200.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455601",
+        "name": "LUXURY SMART WATCH (MX10)",
+        "price": 785.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455602",
+        "name": "SMART WATCH ( T 2000)  ultra",
+        "price": 385.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455603",
+        "name": "SMART WATCH  ( T 800)ULTRA",
+        "price": 385.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455604",
+        "name": "SMART WATCH ( T 900)ultra BIG",
+        "price": 385.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455605",
+        "name": "SMART WATCH (T 10) ULTRA 3",
+        "price": 550.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455607",
+        "name": "FASHION جراب سامعه بجليتر",
+        "price": 265.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "1122334455608",
+        "name": "حامل معدن",
+        "price": 60.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "1122334455635",
+        "name": "SPEAKER ( JL-4488)",
+        "price": 735.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455634",
+        "name": "SPEAKER (JL_902)",
+        "price": 760.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455623",
+        "name": "SPEAKER SING-E",
+        "price": 270.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "1122334455624",
+        "name": "SPEAKER (GT-112)",
+        "price": 160.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "1122334455626",
+        "name": "SPEAKER (YF-034)",
+        "price": 275.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455629",
+        "name": "SPEAKER (HR-201)",
+        "price": 195.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455628",
+        "name": "SPEAKER (HR-12)",
+        "price": 147.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "1122334455627",
+        "name": "SPEAKER (YF-T17)",
+        "price": 285.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "1122334455630",
+        "name": "SPEAKER SODA",
+        "price": 185.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "1122334455631",
+        "name": "SPEAKER (HR -200)",
+        "price": 197.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "1122334455625",
+        "name": "SPEAKER (GT-113)",
+        "price": 140.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "1122334455632",
+        "name": "SPEAKER (YF-007)",
+        "price": 285.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455633",
+        "name": "SPEAKER  JBL MINI",
+        "price": 185.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6973281283087",
+        "name": "COLORFUL KARAOK SOUND SYSTEM (model K12)",
+        "price": 225.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "1122334455618",
+        "name": "SPEAKER (YS-911)",
+        "price": 360.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6942665992600",
+        "name": "RING FILL LIGHT (HX-260)",
+        "price": 95.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "4895224182931",
+        "name": "LED MAKAUP MIRROR",
+        "price": 200.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455609",
+        "name": "NEWEST headset (M10)",
+        "price": 150.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455610",
+        "name": "DAMAX headset (M20)",
+        "price": 220.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455614",
+        "name": "ENC PRO (M90)",
+        "price": 220.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455615",
+        "name": "PLAYGAMES (M28)",
+        "price": 210.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455613",
+        "name": "NEWEST (M66PRO )",
+        "price": 220.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455606",
+        "name": "ENC HEADSET (touch control )",
+        "price": 650.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455617",
+        "name": "WASP FEELERS mobile gaming finger sleeve",
+        "price": 10.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "1122334455616",
+        "name": "لاصق سيليكون للموبيل",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455619",
+        "name": "DONGLE USB    فلاشه",
+        "price": 45.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6973558963735",
+        "name": "SK YOOLPHIN شاحن تايب سي",
+        "price": 50.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6815648468761",
+        "name": "K-MOJOS تايب سي",
+        "price": 120.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6949810520893",
+        "name": "QUICK CHARGE (232T) تايب سي",
+        "price": 98.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "1122334455621",
+        "name": "شاحن ايفون (20 W)",
+        "price": 90.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "6973965931594",
+        "name": "EARLDM 4USB car charger",
+        "price": 250.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455620",
+        "name": "LDNIO -3dual USB charger",
+        "price": 145.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "1122334455611",
+        "name": "جراب ايربودز لابوبو",
+        "price": 99.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "1122334455622",
+        "name": "JD-F11 مروحه + نور",
+        "price": 265.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455638",
+        "name": "اسكرينه لشاشه الساعه",
+        "price": 25.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "1122334455637",
+        "name": "RING LIGHT (MJ-33)",
+        "price": 150.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "1122334455636",
+        "name": "RING LIGHT (MF-36)",
+        "price": 395.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455612",
+        "name": "ستيكرز حروف للكيبورد",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "3344556677820",
+        "name": "علبه بدبدوب احمر",
+        "price": 85.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788996",
+        "name": "جبس اشكال للتلوين + الوان مايه",
+        "price": 20.0,
+        "quantity": 17
+    },
+    {
+        "barcode": "4007593110013",
+        "name": "ياسين برايه",
+        "price": 3.0,
+        "quantity": 67
+    },
+    {
+        "barcode": "4455667788998",
+        "name": "سلاح الكتر الكبير",
+        "price": 4.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "4455667788999",
+        "name": "سلاح الكتر الصغير",
+        "price": 3.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "4455667788997",
+        "name": "بكره خيط استيك",
+        "price": 10.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "3344556677821",
+        "name": "حزام رجالي جلد",
+        "price": 185.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8680869437074",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437036",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437067",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437104",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437043",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437098",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437081",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437050",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869437012",
+        "name": "SERVE BURGO ERASER",
+        "price": 45.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4005401871736",
+        "name": "FABER CASTELL ERASER CAP GRIP",
+        "price": 30.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8680869438057",
+        "name": "SERVE STEPS ERASER",
+        "price": 55.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869438217",
+        "name": "SERVE STEPS ERASER",
+        "price": 55.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869438040",
+        "name": "SERVE STEPS ERASER",
+        "price": 55.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869438002",
+        "name": "SERVE STEPS ERASER",
+        "price": 55.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8680869438224",
+        "name": "SERVE STEPS ERASER",
+        "price": 55.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "1122334455640",
+        "name": "G-Power حافظه لواصله الشاحن",
+        "price": 40.0,
+        "quantity": 44
+    },
+    {
+        "barcode": "1122334455689",
+        "name": "G-Power حافظه للشاحن(2)",
+        "price": 70.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "4455667788914",
+        "name": "cairo color paper",
+        "price": 45.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "4893055366544",
+        "name": "EGALE sticky notes (classic) (12x 100 sheets)",
+        "price": 189.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4893055486549",
+        "name": "EGALE sticky notes neon colour (12x100sheetss )",
+        "price": 249.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "2233445566737",
+        "name": "فرش ميكاب",
+        "price": 35.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "2233445566738",
+        "name": "برايه ميكاب كبيره",
+        "price": 20.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6977791770266",
+        "name": "KAFURUX PLUMP",
+        "price": 175.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224008086079",
+        "name": "M Design طبق مفلطح",
+        "price": 7777.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6224008086574",
+        "name": "M DESIGN سرفيس",
+        "price": 50.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "10419950168519",
+        "name": "IKEA  صانيه (37x29)cm",
+        "price": 250.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224008086390",
+        "name": "M Design small cup (green )",
+        "price": 25.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6223008750515",
+        "name": "M Designsmall cup (teal)",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224008086369",
+        "name": "M Design small cup (blue)",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6223008750508",
+        "name": "M Design small cup (red)",
+        "price": 25.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224008086147",
+        "name": "M Design طبق مفلطح (21) cm green",
+        "price": 7777.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "6223008750423",
+        "name": "M Design deep plate (red)طبق مفلطح",
+        "price": 40.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224008086178",
+        "name": "M Design plate (purple )",
+        "price": 40.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224007306093",
+        "name": "M Design deep plate ( red/ orange ) طبق مربع",
+        "price": 55.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "6224007306215",
+        "name": "M DESIGN  deep plate (purple)",
+        "price": 55.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6222002209340",
+        "name": "تيكيت ياسين",
+        "price": 5.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "2000004546335",
+        "name": "DISNEY تيكت ديزني",
+        "price": 5.0,
+        "quantity": 70
+    },
+    {
+        "barcode": "5566778899143",
+        "name": "EARRING FOR EARS (stainless steel)",
+        "price": 65.0,
+        "quantity": 20
+    },
+    {
+        "barcode": "4455667788151",
+        "name": "EGALE STICKY NOTS classic  ايجيل ستيكي نوت باستل",
+        "price": 17.0,
+        "quantity": 10
+    },
+    {
+        "barcode": "4455667788150",
+        "name": "EGALE STICKY NOTS neon ايجيل ستيكي نوت نيون",
+        "price": 23.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "4455667788152",
+        "name": "برايه كوره باسكت",
+        "price": 7.0,
+        "quantity": 19
+    },
+    {
+        "barcode": "9802024080829",
+        "name": "butterfly notebook 80 sheets",
+        "price": 30.0,
+        "quantity": 6
+    },
+    {
+        "barcode": "5566778899144",
+        "name": "NECKLACE and EARRING SET stainless steel طقم سلسله وحلق",
+        "price": 95.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899145",
+        "name": "NECKLACE stainless steel   سلسله",
+        "price": 60.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899146",
+        "name": "NECKLACE stainless steel   سلسله",
+        "price": 70.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899147",
+        "name": "NECKLACE stainless steel   سلسله",
+        "price": 80.0,
+        "quantity": 15
+    },
+    {
+        "barcode": "5566778899148",
+        "name": "NECKLACE stainless steel   سلسله",
+        "price": 95.0,
+        "quantity": 7
+    },
+    {
+        "barcode": "5566778899149",
+        "name": "NECKLACE stainless steel   سلسله",
+        "price": 145.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899150",
+        "name": "NECKLACE stainless steel   سلسله",
+        "price": 180.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899151",
+        "name": "BRACELET stainless steel انسيال",
+        "price": 65.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899152",
+        "name": "BRACELET stainless steel انسيال",
+        "price": 95.0,
+        "quantity": 9
+    },
+    {
+        "barcode": "5566778899153",
+        "name": "BRACELET stainless steel انسيال",
+        "price": 145.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899154",
+        "name": "BRACELET stainless steel انسيال",
+        "price": 180.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899155",
+        "name": "BRACELET stainless steel انسيال",
+        "price": 125.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899156",
+        "name": "EARRING FOR EARS (stainless steel)حلق للودان",
+        "price": 50.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "5566778899157",
+        "name": "EARRING FOR EARS stainless steel  حلق للودان",
+        "price": 75.0,
+        "quantity": 21
+    },
+    {
+        "barcode": "5566778899158",
+        "name": "EARRING FOR EARS stainless steel  حلق للودان",
+        "price": 80.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899159",
+        "name": "EARRING FOR EARS stainless steel  حلق للودان",
+        "price": 125.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899160",
+        "name": "RING stainless steel  خاتم",
+        "price": 65.0,
+        "quantity": 13
+    },
+    {
+        "barcode": "5566778899161",
+        "name": "RING stainless steel  خاتم",
+        "price": 75.0,
+        "quantity": 5
+    },
+    {
+        "barcode": "5566778899162",
+        "name": "RING stainless steel  خاتم",
+        "price": 90.0,
+        "quantity": 22
+    },
+    {
+        "barcode": "5566778899163",
+        "name": "RING BUTTERFLY stainless steel  خاتم   فراشه",
+        "price": 100.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "5566778899164",
+        "name": "RING stainless steel خاتم",
+        "price": 140.0,
+        "quantity": 11
+    },
+    {
+        "barcode": "5566778899165",
+        "name": "RING stainless steel  خاتم",
+        "price": 185.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "5566778899166",
+        "name": "EARRING SET stainless steel",
+        "price": 185.0,
+        "quantity": 4
+    },
+    {
+        "barcode": "5566778899167",
+        "name": "NECKLACE and EARRING SET stainless steel طقم سلسله وحلق",
+        "price": 145.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "5566778899168",
+        "name": "NECKLACE and EARRING SET stainless steel طقم سلسله وحلق",
+        "price": 80.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "5566778899169",
+        "name": "BRACELET stainless steel غويشه مسمار",
+        "price": 120.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "5566778899170",
+        "name": "BRACELET stainless steel (3pcs)  غويشه مسمار  3 قطع",
+        "price": 300.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "4455667788153",
+        "name": "ظرف متوسط الحجم",
+        "price": 2.0,
+        "quantity": 0
+    },
+    {
+        "barcode": "4455667788154",
+        "name": "طباعه ابيض واسود",
+        "price": 1.5,
+        "quantity": 965
+    },
+    {
+        "barcode": "4455667788155",
+        "name": "طباعه الوان",
+        "price": 2.0,
+        "quantity": 100
+    },
+    {
+        "barcode": "4455667788156",
+        "name": "طباعه الوان",
+        "price": 3.0,
+        "quantity": 100
+    },
+    {
+        "barcode": "4455667788157",
+        "name": "تصوير",
+        "price": 0.5,
+        "quantity": 884
+    },
+    {
+        "barcode": "6223014650458",
+        "name": "WHITE WIPES ( shoes&bags )   مناديل مبلله للجزم",
+        "price": 5.0,
+        "quantity": 23
+    },
+    {
+        "barcode": "667559294214",
+        "name": "BATH&BODY WORKS diamond shimmer mist(145)ml(a thousand wishes)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659345076",
+        "name": "BATH&BODY WORKS diamond shimmer mist(145)ml(winter candy apple)",
+        "price": 900.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "667559302971",
+        "name": "BATH&BODY WORKS diamond shimmer mist(145)ml(platinum )",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659383818",
+        "name": "BATH&BODY WORKS diamond shimmer mist(145)ml (in the stars)",
+        "price": 950.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659345717",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (sweetes song)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667558547137",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml( luminous)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667557363318",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml( dark velvet oud )",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659320578",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (pink cashmere)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667556039047",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml ( dark kiss )",
+        "price": 900.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "667659357185",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (perfect in pink )",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559116509",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (butterfly)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559300823",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (champagne)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559289470",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (vanilla romance)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667557061429",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (warm vanilla sugar)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559302865",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (platinum)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659357093",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml (|vanilla bean noel)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659349241",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml(into the night)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659357109",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml(twisted pepper mint )",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659337248",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (you're cheeky)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659337231",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (madame mystique )",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659354368",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (all eyes on her)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659337200",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (loyal to you)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659321919",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (if you musk)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659321667",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (getaway soiree)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659354351",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (imperfect beauty)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659321698",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (lost in santal)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659321681",
+        "name": "BATH& BODY WORKS  BODY MIST(236)ml  (on the horizon)",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559285052",
+        "name": "BATH & BODY WORKS CREAM (into the night)بودي كريم باث & بودي",
+        "price": 390.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659347018",
+        "name": "BATH & BODY WORKS CREAM(warm vanilla sugar)   بودي كريم باث & بودي",
+        "price": 390.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "667559285076",
+        "name": "BATH & BODY LOTION(into the night)   باث & بودي بودي لوشن",
+        "price": 390.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "667557498614",
+        "name": "BATH & BODY LOTION( dark kiss)   باث & بودي بودي لوشن",
+        "price": 390.0,
+        "quantity": 3
+    },
+    {
+        "barcode": "667555499316",
+        "name": "BATH & BODY LOTION( dark kiss) (236ml)  باث & بودي بودي لوشن",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659311422",
+        "name": "BATH&BODY shimmer fizz body lotion (winter candy apple) (100g)",
+        "price": 900.0,
+        "quantity": 2
+    },
+    {
+        "barcode": "8712561940900",
+        "name": "VASELINE SPRAY MOISTURIZER (aloe soothe) (190)ml فازلين سبراي مرطب للجسم",
+        "price": 299.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "8851932459754",
+        "name": "VASELINE BODY WASH (SMOOTH GLOW )425ml",
+        "price": 345.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "085715322432",
+        "name": "GUESS BODY MIST seductive red  (250)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "085715323057",
+        "name": "GUESS BODY MIST bella vita (250)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "085715320858",
+        "name": "GUESS BODY MIST girl(250)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "085715321572",
+        "name": "GUESS BODY MIST 1981(250)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224003170032",
+        "name": "SKIN 101BODY GLOW (GOLD BRONZE)60m",
+        "price": 320.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6224003170025",
+        "name": "SKIN 101BODY GLOW (WARM BRONZE)60ml",
+        "price": 320.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659321650",
+        "name": "BATH & BODY WORKS  BODY MIST covered in roses (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659335145",
+        "name": "BATH & BODY WORKS  BODY MIST strawberry pound cake (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659333585",
+        "name": "BATH & BODY WORKS  BODY MIST waikiki beach coconut (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559278023",
+        "name": "BATH & BODY WORKS  BODY MIST paris amour (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559282471",
+        "name": "BATH & BODY WORKS  BODY MIST  strawberry pound cake (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667558426074",
+        "name": "BATH & BODY WORKS  BODY MIST chasing fireflies (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659337286",
+        "name": "BATH & BODY WORKS  BODY MIST seeing rouge (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667659337293",
+        "name": "BATH & BODY WORKS  BODY MIST midnight addiction  (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "667559139683",
+        "name": "BATH & BODY WORKS  BODY MIST brightest bloom (236)ml",
+        "price": 900.0,
+        "quantity": 1
+    },
+    {
+        "barcode": "6977791770129",
+        "name": "kafurux plump (3D)",
+        "price": 175.0,
+        "quantity": 1
+    }
 ]

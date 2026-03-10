@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "id": 1,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "12345",
+                "name": "Product A",
+                "price": 60.0,
+                "quantity": 1
+            }
+        ],
+        "subtotal": 60.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "total": 60.0,
+        "promo_code": "",
+        "date": "2026-03-07"
+    }
+]
