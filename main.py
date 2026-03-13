@@ -3,7 +3,7 @@ from gui.login_screen import LoginScreen
 import os
 
 # Client PC data folder path
-DATA_DIR = r"C:\Users\A\Desktop\JUSTB\data"
+DATA_DIR = r"C:\Users\Ziad\JUSTB\gui\data\products.json"
 
 
 # Initialize root window
