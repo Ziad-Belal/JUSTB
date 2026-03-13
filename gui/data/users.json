@@ -1,12 +1,12 @@
 [
     {
         "username": "admin",
-        "password": "admin123",
+        "password": "$2b$12$lijl7cVu4h88OAEGBX7zc.GEgx4AeERhr0oZV2IowLXKhA2OmUBDu",
         "role": "Admin"
     },
     {
         "username": "cashier",
-        "password": "cashier123",
+        "password": "$2b$12$Ye89mb1RlbFF73VuKqtbWuapT0yEBcM4v/hD1SPreQZwIk3VMaU6O",
         "role": "Cashier"
     }
 ]
