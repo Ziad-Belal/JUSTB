@@ -4,6 +4,7 @@ from gui.pos_screen import POSScreen
 from gui.product_management import ProductManagementScreen
 from gui.promo_management import PromoManagementScreen
 from gui.daily_feedback import DailyFeedbackScreen
+from gui.receipt_database import ReceiptDatabaseScreen
 from utils.helpers import load_json
 import os
 
@@ -85,8 +86,12 @@ class AdminDashboard:
         self.feedback_tab = DailyFeedbackScreen(root, data_dir=self.data_dir,
                                                  frame_parent=self.notebook,
                                                  admin=True).frame
+        self.receipt_tab  = ReceiptDatabaseScreen(root, data_dir=self.data_dir,
+                                                   frame_parent=self.notebook,
+                                                   admin=True).frame
 
         self.notebook.add(self.pos_tab,      text="POS")
         self.notebook.add(self.product_tab,  text="Products")
         self.notebook.add(self.promo_tab,    text="Promotions")
         self.notebook.add(self.feedback_tab, text="Daily Feedback")
+        self.notebook.add(self.receipt_tab,  text="📋 Receipts")
