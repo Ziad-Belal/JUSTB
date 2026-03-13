@@ -193,6 +193,53 @@ def _qr_escpos(url):
 #  Receipt assembler  (untouched)
 # ══════════════════════════════════════════════════════════════════════════════
 
+def _barcode_escpos(sale_id):
+    """
+    Prints a CODE128 barcode encoding 'RCPT-XXXXXX' via ESC/POS.
+    When scanned, the Receipt Database will decode this and jump to the receipt.
+    Falls back gracefully if python-barcode is unavailable.
+    """
+    code = f"RCPT-{sale_id:06d}"
+    try:
+        import barcode as pybarcode
+        from barcode.writer import ImageWriter
+        import io
+        bc_class = pybarcode.get_barcode_class("code128")
+        bc = bc_class(code, writer=ImageWriter())
+        buf = io.BytesIO()
+        bc.write(buf, options={"write_text": True, "quiet_zone": 2,
+                               "module_width": 0.8, "module_height": 8.0})
+        buf.seek(0)
+        if not PIL_AVAILABLE:
+            return b''
+        img = Image.open(buf).convert("L")
+        # Scale to paper width
+        ratio = PAPER_WIDTH_DOTS / img.width
+        new_h = max(1, int(img.height * ratio))
+        img   = img.resize((PAPER_WIDTH_DOTS, new_h), Image.LANCZOS)
+        img   = img.point(lambda p: 0 if p < 128 else 255, '1')
+        w_bytes = (PAPER_WIDTH_DOTS + 7) // 8
+        height  = img.height
+        header  = (GS + b'v0\x00'
+                   + bytes([w_bytes & 0xFF, (w_bytes >> 8) & 0xFF])
+                   + bytes([height   & 0xFF, (height   >> 8) & 0xFF]))
+        px   = img.load()
+        rows = bytearray()
+        for y in range(height):
+            for bx in range(w_bytes):
+                byte = 0
+                for bit in range(8):
+                    x = bx * 8 + bit
+                    if x < PAPER_WIDTH_DOTS and px[x, y] == 0:
+                        byte |= (0x80 >> bit)
+                rows.append(byte)
+        return ALIGN_CENTER + header + bytes(rows) + b'\n'
+    except Exception as e:
+        print(f"[Barcode] {e}")
+        # Fallback: print the code as plain text so it's at least visible
+        return ALIGN_CENTER + _enc(f"[ {code} ]") + b'\n'
+
+
 def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""):
     W        = RECEIPT_CHAR_WIDTH
     date_str = datetime.now().strftime("%d/%m/%Y  %H:%M")
@@ -256,6 +303,14 @@ def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""
     raw += _enc("We hope to see you again  :)") + b'\n'
     raw += _divider('~')
     raw += b'\n'
+    # ── Receipt lookup barcode ──────────────────────────────────────────────
+    raw += _divider('-')
+    raw += ALIGN_CENTER
+    raw += _enc("RECEIPT LOOKUP") + b'\n'
+    raw += _barcode_escpos(sale_id)
+    raw += _enc(f"RCPT-{sale_id:06d}") + b'\n'
+    raw += b'\n'
+    # ───────────────────────────────────────────────────────────────────────
     raw += _qr_escpos("https://justb-eg.com")
     raw += ALIGN_CENTER
     raw += _enc("Scan to visit our website!") + b'\n'
