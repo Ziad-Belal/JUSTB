@@ -388,6 +388,18 @@ class POSScreen:
         self._logo_img     = None   # keep reference to avoid GC
 
         self._build_ui()
+        # Return focus to barcode field on any click on a non-interactive area
+        self.frame.bind_all("<Button-1>", self._maybe_refocus)
+
+    def _refocus(self):
+        """Snap focus back to the barcode entry."""
+        self.barcode_entry.focus_set()
+
+    def _maybe_refocus(self, event):
+        """Refocus barcode field unless the user clicked an interactive widget."""
+        interactive = (tk.Entry, tk.Button, ttk.Combobox, ttk.Scrollbar)
+        if not isinstance(event.widget, interactive):
+            self.frame.after(10, self._refocus)
 
     # ─────────────────────────────────────────────────────────────────────────
     def _build_ui(self):
@@ -727,6 +739,7 @@ class POSScreen:
             messagebox.showerror("Not Found",
                 "Product not in inventory.\nAdd it first in the Products tab.")
             self.barcode_entry.delete(0, tk.END)
+            self._refocus()
             return
 
         available = int(product.get("quantity", 0))
@@ -737,6 +750,7 @@ class POSScreen:
             messagebox.showinfo("Out of Stock",
                 f"Maximum stock reached ({available} units).")
             self.barcode_entry.delete(0, tk.END)
+            self._refocus()
             return
 
         qty = simpledialog.askinteger(
@@ -745,6 +759,7 @@ class POSScreen:
             minvalue=1, maxvalue=remaining, parent=self.frame)
         if qty is None:
             self.barcode_entry.delete(0, tk.END)
+            self._refocus()
             return
 
         for item in self.cart:
@@ -753,6 +768,7 @@ class POSScreen:
                 self.update_tree()
                 self.update_total()
                 self.barcode_entry.delete(0, tk.END)
+                self._refocus()
                 return
 
         self.cart.append({
@@ -764,6 +780,7 @@ class POSScreen:
         self.update_tree()
         self.update_total()
         self.barcode_entry.delete(0, tk.END)
+        self._refocus()
 
     def update_tree(self):
         for i in self.tree.get_children():
@@ -861,6 +878,7 @@ class POSScreen:
         self.promo_status.config(text="")
         self.update_tree()
         self.update_total()
+        self._refocus()
 
     def clear_cart(self):
         self.cart          = []
@@ -870,6 +888,7 @@ class POSScreen:
         self.promo_status.config(text="")
         self.update_tree()
         self.update_total()
+        self._refocus()
 
     # ── switch user ───────────────────────────────────────────────────────────────
 
