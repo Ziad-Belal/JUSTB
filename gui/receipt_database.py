@@ -264,51 +264,41 @@ class ReceiptDatabaseScreen:
         search_card = tk.Frame(self.frame, bg=C["bg_card"],
                                highlightthickness=1,
                                highlightbackground=C["border"],
-                               padx=16, pady=12)
+                               padx=16, pady=14)
         search_card.pack(fill="x", padx=14, pady=(12, 0))
+        search_card.columnconfigure(1, weight=1)
 
         # coloured accent
         tk.Frame(search_card, bg=C["teal"], height=3).grid(
-            row=0, column=0, columnspan=6, sticky="ew", pady=(0, 10))
+            row=0, column=0, columnspan=4, sticky="ew", pady=(0, 10))
 
-        tk.Label(search_card, text="🔍  SEARCH  /  SCAN RECEIPT BARCODE",
+        tk.Label(search_card, text="▦  SCAN RECEIPT BARCODE  /  ENTER RECEIPT NUMBER",
                  font=FONT_SECTION, bg=C["bg_card"],
-                 fg=C["text_light"]).grid(row=1, column=0, columnspan=6,
-                                           sticky="w", pady=(0, 6))
+                 fg=C["text_light"]).grid(row=1, column=0, columnspan=4,
+                                           sticky="w", pady=(0, 8))
 
-        # Receipt # search
         tk.Label(search_card, text="Receipt #",
                  font=FONT_LABEL_B, bg=C["bg_card"],
-                 fg=C["text_mid"]).grid(row=2, column=0, sticky="w", padx=(0, 6))
-        self.num_entry = _entry(search_card, width=12)
-        self.num_entry.grid(row=2, column=1, ipady=5, padx=(0, 16))
-        # Bind Enter so scanner "sends Enter" after barcode → auto-search
+                 fg=C["text_mid"]).grid(row=2, column=0, sticky="w", padx=(0, 10))
+
+        self.num_entry = _entry(search_card, width=20)
+        self.num_entry.grid(row=2, column=1, sticky="ew", ipady=7, padx=(0, 10))
+        # Enter key = scanner trigger OR manual search
         self.num_entry.bind("<Return>", lambda e: self._scanner_lookup())
+        self.num_entry.focus()
 
-        # Date search
-        tk.Label(search_card, text="Date (YYYY-MM-DD)",
-                 font=FONT_LABEL_B, bg=C["bg_card"],
-                 fg=C["text_mid"]).grid(row=2, column=2, sticky="w", padx=(0, 6))
-        self.date_entry = _entry(search_card, width=14)
-        self.date_entry.grid(row=2, column=3, ipady=5, padx=(0, 16))
-        self.date_entry.bind("<Return>", lambda e: self.search())
+        _btn(search_card, "  GO  ", self._scanner_lookup,
+             C["teal"], "#159F9F",
+             font=FONT_BTN, padx=20, pady=7).grid(row=2, column=2, padx=(0, 8))
 
-        # Cashier search
-        tk.Label(search_card, text="Cashier",
-                 font=FONT_LABEL_B, bg=C["bg_card"],
-                 fg=C["text_mid"]).grid(row=2, column=4, sticky="w", padx=(0, 6))
-        self.cashier_entry = _entry(search_card, width=12)
-        self.cashier_entry.grid(row=2, column=5, ipady=5, padx=(0, 16))
-        self.cashier_entry.bind("<Return>", lambda e: self.search())
+        _btn(search_card, "↺", self.reset_search,
+             C["text_mid"], "#4B4B6A",
+             font=FONT_BTN, padx=14, pady=7).grid(row=2, column=3)
 
-        # Buttons row
+        # Buttons row (refresh + admin delete)
         btn_row = tk.Frame(self.frame, bg=C["bg_root"])
         btn_row.pack(fill="x", padx=14, pady=8)
 
-        _btn(btn_row, "🔍  Search", self.search,
-             C["purple"], "#7C3AED").pack(side="left", padx=(0, 8))
-        _btn(btn_row, "↺  Reset", self.reset_search,
-             C["text_mid"], "#4B4B6A").pack(side="left", padx=(0, 8))
         _btn(btn_row, "⟳  Refresh", self.load_receipts,
              C["teal"], "#159F9F").pack(side="left")
 
@@ -411,35 +401,25 @@ class ReceiptDatabaseScreen:
 
     # ─────────────────────────────────────────────────────────────────────────
     def search(self):
-        num     = self.num_entry.get().strip()
-        date    = self.date_entry.get().strip()
-        cashier = self.cashier_entry.get().strip().lower()
-
-        results = self._all
-        if num:
+        num = self.num_entry.get().strip()
+        if not num:
+            self._filtered = list(self._all)
+        else:
             try:
                 n = int(num)
-                results = [r for r in results if r.get("id") == n]
+                self._filtered = [r for r in self._all if r.get("id") == n]
             except ValueError:
-                pass
-        if date:
-            results = [r for r in results if r.get("date", "") == date]
-        if cashier:
-            results = [r for r in results
-                       if cashier in r.get("user", "").lower()]
-
-        self._filtered = results
+                self._filtered = []
         self._refresh_tree()
         self.status_lbl.config(
-            text=f"Found {len(results)} result(s).",
-            fg=C["purple"] if results else C["danger"])
+            text=f"Found {len(self._filtered)} result(s).",
+            fg=C["purple"] if self._filtered else C["danger"])
 
     def reset_search(self):
         self.num_entry.delete(0, tk.END)
-        self.date_entry.delete(0, tk.END)
-        self.cashier_entry.delete(0, tk.END)
         self._filtered = list(self._all)
         self._refresh_tree()
+        self.status_lbl.config(text="")
 
     # ── Barcode scanner lookup ─────────────────────────────────────────────
     def _scanner_lookup(self):

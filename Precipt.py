@@ -5,7 +5,7 @@ Run from your project root:
     python preview_receipt.py
 
 Generates  receipt_preview.png  and opens it automatically.
-Shows the receipt EXACTLY as it will print — including logo and QR code.
+Shows the receipt EXACTLY as it will print — including logo, receipt barcode, and QR code.
 """
 
 import sys, os
@@ -41,7 +41,17 @@ except ImportError:
     print("ERROR: qrcode not installed. Run:  pip install qrcode")
     sys.exit(1)
 
+try:
+    import barcode as pybarcode
+    from barcode.writer import ImageWriter
+    BARCODE_AVAILABLE = True
+except ImportError:
+    BARCODE_AVAILABLE = False
+    print("⚠ python-barcode not installed. Run:  pip install python-barcode")
+    print("  Receipt lookup barcode will be shown as text fallback.")
+
 from datetime import datetime
+import io
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  Settings
@@ -54,9 +64,10 @@ LINE_H      = 24           # pixels per text line
 BG          = (255, 255, 255)
 FG          = (15,  15,  15)
 GRAY        = (150, 150, 150)
+GREEN       = (34,  139,  34)
 WEBSITE_URL = "https://justb-eg.com"
 
-# ── Fonts (uses Courier New on Windows — perfect monospace match) ──────────────
+# ── Fonts ──────────────────────────────────────────────────────────────────────
 def _font(size=13, bold=False):
     candidates_bold   = ["courbd.ttf", "DejaVuSansMono-Bold.ttf",  "LiberationMono-Bold.ttf"]
     candidates_normal = ["cour.ttf",   "DejaVuSansMono.ttf",       "LiberationMono.ttf"]
@@ -68,10 +79,10 @@ def _font(size=13, bold=False):
             pass
     return ImageFont.load_default()
 
-font_normal   = _font(13)
-font_bold     = _font(14, bold=True)
-font_large    = _font(18, bold=True)
-font_small    = _font(11)
+font_normal = _font(13)
+font_bold   = _font(14, bold=True)
+font_large  = _font(18, bold=True)
+font_small  = _font(11)
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  Helpers
@@ -87,19 +98,12 @@ def centered_x(draw, text, font, paper_w=PAPER_W, pad=PAD):
     w = text_w(draw, text, font)
     return pad + max(0, (paper_w - w) // 2)
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  Build the preview image section by section
-# ══════════════════════════════════════════════════════════════════════════════
-
-sections = []   # list of PIL Image objects to stack vertically
-
 def make_blank(h, bg=BG):
     return Image.new("RGB", (PAPER_W + PAD * 2, h), bg)
 
 def add_text_img(text, font, color=FG, align="left", bg=BG, pad_top=4, pad_bot=4):
     img  = make_blank(LINE_H + pad_top + pad_bot, bg)
     draw = ImageDraw.Draw(img)
-    w    = img.width
     if align == "center":
         x = centered_x(draw, text, font, PAPER_W, PAD)
     elif align == "right":
@@ -112,26 +116,28 @@ def add_text_img(text, font, color=FG, align="left", bg=BG, pad_top=4, pad_bot=4
 def add_divider(char="-", color=GRAY):
     img  = make_blank(16)
     draw = ImageDraw.Draw(img)
-    line = char * 42
-    draw.text((PAD, 2), line[:42], font=font_small, fill=color)
+    draw.text((PAD, 2), char * 42, font=font_small, fill=color)
     return img
 
 def add_spacer(h=10):
     return make_blank(h)
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  Build sections
+# ══════════════════════════════════════════════════════════════════════════════
+
+sections = []
+
 # ── 1. LOGO ────────────────────────────────────────────────────────────────────
 if os.path.exists(LOGO_PATH):
     try:
         logo = Image.open(LOGO_PATH).convert("RGBA")
-        # White background for transparency
         bg_logo = Image.new("RGB", logo.size, (255, 255, 255))
         bg_logo.paste(logo, mask=logo.split()[3])
-        logo = bg_logo
-        # Scale to paper width
+        logo   = bg_logo
         ratio  = PAPER_W / logo.width
         new_h  = max(1, int(logo.height * ratio))
         logo   = logo.resize((PAPER_W, new_h), Image.LANCZOS)
-        # Paste centred
         canvas = make_blank(new_h + 10)
         canvas.paste(logo, (PAD, 5))
         sections.append(canvas)
@@ -181,7 +187,7 @@ for item in FAKE_SALE["items"]:
 sections.append(add_divider("-"))
 
 # ── 5. TOTALS ──────────────────────────────────────────────────────────────────
-LW = 22
+LW       = 22
 disc_pct = FAKE_SALE["discount_pct"]
 disc_amt = subtotal * (disc_pct / 100.0)
 final    = subtotal - disc_amt
@@ -192,7 +198,7 @@ sections.append(add_text_img(
 if disc_pct > 0:
     sections.append(add_text_img(
         f"{'Discount (' + str(int(disc_pct)) + '%):':>{LW}} -{disc_amt:>8.2f} EGP",
-        font_normal, (34, 139, 34), "left"))
+        font_normal, GREEN, "left"))
 
 sections.append(add_divider("="))
 sections.append(add_text_img(
@@ -210,7 +216,57 @@ sections.append(add_text_img("We hope to see you again  :)",     font_normal, GR
 sections.append(add_divider("~"))
 sections.append(add_spacer(12))
 
-# ── 7. QR CODE ─────────────────────────────────────────────────────────────────
+# ── 7. RECEIPT LOOKUP BARCODE ──────────────────────────────────────────────────
+#
+#  This is the NEW barcode added to every receipt.
+#  Format: RCPT-000001  (Code128)
+#  When scanned, the Receipt Database screen reads this value,
+#  strips the "RCPT-" prefix, and jumps directly to that receipt.
+#
+receipt_code = f"RCPT-{FAKE_SALE['id']:06d}"
+sections.append(add_divider("-"))
+sections.append(add_text_img("RECEIPT LOOKUP", font_small, GRAY, "center"))
+sections.append(add_spacer(6))
+
+if BARCODE_AVAILABLE:
+    try:
+        bc_class = pybarcode.get_barcode_class("code128")
+        bc       = bc_class(receipt_code, writer=ImageWriter())
+        buf      = io.BytesIO()
+        bc.write(buf, options={
+            "write_text":   True,
+            "quiet_zone":   4,
+            "module_width": 0.9,
+            "module_height": 12.0,
+            "font_size":    8,
+            "text_distance": 3,
+        })
+        buf.seek(0)
+        bc_img = Image.open(buf).convert("RGB")
+
+        # Scale to fit paper width with padding
+        target_w = PAPER_W - 20
+        ratio    = target_w / bc_img.width
+        new_h    = max(1, int(bc_img.height * ratio))
+        bc_img   = bc_img.resize((target_w, new_h), Image.LANCZOS)
+
+        canvas = make_blank(new_h + 10)
+        x_off  = PAD + (PAPER_W - target_w) // 2
+        canvas.paste(bc_img, (x_off, 5))
+        sections.append(canvas)
+        print(f"✓ Receipt barcode generated: {receipt_code}")
+    except Exception as e:
+        print(f"⚠ Barcode error: {e}")
+        sections.append(add_text_img(f"[ {receipt_code} ]", font_bold, FG, "center"))
+else:
+    # Plain-text fallback
+    sections.append(add_text_img(f"[ {receipt_code} ]", font_bold, FG, "center"))
+
+sections.append(add_spacer(10))
+sections.append(add_divider("-"))
+sections.append(add_spacer(12))
+
+# ── 8. WEBSITE QR CODE ─────────────────────────────────────────────────────────
 try:
     qr = qrcode.QRCode(
         version=3,
@@ -220,9 +276,7 @@ try:
     )
     qr.add_data(WEBSITE_URL)
     qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
-
-    # Scale to 60% of paper width, centred
+    qr_img   = qr.make_image(fill_color="black", back_color="white").convert("RGB")
     target_w = int(PAPER_W * 0.60)
     ratio    = target_w / qr_img.width
     new_h    = max(1, int(qr_img.height * ratio))
@@ -233,7 +287,7 @@ try:
     x_off    = PAD + (PAPER_W - target_w) // 2
     canvas.paste(qr_img, (x_off, 5))
     sections.append(canvas)
-    print("✓ QR code generated for:", WEBSITE_URL)
+    print(f"✓ QR code generated for: {WEBSITE_URL}")
 except Exception as e:
     print(f"⚠ QR error: {e}")
     sections.append(add_text_img("[QR Code]", font_small, GRAY, "center"))
@@ -246,7 +300,7 @@ sections.append(add_spacer(20))
 #  Stack all sections and save
 # ══════════════════════════════════════════════════════════════════════════════
 
-total_h = sum(s.height for s in sections)
+total_h   = sum(s.height for s in sections)
 final_img = Image.new("RGB", (PAPER_W + PAD * 2, total_h), BG)
 
 y = 0
@@ -254,7 +308,6 @@ for s in sections:
     final_img.paste(s, (0, y))
     y += s.height
 
-# Add a subtle drop shadow border
 bordered = ImageOps.expand(final_img, border=2, fill=(220, 220, 220))
 
 out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "receipt_preview.png")
@@ -262,7 +315,6 @@ bordered.save(out_path)
 
 print(f"\n✓ Receipt preview saved!\n  → {out_path}\n")
 
-# Auto-open
 try:
     os.startfile(out_path)
     print("  Opening automatically...")
