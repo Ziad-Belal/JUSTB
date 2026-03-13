@@ -13,9 +13,10 @@ except ImportError:
     WIN32_AVAILABLE = False
 
 class ProductManagementScreen:
-    def __init__(self, root, data_dir, frame_parent=None):
+    def __init__(self, root, data_dir, frame_parent=None, cashier_mode=False):
         self.root = root
         self.data_dir = data_dir
+        self.cashier_mode = cashier_mode
         self.frame = tk.Frame(frame_parent or root, padx=10, pady=10)
         self.frame.pack(fill="both", expand=True)
 
@@ -61,8 +62,9 @@ class ProductManagementScreen:
         btns = tk.Frame(self.frame)
         btns.pack(anchor="w")
         tk.Button(btns, text="Add Product", command=self.add_product_popup, bg="green", fg="white").pack(side="left", padx=5, pady=5)
-        tk.Button(btns, text="Edit Product", command=self.edit_product_popup, bg="orange", fg="white").pack(side="left", padx=5, pady=5)
-        tk.Button(btns, text="Delete Product", command=self.delete_product, bg="red", fg="white").pack(side="left", padx=5, pady=5)
+        if not self.cashier_mode:
+            tk.Button(btns, text="Edit Product", command=self.edit_product_popup, bg="orange", fg="white").pack(side="left", padx=5, pady=5)
+            tk.Button(btns, text="Delete Product", command=self.delete_product, bg="red", fg="white").pack(side="left", padx=5, pady=5)
         tk.Button(btns, text="Print Product", command=self.print_product, bg="blue", fg="white").pack(side="left", padx=5, pady=5)
         tk.Button(btns, text="Refresh", command=self.load_products).pack(side="left", padx=5, pady=5)
 
