@@ -240,7 +240,7 @@ def _barcode_escpos(sale_id):
         return ALIGN_CENTER + _enc(f"[ {code} ]") + b'\n'
 
 
-def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""):
+def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code="", payment_method="Cash"):
     W        = RECEIPT_CHAR_WIDTH
     date_str = datetime.now().strftime("%d/%m/%Y  %H:%M")
     raw      = bytearray()
@@ -257,6 +257,7 @@ def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""
     raw += _enc(f"Receipt # : {sale_id:06d}") + b'\n'
     raw += _enc(f"Date      : {date_str}") + b'\n'
     raw += _enc(f"Cashier   : {cashier}") + b'\n'
+    raw += _enc(f"Payment   : {payment_method}") + b'\n'
     raw += _divider('=')
     raw += BOLD_ON
     raw += _enc(f"{'ITEM':<20} {'QTY':>3}  {'PRICE':>6}  {'TOTAL':>7}") + b'\n'
@@ -388,26 +389,22 @@ class POSScreen:
         self._logo_img     = None   # keep reference to avoid GC
 
         self._build_ui()
-        # Return focus to barcode field on any click on a non-interactive area
-        self._bind_refocus(self.frame)
+        # Restore focus to barcode entry whenever it loses focus to a non-entry widget
+        self.barcode_entry.bind("<FocusOut>", self._on_barcode_focus_out)
 
     def _refocus(self):
         """Snap focus back to the barcode entry."""
         self.barcode_entry.focus_set()
 
-    def _bind_refocus(self, widget):
-        """Recursively bind click-to-refocus on every non-interactive child of the POS frame."""
-        interactive = (tk.Entry, tk.Button, ttk.Combobox, ttk.Scrollbar, ttk.Treeview)
-        if not isinstance(widget, interactive):
-            widget.bind("<Button-1>", self._maybe_refocus)
-        for child in widget.winfo_children():
-            self._bind_refocus(child)
-
-    def _maybe_refocus(self, event):
-        """Refocus barcode field on click of a non-interactive widget inside POS frame only."""
-        interactive = (tk.Entry, tk.Button, ttk.Combobox, ttk.Scrollbar, ttk.Treeview)
-        if not isinstance(event.widget, interactive):
-            self.frame.after(10, self._refocus)
+    def _on_barcode_focus_out(self, event):
+        """When barcode field loses focus, return it unless focus went to another Entry or popup."""
+        def _check():
+            focused = self.frame.focus_get()
+            # Only steal back if focus went to a non-Entry widget (label, frame, treeview, etc.)
+            # or went to nothing — never steal from Entry, Button, Combobox, or Toplevel
+            if focused is None or isinstance(focused, (tk.Frame, tk.Canvas, ttk.Treeview)):
+                self.barcode_entry.focus_set()
+        self.frame.after(150, _check)
 
     # ─────────────────────────────────────────────────────────────────────────
     def _build_ui(self):
@@ -836,10 +833,124 @@ class POSScreen:
         self.promo_status.config(
             text=f"✓  {int(pct)}% discount applied!", fg=C["success"])
 
+    def _ask_payment_method(self):
+        """Popup — returns 'Cash', 'Visa', 'Split: EGP X cash / EGP Y visa', or None if cancelled."""
+        result = [None]
+
+        popup = tk.Toplevel(self.root)
+        popup.title("Payment Method")
+        popup.resizable(False, False)
+        popup.grab_set()
+        popup.configure(bg=C["bg_card"])
+
+        popup.update_idletasks()
+        pw, ph = 340, 260
+        sx = popup.winfo_screenwidth()
+        sy = popup.winfo_screenheight()
+        popup.geometry(f"{pw}x{ph}+{(sx-pw)//2}+{(sy-ph)//2}")
+
+        tk.Frame(popup, bg=C["purple"], height=3).pack(fill="x")
+
+        tk.Label(popup, text="How is the customer paying?",
+                 font=FONT_LABEL_B, bg=C["bg_card"],
+                 fg=C["text_dark"]).pack(pady=(16, 12))
+
+        # ── Cash / Visa row ───────────────────────────────────────────
+        btn_row = tk.Frame(popup, bg=C["bg_card"])
+        btn_row.pack()
+
+        def pick(method):
+            result[0] = method
+            popup.destroy()
+
+        cash_btn = tk.Label(btn_row, text="  CASH  ", font=FONT_BTN_LG,
+                            bg=C["green"], fg="#FFFFFF", cursor="hand2",
+                            relief="flat", padx=18, pady=10)
+        cash_btn.pack(side="left", padx=(0, 14))
+        cash_btn.bind("<Button-1>", lambda e: pick("Cash"))
+        cash_btn.bind("<Enter>",    lambda e: cash_btn.config(bg=C["success"]))
+        cash_btn.bind("<Leave>",    lambda e: cash_btn.config(bg=C["green"]))
+
+        visa_btn = tk.Label(btn_row, text="  VISA  ", font=FONT_BTN_LG,
+                            bg=C["purple"], fg="#FFFFFF", cursor="hand2",
+                            relief="flat", padx=18, pady=10)
+        visa_btn.pack(side="left")
+        visa_btn.bind("<Button-1>", lambda e: pick("Visa"))
+        visa_btn.bind("<Enter>",    lambda e: visa_btn.config(bg="#7C3AED"))
+        visa_btn.bind("<Leave>",    lambda e: visa_btn.config(bg=C["purple"]))
+
+        # ── Divider ───────────────────────────────────────────────────
+        tk.Frame(popup, bg=C["border"], height=1).pack(fill="x", padx=20, pady=(14, 10))
+
+        # ── Split row ─────────────────────────────────────────────────
+        split_frame = tk.Frame(popup, bg=C["bg_card"])
+        split_frame.pack()
+
+        tk.Label(split_frame, text="Cash", font=FONT_LABEL_B,
+                 bg=C["bg_card"], fg=C["text_mid"]).pack(side="left", padx=(0, 6))
+
+        cash_entry = tk.Entry(split_frame, font=FONT_ENTRY, width=8,
+                              bg=C["bg_input"], fg=C["text_dark"],
+                              relief="flat", highlightthickness=2,
+                              highlightbackground=C["border"],
+                              highlightcolor=C["orange"])
+        cash_entry.pack(side="left", ipady=5)
+        cash_entry.insert(0, "0")
+
+        tk.Label(split_frame, text="  +  Visa", font=FONT_LABEL_B,
+                 bg=C["bg_card"], fg=C["text_mid"]).pack(side="left", padx=(8, 6))
+
+        visa_entry = tk.Entry(split_frame, font=FONT_ENTRY, width=8,
+                              bg=C["bg_input"], fg=C["text_dark"],
+                              relief="flat", highlightthickness=2,
+                              highlightbackground=C["border"],
+                              highlightcolor=C["purple"])
+        visa_entry.pack(side="left", ipady=5)
+        visa_entry.insert(0, "0")
+
+        def pick_split():
+            try:
+                c = float(cash_entry.get().strip() or 0)
+                v = float(visa_entry.get().strip() or 0)
+            except ValueError:
+                cash_entry.config(highlightbackground=C["danger"])
+                return
+            if c <= 0 and v <= 0:
+                cash_entry.config(highlightbackground=C["danger"])
+                return
+            result[0] = f"Split: EGP {c:.2f} cash + EGP {v:.2f} visa"
+            popup.destroy()
+
+        split_btn = tk.Label(popup, text="  SPLIT  ", font=FONT_BTN,
+                             bg=C["orange"], fg="#FFFFFF", cursor="hand2",
+                             relief="flat", padx=16, pady=8)
+        split_btn.pack(pady=(10, 0))
+        split_btn.bind("<Button-1>", lambda e: pick_split())
+        split_btn.bind("<Enter>",    lambda e: split_btn.config(bg="#D97706"))
+        split_btn.bind("<Leave>",    lambda e: split_btn.config(bg=C["orange"]))
+
+        # Keyboard shortcuts
+        popup.bind("c", lambda e: pick("Cash"))
+        popup.bind("C", lambda e: pick("Cash"))
+        popup.bind("v", lambda e: pick("Visa"))
+        popup.bind("V", lambda e: pick("Visa"))
+        popup.bind("<Escape>", lambda e: popup.destroy())
+        cash_entry.bind("<Return>", lambda e: visa_entry.focus())
+        visa_entry.bind("<Return>", lambda e: pick_split())
+
+        cash_entry.focus()
+        popup.wait_window()
+        return result[0]
+
     def finalize_sale(self):
         if not self.cart:
             messagebox.showinfo("Empty Cart", "Add items to the cart first.")
             return
+
+        # ── Payment method popup ───────────────────────────────────────────
+        payment_method = self._ask_payment_method()
+        if payment_method is None:
+            return  # user cancelled
 
         products = load_json(self._products_path())
         for item in self.cart:
@@ -858,24 +969,26 @@ class POSScreen:
         final    = subtotal - disc_amt
 
         sale_record = {
-            "id":           sale_id,
-            "user":         self.user_name,
-            "items":        list(self.cart),
-            "subtotal":     round(subtotal, 2),
-            "discount_pct": self._discount_pct,
-            "discount_amt": round(disc_amt, 2),
-            "total":        round(final, 2),
-            "promo_code":   self._promo_code,
-            "date":         get_today_date(),
+            "id":             sale_id,
+            "user":           self.user_name,
+            "items":          list(self.cart),
+            "subtotal":       round(subtotal, 2),
+            "discount_pct":   self._discount_pct,
+            "discount_amt":   round(disc_amt, 2),
+            "total":          round(final, 2),
+            "promo_code":     self._promo_code,
+            "payment_method": payment_method,
+            "date":           get_today_date(),
         }
         sales.append(sale_record)
         save_json(self._sales_path(), sales)
 
         receipt_bytes = build_receipt(
             sale_id, sale_record,
-            cashier      = self.user_name,
-            discount_pct = self._discount_pct,
-            promo_code   = self._promo_code,
+            cashier         = self.user_name,
+            discount_pct    = self._discount_pct,
+            promo_code      = self._promo_code,
+            payment_method  = payment_method,
         )
         self._send_to_printer(sale_id, receipt_bytes)
 

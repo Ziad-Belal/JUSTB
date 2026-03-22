@@ -16,5 +16,43 @@
         "total": 60.0,
         "promo_code": "",
         "date": "2026-03-07"
+    },
+    {
+        "id": 2,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "430001944131",
+                "name": "لعبة عربية exhost smash",
+                "price": 320.0,
+                "quantity": 1
+            }
+        ],
+        "subtotal": 320.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "total": 320.0,
+        "promo_code": "",
+        "payment_method": "Visa",
+        "date": "2026-03-22"
+    },
+    {
+        "id": 3,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "430001944131",
+                "name": "لعبة عربية exhost smash",
+                "price": 320.0,
+                "quantity": 1
+            }
+        ],
+        "subtotal": 320.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "total": 320.0,
+        "promo_code": "",
+        "payment_method": "Cash",
+        "date": "2026-03-22"
     }
 ]
