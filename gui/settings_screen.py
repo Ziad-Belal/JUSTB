@@ -152,6 +152,9 @@ class SettingsScreen:
         card3.pack(padx=30, pady=(16, 30), fill="x")
         self._build_cashier_password(inner3)
 
+        # Now all widgets exist — safe to populate
+        self._refresh_cashier_list()
+
     # ══════════════════════════════════════════════════════════════════
     #  Card 1 — Change MY password
     # ══════════════════════════════════════════════════════════════════
@@ -225,7 +228,6 @@ class SettingsScreen:
              C["danger"], "#B91C1C",
              padx=12, pady=6).pack(fill="x", padx=8, pady=(0, 8))
 
-        self._refresh_cashier_list()
 
     # ══════════════════════════════════════════════════════════════════
     #  Card 3 — Change a cashier's password
@@ -262,7 +264,6 @@ class SettingsScreen:
              C["teal"], "#159F9F").grid(
                  row=5, column=0, columnspan=2, sticky="w", pady=(14, 4))
 
-        self._load_cashier_dropdown()
 
     # ─────────────────────────────────────────────────────────────────
     def _refresh_cashier_list(self):

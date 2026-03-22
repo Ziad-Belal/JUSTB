@@ -389,15 +389,23 @@ class POSScreen:
 
         self._build_ui()
         # Return focus to barcode field on any click on a non-interactive area
-        self.frame.bind_all("<Button-1>", self._maybe_refocus)
+        self._bind_refocus(self.frame)
 
     def _refocus(self):
         """Snap focus back to the barcode entry."""
         self.barcode_entry.focus_set()
 
+    def _bind_refocus(self, widget):
+        """Recursively bind click-to-refocus on every non-interactive child of the POS frame."""
+        interactive = (tk.Entry, tk.Button, ttk.Combobox, ttk.Scrollbar, ttk.Treeview)
+        if not isinstance(widget, interactive):
+            widget.bind("<Button-1>", self._maybe_refocus)
+        for child in widget.winfo_children():
+            self._bind_refocus(child)
+
     def _maybe_refocus(self, event):
-        """Refocus barcode field unless the user clicked an interactive widget."""
-        interactive = (tk.Entry, tk.Button, ttk.Combobox, ttk.Scrollbar)
+        """Refocus barcode field on click of a non-interactive widget inside POS frame only."""
+        interactive = (tk.Entry, tk.Button, ttk.Combobox, ttk.Scrollbar, ttk.Treeview)
         if not isinstance(event.widget, interactive):
             self.frame.after(10, self._refocus)
 
