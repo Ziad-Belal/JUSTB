@@ -1,31 +1,35 @@
+"""
+main.py  —  JustB Retail Management System
+==========================================
+Entry point.  Run with:   python main.py
+"""
+
 import tkinter as tk
-from gui.login_screen import LoginScreen
+from gui.login_screen import LoginScreen, SplashScreen
 import os
+DATA_DIR = r"C:\Users\Ziad\JUSTB\gui\data"
+def main():
+    root = tk.Tk()
+    root.title("JustB — Retail Management System")
+    root.geometry("1024x700")
+    root.minsize(800, 560)
+    root.configure(bg="#F7F5FF")
 
-# Client PC data folder path
-DATA_DIR = r"C:\Users\A\Desktop\JUSTB\data"
+    # Centre window on screen
+    root.update_idletasks()
+    sw, sh = root.winfo_screenwidth(), root.winfo_screenheight()
+    root.geometry(f"1024x700+{(sw-1024)//2}+{(sh-700)//2}")
+
+    # Hide main window during splash, then show login
+    root.withdraw()
+
+    def launch_login():
+        root.deiconify()
+        LoginScreen(root, DATA_DIR)
+
+    SplashScreen(root, on_done=launch_login)
+    root.mainloop()
 
 
-# Initialize root window
-root = tk.Tk()
-root.title("JustB")
-
-# Set window icon
-icon_path = r"C:\Users\Ziad\JUSTB\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico"
-if os.path.exists(icon_path):
-    try:
-        root.iconbitmap(icon_path)
-    except Exception as e:
-        print(f"Could not load icon: {e}")
-else:
-    print(f"Icon file not found at: {icon_path}")
-
-# Launch login screen with forced data path
-LoginScreen(root, DATA_DIR)
-
-# Start GUI loop
-root.mainloop()
-
-#r"C:\Users\A\Desktop\JUSTB\data" this is the original path I will use when the project runs after the testing.
-#here is the command for execution :
-#python -m PyInstaller --onefile --windowed --icon="C:\Users\Ziad\JUSTB\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico" --add-data "gui;gui" --add-data "utils;utils" --name "JustB" main.py
+if __name__ == "__main__":
+    main()
