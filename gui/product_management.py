@@ -263,10 +263,9 @@ class ProductManagementScreen:
 
         self._stat_total   = self._stat_card(stats_bar, "TOTAL PRODUCTS", "0", C["purple"],  0)
         self._stat_stock   = self._stat_card(stats_bar, "TOTAL STOCK",    "0", C["teal"],    1)
-        self._stat_value   = self._stat_card(stats_bar, "INVENTORY VALUE", "EGP 0", C["orange"], 2)
-        self._stat_lowstock= self._stat_card(stats_bar, "LOW STOCK (≤5)",  "0", C["pink"],   3)
+        self._stat_lowstock= self._stat_card(stats_bar, "LOW STOCK (≤5)",  "0", C["pink"],   2)
 
-        for i in range(4):
+        for i in range(3):
             stats_bar.columnconfigure(i, weight=1)
 
         # ── Search bar card ───────────────────────────────────────────────────
@@ -541,7 +540,6 @@ class ProductManagementScreen:
         # Animate stat counters
         self._animate_counter(self._stat_total,    total)
         self._animate_counter(self._stat_stock,    stock)
-        self._animate_float  (self._stat_value,    value)
         self._animate_counter(self._stat_lowstock, low_all)
 
         # Results label
