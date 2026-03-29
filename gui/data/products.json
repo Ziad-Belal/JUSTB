@@ -6898,5 +6898,11 @@
         "name": "kafurux plump (3D)",
         "price": 175.0,
         "quantity": 1
+    },
+    {
+        "barcode": "45",
+        "name": "sui",
+        "price": 20.0,
+        "quantity": 14
     }
 ]

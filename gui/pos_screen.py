@@ -963,7 +963,13 @@ class POSScreen:
         save_json(self._products_path(), products)
 
         sales    = load_json(self._sales_path())
+        
+        # Generate unique receipt ID - skip if already exists
         sale_id  = len(sales) + 1
+        existing_ids = {s.get("id", 0) for s in sales}
+        while sale_id in existing_ids:
+            sale_id += 1
+        
         subtotal = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
         disc_amt = subtotal * (self._discount_pct / 100.0)
         final    = subtotal - disc_amt
@@ -979,6 +985,7 @@ class POSScreen:
             "promo_code":     self._promo_code,
             "payment_method": payment_method,
             "date":           get_today_date(),
+            "time":           datetime.now().strftime("%H:%M:%S"),
         }
         sales.append(sale_record)
         save_json(self._sales_path(), sales)

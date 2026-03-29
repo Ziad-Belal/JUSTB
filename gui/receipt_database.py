@@ -1,20 +1,21 @@
 """
-daily_feedback.py  —  JustB Retail Management System
-=====================================================
-Redesigned with JustB bright luxury theme.
+receipt_database.py  —  JustB Retail Management System
+======================================================
+Receipt Database - Browse individual transactions with hover previews
 Dynamic features:
-  • Animated revenue counter on load
-  • Mini bar chart drawn on a Canvas (top 5 products by revenue)
-  • Colour-coded rank badges in the table (gold / silver / bronze / …)
-  • Live date picker with refresh pulse
-  • Print report button
+  • Live receipt list with time-sorted transactions
+  • Hover to preview formatted receipt
+  • Filter by date
+  • Search receipts by ID or amount
+  • Export receipt data
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 from tkinter.simpledialog import askstring
 from utils.helpers import load_json, get_today_date
 import os
+from datetime import datetime, timedelta
 
 # ══════════════════════════════════════════════════════════════════════════════
 C = {
@@ -40,18 +41,14 @@ C = {
     "danger":     "#DC2626",
 }
 BRAND_COLORS = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]
-RANK_COLORS  = ["#D97706", "#9CA3AF", "#C2703A", "#8B5CF6", "#1BBFBF"]
 
 FONT_HEAD    = ("Georgia",   13, "bold")
 FONT_LABEL   = ("Segoe UI",  10)
 FONT_LABEL_B = ("Segoe UI",  10, "bold")
-FONT_ENTRY   = ("Segoe UI",  11)
+FONT_RECEIPT = ("Courier New", 9)
 FONT_BTN     = ("Segoe UI",  10, "bold")
 FONT_SMALL   = ("Segoe UI",   9)
 FONT_SECTION = ("Segoe UI",   8, "bold")
-FONT_STAT    = ("Georgia",   22, "bold")
-FONT_STAT_LB = ("Segoe UI",   9)
-FONT_TOTAL   = ("Georgia",   28, "bold")
 
 
 def _btn(parent, text, command, bg, hover, fg="#FFFFFF",
@@ -69,10 +66,12 @@ def _btn(parent, text, command, bg, hover, fg="#FFFFFF",
 
 class ReceiptDatabaseScreen:
     def __init__(self, root, data_dir=None, frame_parent=None, admin=False):
-        self.root      = root
-        self.data_dir  = data_dir
-        self.admin     = admin
-        self.feedback_date = get_today_date()
+        self.root       = root
+        self.data_dir   = data_dir
+        self.admin      = admin
+        self.view_date  = get_today_date()
+        self.current_hover_receipt = None
+        self.preview_window = None
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
         self.frame.pack(fill="both", expand=True)
@@ -92,168 +91,145 @@ class ReceiptDatabaseScreen:
                        highlightbackground=C["border"])
         hdr.pack(fill="x")
 
-        dots = tk.Frame(hdr, bg=C["bg_header"])
-        dots.pack(side="left", padx=(16, 4), pady=10)
-        for col in BRAND_COLORS:
-            tk.Label(dots, text="●", font=("Segoe UI", 9),
+        # Title with dots
+        title_frame = tk.Frame(hdr, bg=C["bg_header"])
+        title_frame.pack(side="left", padx=(16, 0), pady=10)
+        for col in BRAND_COLORS[:3]:
+            tk.Label(title_frame, text="●", font=("Segoe UI", 9),
                      bg=C["bg_header"], fg=col).pack(side="left", padx=1)
-        tk.Label(hdr, text="Daily Feedback",
+        tk.Label(hdr, text="Receipt Database",
                  font=FONT_HEAD, bg=C["bg_header"],
                  fg=C["text_dark"]).pack(side="left", padx=(6, 0), pady=10)
 
-        # Date picker on right of header
+        # Date picker on right
         date_frame = tk.Frame(hdr, bg=C["bg_header"])
         date_frame.pack(side="right", padx=16, pady=8)
 
-        tk.Label(date_frame, text="Viewing date:",
+        tk.Label(date_frame, text="Filter date:",
                  font=FONT_SMALL, bg=C["bg_header"],
                  fg=C["text_light"]).pack(side="left", padx=(0, 8))
 
         self.date_lbl = tk.Label(date_frame,
-                                  text=self.feedback_date,
+                                  text=self.view_date,
                                   font=FONT_LABEL_B,
-                                  bg=C["purple"], fg="#FFFFFF",
+                                  bg=C["teal"], fg="#FFFFFF",
                                   padx=12, pady=5, cursor="hand2")
         self.date_lbl.pack(side="left")
         self.date_lbl.bind("<Button-1>", lambda e: self._pick_date())
-        self.date_lbl.bind("<Enter>",    lambda e: self.date_lbl.config(bg=C["purple_dk"]))
-        self.date_lbl.bind("<Leave>",    lambda e: self.date_lbl.config(bg=C["purple"]))
+        self.date_lbl.bind("<Enter>",    lambda e: self.date_lbl.config(bg="#159F9F"))
+        self.date_lbl.bind("<Leave>",    lambda e: self.date_lbl.config(bg=C["teal"]))
 
         if self.admin:
             _btn(date_frame, "⟳  Refresh",
                  self.load_data,
-                 C["teal"], "#159F9F",
+                 C["orange"], "#E05F00",
                  padx=12, pady=5).pack(side="left", padx=(8, 0))
 
-        # ── Top KPI cards row ─────────────────────────────────────────────────
-        kpi_row = tk.Frame(self.frame, bg=C["bg_root"])
-        kpi_row.pack(fill="x", padx=14, pady=(10, 0))
-        for i in range(4):
-            kpi_row.columnconfigure(i, weight=1)
+        # Print Report button
+        _btn(date_frame, "🖨  Print Report",
+             self._open_print_dialog,
+             C["purple"], C["purple_dk"],
+             padx=12, pady=5).pack(side="left", padx=(8, 0))
 
-        self._kpi_revenue = self._kpi_card(kpi_row, "REVENUE TODAY",    "EGP 0.00", C["green"],  0)
-        self._kpi_sales   = self._kpi_card(kpi_row, "SALES COUNT",       "0",        C["purple"], 1)
-        self._kpi_items   = self._kpi_card(kpi_row, "ITEMS SOLD",         "0",        C["teal"],   2)
-        self._kpi_avg     = self._kpi_card(kpi_row, "AVG SALE VALUE",     "EGP 0.00", C["orange"], 3)
+        # ── Search bar ─────────────────────────────────────────────────────────
+        search_frame = tk.Frame(self.frame, bg=C["bg_root"])
+        search_frame.pack(fill="x", padx=14, pady=(8, 0))
 
-        # ── Body: left (table) + right (mini bar chart) ───────────────────────
+        tk.Label(search_frame, text="Search ID or Amount:",
+                 font=FONT_SMALL, bg=C["bg_root"],
+                 fg=C["text_mid"]).pack(side="left", padx=(0, 8))
+
+        self.search_var = tk.StringVar()
+        self.search_var.trace("w", lambda *args: self._filter_receipts())
+        search_entry = tk.Entry(search_frame, textvariable=self.search_var,
+                                font=FONT_SMALL, bg=C["bg_input"],
+                                fg=C["text_dark"], width=30,
+                                relief="solid", borderwidth=1)
+        search_entry.pack(side="left", padx=(0, 8))
+
+        # ── Main content: Receipts list + Preview ─────────────────────────────
         body = tk.Frame(self.frame, bg=C["bg_root"])
         body.pack(fill="both", expand=True, padx=14, pady=10)
-        body.columnconfigure(0, weight=3)
-        body.columnconfigure(1, weight=2, minsize=260)
+        body.columnconfigure(0, weight=2)
+        body.columnconfigure(1, weight=1, minsize=320)
         body.rowconfigure(0, weight=1)
 
-        # ── LEFT: Product sales table ─────────────────────────────────────────
-        tree_card = tk.Frame(body, bg=C["bg_card"],
+        # LEFT: Receipts list
+        list_card = tk.Frame(body, bg=C["bg_card"],
                              highlightthickness=1,
                              highlightbackground=C["border"])
-        tree_card.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
-        tree_card.rowconfigure(1, weight=1)
-        tree_card.columnconfigure(0, weight=1)
+        list_card.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
+        list_card.rowconfigure(1, weight=1)
+        list_card.columnconfigure(0, weight=1)
 
-        ch = tk.Frame(tree_card, bg=C["bg_panel"], padx=14, pady=10)
-        ch.grid(row=0, column=0, columnspan=2, sticky="ew")
-        dot_f = tk.Frame(ch, bg=C["bg_panel"])
-        dot_f.pack(side="left")
-        for col in BRAND_COLORS:
-            tk.Label(dot_f, text="●", font=("Segoe UI", 8),
-                     bg=C["bg_panel"], fg=col).pack(side="left", padx=1)
-        tk.Label(ch, text="  PRODUCT PERFORMANCE",
+        # List header
+        list_hdr = tk.Frame(list_card, bg=C["bg_panel"], padx=14, pady=10)
+        list_hdr.grid(row=0, column=0, sticky="ew")
+        tk.Label(list_hdr, text="📋  RECEIPTS",
                  font=FONT_SECTION, bg=C["bg_panel"],
                  fg=C["text_mid"]).pack(side="left")
 
+        # Receipts treeview
         ts = ttk.Style()
-        ts.configure("DF.Treeview",
+        ts.configure("RDB.Treeview",
                      background=C["bg_card"],
                      foreground=C["text_dark"],
                      fieldbackground=C["bg_card"],
-                     rowheight=38,
+                     rowheight=44,
                      font=("Segoe UI", 10),
                      borderwidth=0, relief="flat")
-        ts.configure("DF.Treeview.Heading",
+        ts.configure("RDB.Treeview.Heading",
                      background=C["bg_panel"],
                      foreground=C["text_mid"],
                      font=("Segoe UI", 9, "bold"),
                      relief="flat", borderwidth=0)
-        ts.map("DF.Treeview",
+        ts.map("RDB.Treeview",
                background=[("selected", C["bg_panel"])],
-               foreground=[("selected", C["purple"])])
-        ts.layout("DF.Treeview",
+               foreground=[("selected", C["teal"])])
+        ts.layout("RDB.Treeview",
                   [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        cols = ("#", "Product", "Qty Sold", "Revenue")
-        self.tree = ttk.Treeview(tree_card, columns=cols,
+        cols = ("ID", "Time", "Items", "Total")
+        self.tree = ttk.Treeview(list_card, columns=cols,
                                   show="headings", selectmode="browse",
-                                  style="DF.Treeview")
-        cw = {"#": 40, "Product": 220, "Qty Sold": 80, "Revenue": 110}
+                                  style="RDB.Treeview")
+        cw = {"ID": 60, "Time": 70, "Items": 50, "Total": 100}
         for col in cols:
             self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center",
-                              width=cw[col], minwidth=40)
+            self.tree.column(col, anchor="center", width=cw[col], minwidth=40)
 
-        # Rank tag colours
-        for i, col in enumerate(RANK_COLORS):
-            self.tree.tag_configure(f"rank{i}", foreground=col)
-            self.tree.tag_configure(f"rank{i}_odd",
-                                    background=C["bg_row_alt"], foreground=col)
+        # Hover preview binding
+        self.tree.bind("<Motion>", self._on_tree_hover)
+        self.tree.bind("<Leave>",  self._hide_preview)
 
-        vsb = ttk.Scrollbar(tree_card, orient="vertical",
+        vsb = ttk.Scrollbar(list_card, orient="vertical",
                              command=self.tree.yview)
         self.tree.configure(yscrollcommand=vsb.set)
-        self.tree.grid(row=1, column=0, sticky="nsew")
+        self.tree.grid(row=1, column=0, sticky="nsew", padx=(0, 1))
         vsb.grid(row=1, column=1, sticky="ns")
 
-        # ── RIGHT: Totals + mini bar chart ────────────────────────────────────
-        right = tk.Frame(body, bg=C["bg_root"])
-        right.grid(row=0, column=1, sticky="nsew")
-        right.columnconfigure(0, weight=1)
-        right.rowconfigure(1, weight=1)
+        # RIGHT: Receipt preview panel
+        preview_card = tk.Frame(body, bg=C["bg_card"],
+                                highlightthickness=1,
+                                highlightbackground=C["border"])
+        preview_card.grid(row=0, column=1, sticky="nsew")
+        preview_card.rowconfigure(1, weight=1)
+        preview_card.columnconfigure(0, weight=1)
 
-        # Big total card
-        tot_card = tk.Frame(right, bg=C["bg_card"],
-                            highlightthickness=1,
-                            highlightbackground=C["border"],
-                            padx=20, pady=18)
-        tot_card.grid(row=0, column=0, sticky="ew", pady=(0, 10))
-        tk.Frame(tot_card, bg=C["green"], height=4).pack(fill="x", pady=(0, 12))
-        tk.Label(tot_card, text="TOTAL REVENUE",
-                 font=FONT_SECTION, bg=C["bg_card"],
-                 fg=C["text_light"]).pack(anchor="w")
-        self.total_lbl = tk.Label(tot_card, text="EGP 0.00",
-                                   font=FONT_TOTAL,
-                                   bg=C["bg_card"], fg=C["green"])
-        self.total_lbl.pack(anchor="w")
-        self.sales_count_lbl = tk.Label(tot_card, text="0 transactions",
-                                         font=FONT_LABEL,
-                                         bg=C["bg_card"], fg=C["text_light"])
-        self.sales_count_lbl.pack(anchor="w", pady=(4, 0))
-
-        # Mini bar chart canvas
-        chart_card = tk.Frame(right, bg=C["bg_card"],
-                              highlightthickness=1,
-                              highlightbackground=C["border"])
-        chart_card.grid(row=1, column=0, sticky="nsew")
-        chart_card.rowconfigure(1, weight=1)
-        chart_card.columnconfigure(0, weight=1)
-
-        ch2 = tk.Frame(chart_card, bg=C["bg_panel"], padx=14, pady=10)
-        ch2.grid(row=0, column=0, sticky="ew")
-        tk.Label(ch2, text="TOP 5  BY REVENUE",
+        prev_hdr = tk.Frame(preview_card, bg=C["bg_panel"], padx=14, pady=10)
+        prev_hdr.grid(row=0, column=0, sticky="ew")
+        tk.Label(prev_hdr, text="👁  PREVIEW",
                  font=FONT_SECTION, bg=C["bg_panel"],
                  fg=C["text_mid"]).pack(side="left")
 
-        self.chart_canvas = tk.Canvas(chart_card, bg=C["bg_card"],
-                                       highlightthickness=0)
-        self.chart_canvas.grid(row=1, column=0, sticky="nsew",
-                               padx=12, pady=12)
-
-        # Print button
-        if self.admin:
-            _btn(right, "🖨  Print Report",
-                 self.print_report,
-                 C["orange"], "#E05F00",
-                 padx=0, pady=10).grid(
-                     row=2, column=0, sticky="ew", pady=(8, 0))
+        # Preview text area
+        self.preview_text = tk.Text(preview_card, bg=C["bg_root"],
+                                     fg=C["text_dark"],
+                                     font=("Courier New", 9),
+                                     relief="flat", borderwidth=0,
+                                     padx=10, pady=10)
+        self.preview_text.grid(row=1, column=0, sticky="nsew")
+        self.preview_text.config(state="disabled")
 
         # Footer
         tk.Label(self.frame,
@@ -261,227 +237,487 @@ class ReceiptDatabaseScreen:
                  font=("Segoe UI", 8),
                  bg=C["bg_root"], fg=C["text_light"]).pack(side="bottom", pady=4)
 
-    # ── KPI card ──────────────────────────────────────────────────────────────
+    # ── Receipt hover preview ────────────────────────────────────────────────
 
-    def _kpi_card(self, parent, label, value, accent, col):
-        card = tk.Frame(parent, bg=C["bg_card"],
-                        highlightthickness=1,
-                        highlightbackground=C["border"],
-                        padx=16, pady=14)
-        card.grid(row=0, column=col, sticky="ew",
-                  padx=(0 if col == 0 else 8, 0))
-        tk.Frame(card, bg=accent, height=3).pack(fill="x", pady=(0, 8))
-        tk.Label(card, text=label, font=FONT_STAT_LB,
-                 bg=C["bg_card"], fg=C["text_light"]).pack(anchor="w")
-        val = tk.Label(card, text=value, font=FONT_STAT,
-                       bg=C["bg_card"], fg=accent)
-        val.pack(anchor="w")
-        return val
-
-    # ── Animated counter ──────────────────────────────────────────────────────
-
-    def _animate_float(self, label, target, prefix="EGP ", steps=24):
-        try:
-            raw = label.cget("text").replace(prefix, "").replace(",", "").strip() or "0"
-            current = float(raw)
-        except Exception:
-            current = 0.0
-        delta = target - current
-
-        def _step(i=0):
-            if i > steps:
-                label.config(text=f"{prefix}{target:,.2f}")
-                return
-            val = current + delta * (i / steps)
-            label.config(text=f"{prefix}{val:,.2f}")
-            label.after(16, lambda: _step(i + 1))
-
-        _step()
-
-    def _animate_int(self, label, target, prefix="", suffix="", steps=20):
-        try:
-            raw = label.cget("text").replace(prefix, "").replace(suffix, "").replace(",", "").strip() or "0"
-            current = int(float(raw))
-        except Exception:
-            current = 0
-        delta = target - current
-
-        def _step(i=0):
-            if i > steps:
-                label.config(text=f"{prefix}{target:,}{suffix}")
-                return
-            label.config(text=f"{prefix}{int(current + delta * i/steps):,}{suffix}")
-            label.after(16, lambda: _step(i + 1))
-
-        _step()
-
-    # ── Mini bar chart ────────────────────────────────────────────────────────
-
-    def _draw_chart(self, items):
-        """Draw a horizontal bar chart for top-5 products."""
-        canvas = self.chart_canvas
-        canvas.delete("all")
-        canvas.update_idletasks()
-        W = canvas.winfo_width()
-        H = canvas.winfo_height()
-        if W < 10 or H < 10:
+    def _on_tree_hover(self, event):
+        """Show receipt preview when hovering over a receipt."""
+        item = self.tree.identify_row(event.y)
+        if not item:
             return
 
-        top5 = sorted(items, key=lambda x: x["revenue"], reverse=True)[:5]
-        if not top5:
-            canvas.create_text(W // 2, H // 2,
-                               text="No data for this date",
-                               font=FONT_SMALL, fill=C["text_light"])
+        values = self.tree.item(item)["values"]
+        receipt_id = values[0]
+
+        # Only update if hovering over a different receipt
+        if self.current_hover_receipt == receipt_id:
             return
 
-        max_rev = max(x["revenue"] for x in top5)
-        if max_rev == 0:
+        self.current_hover_receipt = receipt_id
+        self._update_preview(receipt_id)
+
+    def _hide_preview(self, event):
+        """Clear preview when mouse leaves tree."""
+        self.current_hover_receipt = None
+        self.preview_text.config(state="normal")
+        self.preview_text.delete(1.0, tk.END)
+        self.preview_text.config(state="disabled")
+
+    def _update_preview(self, receipt_id):
+        """Update preview panel with receipt text info."""
+        if not self.receipts_data:
             return
 
-        pad_l, pad_r = 12, 50
-        pad_t, pad_b = 10, 10
-        bar_h    = max(14, (H - pad_t - pad_b - (len(top5) - 1) * 6) // len(top5))
-        usable_w = W - pad_l - pad_r
+        receipt = None
+        for r in self.receipts_data:
+            if str(r.get("id", "")) == str(receipt_id):
+                receipt = r
+                break
 
-        def _draw_bar(idx, item, pct):
-            y = pad_t + idx * (bar_h + 6)
-            bar_w = int(usable_w * pct)
-            col = BRAND_COLORS[idx % len(BRAND_COLORS)]
+        if not receipt:
+            return
 
-            # Background track
-            canvas.create_rectangle(pad_l, y, pad_l + usable_w, y + bar_h,
-                                     fill=C["bg_panel"], outline="")
-            # Animate bar width
-            def _anim(w=0):
-                if w > bar_w:
-                    # Value label
-                    canvas.create_text(pad_l + bar_w + 6, y + bar_h // 2,
-                                       text=f"EGP {item['revenue']:,.0f}",
-                                       font=FONT_SMALL, fill=C["text_mid"],
-                                       anchor="w")
-                    return
-                canvas.delete(f"bar{idx}")
-                canvas.create_rectangle(pad_l, y, pad_l + w, y + bar_h,
-                                         fill=col, outline="",
-                                         tags=(f"bar{idx}",))
-                canvas.after(8, lambda: _anim(w + max(1, bar_w // 18)))
+        # Format receipt as text
+        preview_text = self._format_receipt_text(receipt)
 
-            _anim()
+        self.preview_text.config(state="normal")
+        self.preview_text.delete(1.0, tk.END)
+        self.preview_text.insert(1.0, preview_text)
+        self.preview_text.config(state="disabled")
 
-            # Label (truncate at 14 chars)
-            name = item["name"][:14] + ("…" if len(item["name"]) > 14 else "")
-            canvas.create_text(pad_l, y - 2,
-                               text=name, font=FONT_SMALL,
-                               fill=C["text_mid"], anchor="sw")
+    def _format_receipt_text(self, receipt):
+        """Generate a text-formatted receipt."""
+        lines = []
+        lines.append("=" * 42)
+        lines.append("JustB - Stationery & Gifts".center(42))
+        lines.append("=" * 42)
+        lines.append("")
 
-        for i, item in enumerate(top5):
-            _draw_bar(i, item, item["revenue"] / max_rev)
+        receipt_id = receipt.get("id", "N/A")
+        receipt_time = receipt.get("time", receipt.get("date", "N/A"))
+        cashier = receipt.get("user", "—")
 
-    # ══════════════════════════════════════════════════════════════════════════
-    #  Data
-    # ══════════════════════════════════════════════════════════════════════════
+        lines.append(f"Receipt #   : {receipt_id}")
+        lines.append(f"Date        : {receipt.get('date', 'N/A')}")
+        lines.append(f"Time        : {receipt_time}")
+        lines.append(f"Cashier     : {cashier}")
+        lines.append("-" * 42)
+        lines.append("")
+
+        # Items
+        items = receipt.get("items", [])
+        if items:
+            lines.append("ITEMS:")
+            lines.append("-" * 42)
+            for item in items:
+                name = item.get("name", "?")
+                qty = item.get("quantity", 1)
+                price = float(item.get("price", 0))
+                subtotal = qty * price
+                lines.append(f"  {name}")
+                lines.append(f"    Qty: {qty}  @  EGP {price:.2f}  =  EGP {subtotal:.2f}")
+            lines.append("-" * 42)
+        else:
+            lines.append("No items in receipt")
+            lines.append("-" * 42)
+        
+        lines.append("")
+
+        # Totals
+        subtotal = receipt.get("subtotal", 0)
+        discount_amt = receipt.get("discount_amt", 0)
+        discount_pct = receipt.get("discount_pct", 0)
+        total = receipt.get("total", 0)
+
+        lines.append(f"Subtotal    : EGP {subtotal:.2f}")
+        if discount_amt > 0:
+            lines.append(f"Discount ({discount_pct}%) : -EGP {discount_amt:.2f}")
+        lines.append("=" * 42)
+        lines.append(f"TOTAL       : EGP {total:.2f}")
+        lines.append("=" * 42)
+
+        # Promo
+        promo = receipt.get("promo_code", "")
+        if promo:
+            lines.append(f"Promo Code  : {promo}")
+
+        lines.append("")
+        lines.append("Thank you for shopping at JustB!")
+        lines.append("justb-eg.com")
+
+        return "\n".join(lines)
+
+    # ── Search / Filter ───────────────────────────────────────────────────────
+
+    def _filter_receipts(self):
+        """Filter receipts based on search term."""
+        search_term = self.search_var.get().lower().strip()
+
+        # Clear tree
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # Repopulate with filtered results
+        if not search_term:
+            self._populate_receipts(self.receipts_data)
+        else:
+            filtered = []
+            for receipt in self.receipts_data:
+                receipt_id = str(receipt.get("id", "")).lower()
+                total = str(receipt.get("total", "")).lower()
+                if search_term in receipt_id or search_term in total:
+                    filtered.append(receipt)
+            self._populate_receipts(filtered)
+
+    # ── Date picker ───────────────────────────────────────────────────────────
 
     def _pick_date(self):
+        """Open date picker dialog."""
         new_date = askstring("Select Date",
                              "Enter date (YYYY-MM-DD):",
-                             initialvalue=self.feedback_date,
+                             initialvalue=self.view_date,
                              parent=self.frame)
         if new_date:
-            self.feedback_date = new_date
-            self.date_lbl.config(text=self.feedback_date)
+            self.view_date = new_date
+            self.date_lbl.config(text=self.view_date)
+            self.search_var.set("")  # Clear search
             self.load_data()
 
+    # ══════════════════════════════════════════════════════════════════════════
+    #  Data Loading
+    # ══════════════════════════════════════════════════════════════════════════
+
     def load_data(self):
-        for i in self.tree.get_children():
-            self.tree.delete(i)
-
+        """Load receipts from sales.json and populate tree, consolidating duplicates."""
         sales = load_json(self._sales_path())
-
-        total_revenue  = 0.0
-        total_sales    = 0
-        total_items    = 0
-        product_summary = {}
+        self.receipts_data = []
+        receipt_map = {}  # To consolidate duplicate receipt IDs
 
         for sale in sales:
-            if sale.get("date", "") == self.feedback_date:
-                total_sales   += 1
-                total_revenue += float(sale.get("total", 0))
-                for item in sale.get("items", []):
-                    key = item.get("barcode", item.get("name", "?"))
-                    if key not in product_summary:
-                        product_summary[key] = {
-                            "name":    item.get("name", "?"),
-                            "qty":     0,
-                            "revenue": 0.0,
-                        }
-                    qty = int(item.get("quantity", 1))
-                    product_summary[key]["qty"]     += qty
-                    product_summary[key]["revenue"] += float(item.get("price", 0)) * qty
-                    total_items += qty
+            if sale.get("date", "") == self.view_date:
+                receipt_id = sale.get("id", "?")
+                
+                # If we already have this receipt ID, consolidate items
+                if receipt_id in receipt_map:
+                    # Merge items and recalculate totals
+                    existing = receipt_map[receipt_id]
+                    existing["items"].extend(sale.get("items", []))
+                    existing["subtotal"] = existing.get("subtotal", 0) + sale.get("subtotal", 0)
+                    existing["discount_amt"] = existing.get("discount_amt", 0) + sale.get("discount_amt", 0)
+                    existing["total"] = existing.get("total", 0) + sale.get("total", 0)
+                else:
+                    # New receipt ID
+                    receipt_dict = {
+                        "id": receipt_id,
+                        "date": sale.get("date", ""),
+                        "time": sale.get("time", sale.get("date", "")),
+                        "items": sale.get("items", []),
+                        "total": sale.get("total", 0),
+                        "subtotal": sale.get("subtotal", 0),
+                        "discount_amt": sale.get("discount_amt", 0),
+                        "discount_pct": sale.get("discount_pct", 0),
+                        "user": sale.get("user", "—"),
+                        "promo_code": sale.get("promo_code", ""),
+                    }
+                    receipt_map[receipt_id] = receipt_dict
 
-        avg_sale = (total_revenue / total_sales) if total_sales > 0 else 0.0
+        # Convert map to list and sort by ID descending
+        self.receipts_data = list(receipt_map.values())
+        self.receipts_data.sort(key=lambda x: x["id"] if isinstance(x["id"], int) else 0, reverse=True)
 
-        # Animate KPIs
-        self._animate_float(self._kpi_revenue, total_revenue)
-        self._animate_int  (self._kpi_sales,   total_sales)
-        self._animate_int  (self._kpi_items,   total_items)
-        self._animate_float(self._kpi_avg,     avg_sale)
+        # Clear search and populate
+        self.search_var.set("")
+        self._populate_receipts(self.receipts_data)
+        self._hide_preview(None)
 
-        # Animate big total
-        self._animate_float(self.total_lbl, total_revenue)
-        self.sales_count_lbl.config(
-            text=f"{total_sales} transaction{'s' if total_sales != 1 else ''}")
+    def _populate_receipts(self, receipts):
+        """Populate tree with receipt list - one row per RECEIPT, not per item."""
+        # Clear tree first to prevent duplicates
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        
+        for r in receipts:
+            receipt_id = r["id"]
+            time_str = r["time"]
+            # Sum total quantity of all items in this receipt
+            items_count = sum(int(item.get("quantity", 1)) for item in r["items"])
+            total = r["total"]
 
-        # Populate table — sorted by revenue desc
-        sorted_prods = sorted(product_summary.values(),
-                              key=lambda x: x["revenue"], reverse=True)
+            self.tree.insert("", "end",
+                             values=(receipt_id,
+                                     time_str,
+                                     items_count,
+                                     f"EGP {total:,.2f}"))
 
-        for idx, item in enumerate(sorted_prods):
-            rank = idx  # 0=gold, 1=silver, 2=bronze, …
-            tag_base = f"rank{min(rank, len(RANK_COLORS)-1)}"
-            tag = tag_base + ("_odd" if idx % 2 else "")
-            rank_sym = ["🥇", "🥈", "🥉"] + ["·"] * 10
-            sym = rank_sym[rank] if rank < len(rank_sym) else "·"
-            self.tree.insert("", "end", tags=(tag,),
-                             values=(sym,
-                                     item["name"],
-                                     item["qty"],
-                                     f"EGP {item['revenue']:,.2f}"))
+    # ══════════════════════════════════════════════════════════════════════════
+    #  Print Report
+    # ══════════════════════════════════════════════════════════════════════════
 
-        # Draw bar chart after geometry settles
-        self.frame.after(80, lambda: self._draw_chart(sorted_prods))
+    def _open_print_dialog(self):
+        """Open dialog to select date range and print method."""
+        dialog = tk.Toplevel(self.frame)
+        dialog.title("Print Report")
+        dialog.geometry("400x300")
+        dialog.transient(self.frame)
+        dialog.resizable(False, False)
+        
+        # Center the dialog
+        dialog.grab_set()
 
-    # ── Print ─────────────────────────────────────────────────────────────────
+        # Main frame
+        main = tk.Frame(dialog, bg=C["bg_root"], padx=20, pady=20)
+        main.pack(fill="both", expand=True)
 
-    def print_report(self):
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=[("Text files", "*.txt")],
-            title="Save Report As",
-            initialfile=f"JustB_Report_{self.feedback_date}.txt"
-        )
-        if not file_path:
+        tk.Label(main, text="Print Report", font=FONT_HEAD,
+                bg=C["bg_root"], fg=C["text_dark"]).pack(anchor="w", pady=(0, 20))
+
+        # Date range section
+        tk.Label(main, text="Report Date Range", font=FONT_SECTION,
+                bg=C["bg_root"], fg=C["text_mid"]).pack(anchor="w", pady=(0, 10))
+
+        date_frame = tk.Frame(main, bg=C["bg_root"])
+        date_frame.pack(fill="x", pady=(0, 20))
+
+        tk.Label(date_frame, text="From:", font=FONT_LABEL,
+                bg=C["bg_root"], fg=C["text_dark"]).pack(side="left", padx=(0, 8))
+        self.from_date_entry = tk.Entry(date_frame, font=FONT_SMALL, width=15,
+                                        relief="solid", borderwidth=1)
+        self.from_date_entry.pack(side="left", padx=(0, 16))
+        self.from_date_entry.insert(0, get_today_date())
+
+        tk.Label(date_frame, text="To:", font=FONT_LABEL,
+                bg=C["bg_root"], fg=C["text_dark"]).pack(side="left", padx=(0, 8))
+        self.to_date_entry = tk.Entry(date_frame, font=FONT_SMALL, width=15,
+                                      relief="solid", borderwidth=1)
+        self.to_date_entry.pack(side="left")
+        self.to_date_entry.insert(0, get_today_date())
+
+        # Print method section
+        tk.Label(main, text="Print Method", font=FONT_SECTION,
+                bg=C["bg_root"], fg=C["text_mid"]).pack(anchor="w", pady=(0, 10))
+
+        self.print_method = tk.StringVar(value="normal")
+
+        tk.Radiobutton(main, text="📄 Normal Printer (A4, with formatting)",
+                      variable=self.print_method, value="normal",
+                      font=FONT_LABEL, bg=C["bg_root"],
+                      fg=C["text_dark"]).pack(anchor="w", pady=5)
+
+        tk.Radiobutton(main, text="🖨  POS58 Thermal Printer (receipt format)",
+                      variable=self.print_method, value="pos58",
+                      font=FONT_LABEL, bg=C["bg_root"],
+                      fg=C["text_dark"]).pack(anchor="w", pady=5)
+
+        # Buttons
+        btn_frame = tk.Frame(main, bg=C["bg_root"])
+        btn_frame.pack(fill="x", pady=(20, 0))
+
+        _btn(btn_frame, "Print", 
+             lambda: self._print_report(self.from_date_entry.get(),
+                                       self.to_date_entry.get(),
+                                       self.print_method.get()),
+             C["green"], "#16A34A",
+             padx=20, pady=10).pack(side="left", padx=(0, 10))
+
+        _btn(btn_frame, "Cancel",
+             dialog.destroy,
+             C["text_light"], "#9CA3AF",
+             padx=20, pady=10).pack(side="left")
+
+    def _print_report(self, from_date, to_date, method):
+        """Generate and print report for date range."""
+        # Validate dates
+        try:
+            datetime.strptime(from_date, "%Y-%m-%d")
+            datetime.strptime(to_date, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showerror("Invalid Date", "Please use YYYY-MM-DD format")
             return
 
-        lines = [
-            "=" * 46,
-            f"  JustB Daily Report — {self.feedback_date}",
-            "=" * 46,
-            f"  Revenue:     {self.total_lbl.cget('text')}",
-            f"  Transactions:{self._kpi_sales.cget('text')}",
-            f"  Items Sold:  {self._kpi_items.cget('text')}",
-            f"  Avg Sale:    {self._kpi_avg.cget('text')}",
-            "-" * 46,
-            f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
-            "-" * 46,
-        ]
-        for item in self.tree.get_children():
-            v = self.tree.item(item)["values"]
-            lines.append(f"  {str(v[0]):<6} {str(v[1]):<24} {str(v[2]):>5}  {str(v[3]):>12}")
+        # Load all sales
+        sales = load_json(self._sales_path())
+        
+        # Filter by date range
+        report_sales = []
+        for sale in sales:
+            sale_date = sale.get("date", "")
+            if from_date <= sale_date <= to_date:
+                report_sales.append(sale)
 
-        lines += ["-" * 46, "  justb-eg.com", "=" * 46]
+        if not report_sales:
+            messagebox.showinfo("No Data", "No receipts found in this date range.")
+            return
 
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines))
+        if method == "pos58":
+            self._print_pos58_report(report_sales, from_date, to_date)
+        else:
+            self._print_normal_report(report_sales, from_date, to_date)
 
-        messagebox.showinfo("Report Saved", f"Report saved:\n{file_path}")
+    def _print_pos58_report(self, sales, from_date, to_date):
+        """Generate POS58 thermal printer report."""
+        try:
+            import win32print
+            import win32ui
+            from win32.lib import win32con
+        except:
+            messagebox.showerror("Error", "Win32 printing not available")
+            return
+
+        lines = []
+        lines.append("")
+        
+        # Logo placeholder (text-based)
+        lines.append("        J U S T B")
+        lines.append("   Stationery & Gifts")
+        lines.append("")
+        lines.append("=" * 42)
+        lines.append("SALES REPORT".center(42))
+        lines.append(f"From: {from_date}  To: {to_date}".center(42))
+        lines.append("=" * 42)
+        lines.append("")
+
+        total_revenue = 0
+        total_items = 0
+        receipt_count = len(sales)
+
+        for sale in sales:
+            lines.append(f"Receipt #{sale.get('id', '?')}")
+            lines.append(f"Date: {sale.get('date', '')}")
+            items = sale.get("items", [])
+            for item in items:
+                name = item.get("name", "?")[:30]
+                qty = item.get("quantity", 1)
+                price = float(item.get("price", 0))
+                subtotal = qty * price
+                lines.append(f"  {name}")
+                lines.append(f"    {qty} x EGP {price:.2f} = EGP {subtotal:.2f}")
+                total_items += qty
+            total = sale.get("total", 0)
+            lines.append(f"Total: EGP {total:.2f}")
+            total_revenue += total
+            lines.append("-" * 42)
+            lines.append("")
+
+        # Summary
+        lines.append("=" * 42)
+        lines.append("SUMMARY".center(42))
+        lines.append("=" * 42)
+        lines.append(f"Receipts: {receipt_count}")
+        lines.append(f"Items Sold: {total_items}")
+        lines.append(f"Total Revenue: EGP {total_revenue:.2f}")
+        lines.append("=" * 42)
+        lines.append("Thank you!".center(42))
+        lines.append("")
+
+        report_text = "\n".join(lines)
+        self._send_to_pos58(report_text)
+
+    def _print_normal_report(self, sales, from_date, to_date):
+        """Generate normal printer report (as text file or printed)."""
+        lines = []
+        lines.append("")
+        lines.append("JUSTB - STATIONERY & GIFTS")
+        lines.append("=" * 80)
+        lines.append("SALES REPORT")
+        lines.append(f"Report Period: {from_date} to {to_date}")
+        lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append("=" * 80)
+        lines.append("")
+
+        total_revenue = 0
+        total_items = 0
+        total_discount = 0
+        receipt_count = len(sales)
+
+        for sale in sales:
+            lines.append(f"Receipt #{sale.get('id', '?')} | Date: {sale.get('date', '')} | Time: {sale.get('time', '')}")
+            lines.append(f"Cashier: {sale.get('user', '—')} | Payment: {sale.get('payment_method', '—')}")
+            lines.append("-" * 80)
+            
+            items = sale.get("items", [])
+            lines.append(f"{'Item':<40} {'Qty':>8} {'Price':>12} {'Total':>15}")
+            lines.append("-" * 80)
+            
+            for item in items:
+                name = item.get("name", "?")[:38]
+                qty = item.get("quantity", 1)
+                price = float(item.get("price", 0))
+                subtotal = qty * price
+                lines.append(f"{name:<40} {qty:>8} EGP {price:>10.2f} EGP {subtotal:>12.2f}")
+                total_items += qty
+            
+            subtotal = sale.get("subtotal", 0)
+            discount_amt = sale.get("discount_amt", 0)
+            discount_pct = sale.get("discount_pct", 0)
+            total = sale.get("total", 0)
+            promo = sale.get("promo_code", "")
+
+            lines.append("-" * 80)
+            lines.append(f"Subtotal: {'EGP ' + str(round(subtotal, 2)):>71}")
+            if discount_amt > 0:
+                lines.append(f"Discount ({discount_pct}%): {'-EGP ' + str(round(discount_amt, 2)):>68}")
+                total_discount += discount_amt
+            if promo:
+                lines.append(f"Promo Code: {promo:>68}")
+            lines.append(f"{'RECEIPT TOTAL: EGP ' + str(round(total, 2)):>80}")
+            lines.append("=" * 80)
+            lines.append("")
+            total_revenue += total
+
+        # Summary
+        lines.append("=" * 80)
+        lines.append("SUMMARY".center(80))
+        lines.append("=" * 80)
+        lines.append(f"Period: {from_date} to {to_date}")
+        lines.append(f"Total Receipts: {receipt_count}")
+        lines.append(f"Total Items Sold: {total_items}")
+        lines.append(f"Total Revenue: EGP {total_revenue:.2f}")
+        if total_discount > 0:
+            lines.append(f"Total Discounts: EGP {total_discount:.2f}")
+        lines.append(f"Average Receipt: EGP {total_revenue/receipt_count:.2f}" if receipt_count > 0 else "Average Receipt: —")
+        lines.append("=" * 80)
+        lines.append("")
+        lines.append("justb-eg.com")
+        lines.append("")
+
+        report_text = "\n".join(lines)
+        
+        # Save to file
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+            initialfile=f"JustB_Report_{from_date}_to_{to_date}.txt"
+        )
+        
+        if file_path:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(report_text)
+            messagebox.showinfo("Success", f"Report saved:\n{file_path}")
+
+    def _send_to_pos58(self, text):
+        """Send text to POS58 thermal printer."""
+        try:
+            import win32print
+            import win32ui
+        except:
+            messagebox.showerror("Error", "Win32 printing not available")
+            return
+
+        try:
+            printer_name = win32print.GetDefaultPrinter()
+            hprinter = win32print.OpenPrinter(printer_name)
+            hdc = win32ui.CreateDC()
+            hdc.CreatePrinterDC(printer_name)
+            hdc.StartDoc(f"JustB_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+            hdc.StartPage()
+
+            # Print text
+            hdc.TextOut(50, 50, text)
+
+            hdc.EndPage()
+            hdc.EndDoc()
+            hdc.DeleteDC()
+            win32print.ClosePrinter(hprinter)
+
+            messagebox.showinfo("Success", "Report sent to POS58 printer!")
+        except Exception as e:
+            messagebox.showerror("Print Error", f"Failed to print:\n{str(e)}")
