@@ -54,5 +54,24 @@
         "promo_code": "",
         "payment_method": "Cash",
         "date": "2026-03-22"
+    },
+    {
+        "id": 4,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "147",
+                "name": "www",
+                "price": 20.0,
+                "quantity": 2
+            }
+        ],
+        "subtotal": 40.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "total": 40.0,
+        "promo_code": "",
+        "payment_method": "Cash",
+        "date": "2026-03-28"
     }
 ]
