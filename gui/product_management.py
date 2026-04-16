@@ -64,6 +64,8 @@ FONT_SECTION = ("Segoe UI",   8, "bold")
 FONT_STAT    = ("Georgia",   22, "bold")
 FONT_STAT_LB = ("Segoe UI",   9)
 
+CATEGORY_OPTIONS = ["None", "Makeup & Cosmetics", "Stationary"]
+
 
 # ── Shared UI helpers ─────────────────────────────────────────────────────────
 
@@ -106,7 +108,7 @@ def _field_row(parent, row, label, widget, col_offset=0):
 class _ProductPopup(tk.Toplevel):
     def __init__(self, master, title, on_save,
                  barcode="", name="", price="", qty="",
-                 lock_barcode=False):
+                 category="None", lock_barcode=False):
         super().__init__(master)
         self.on_save = on_save
         self.title(title)
@@ -151,13 +153,23 @@ class _ProductPopup(tk.Toplevel):
         self.price_e   = _entry(card, width=28)
         self.qty_e     = _entry(card, width=28)
 
+        self.category_cb = ttk.Combobox(
+            card,
+            values=CATEGORY_OPTIONS,
+            state="readonly",
+            width=26,
+            font=FONT_LABEL
+        )
+
         _field_row(card, 0, "Barcode",  self.barcode_e)
         _field_row(card, 1, "Name",     self.name_e)
-        _field_row(card, 2, "Price",    self.price_e)
-        _field_row(card, 3, "Quantity", self.qty_e)
+        _field_row(card, 2, "Category", self.category_cb)
+        _field_row(card, 3, "Price",    self.price_e)
+        _field_row(card, 4, "Quantity", self.qty_e)
 
         self.barcode_e.insert(0, barcode)
         self.name_e.insert(0, name)
+        self.category_cb.set(category or "None")
         self.price_e.insert(0, price)
         self.qty_e.insert(0, qty)
 
@@ -169,7 +181,7 @@ class _ProductPopup(tk.Toplevel):
         # Status
         self.status = tk.Label(card, text="", font=FONT_SMALL,
                                fg=C["danger"], bg=C["bg_card"])
-        self.status.grid(row=4, column=0, columnspan=2,
+        self.status.grid(row=5, column=0, columnspan=2,
                          sticky="w", pady=(4, 0))
 
         # Buttons
@@ -192,6 +204,7 @@ class _ProductPopup(tk.Toplevel):
     def _save(self):
         barcode  = self.barcode_e.get().strip()
         name     = self.name_e.get().strip()
+        category = self.category_cb.get().strip() or "None"
         price_s  = self.price_e.get().strip()
         qty_s    = self.qty_e.get().strip()
 
@@ -210,7 +223,7 @@ class _ProductPopup(tk.Toplevel):
         except Exception:
             self.status.config(text="Quantity must be a non-negative integer."); return
 
-        self.on_save(barcode, name, price, qty)
+        self.on_save(barcode, name, category, price, qty)
         self.destroy()
 
 
@@ -298,7 +311,7 @@ class ProductManagementScreen:
                         background=C["bg_panel"])
         self.search_filter = ttk.Combobox(
             row,
-            values=["All", "Barcode", "Name", "Price", "Quantity"],
+            values=["All", "Barcode", "Name", "Category", "Price", "Quantity"],
             state="readonly", width=11,
             font=FONT_LABEL,
         )
@@ -319,11 +332,10 @@ class ProductManagementScreen:
         acts = tk.Frame(self.frame, bg=C["bg_root"])
         acts.pack(fill="x", padx=14, pady=8)
 
-        _btn(acts, "＋  Add Product",
-             self.add_product_popup,
-             C["teal"], "#159F9F").pack(side="left", padx=(0, 8))
-
         if not self.cashier_mode:
+            _btn(acts, "＋  Add Product",
+                 self.add_product_popup,
+                 C["teal"], "#159F9F").pack(side="left", padx=(0, 8))
             _btn(acts, "✎  Edit",
                  self.edit_product_popup,
                  C["orange"], "#E05F00").pack(side="left", padx=(0, 8))
@@ -394,11 +406,11 @@ class ProductManagementScreen:
         ts.layout("PM.Treeview",
                   [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        cols = ("Barcode", "Name", "Price", "Qty", "Status")
+        cols = ("Barcode", "Name", "Category", "Price", "Qty", "Status")
         self.tree = ttk.Treeview(tree_card, columns=cols,
                                   show="headings", selectmode="extended",
                                   style="PM.Treeview")
-        cw = {"Barcode": 120, "Name": 300, "Price": 100, "Qty": 80, "Status": 100}
+        cw = {"Barcode": 120, "Name": 230, "Category": 160, "Price": 100, "Qty": 80, "Status": 100}
         for col in cols:
             self.tree.heading(col, text=col,
                               command=lambda c=col: self._sort_by(c))
@@ -415,8 +427,9 @@ class ProductManagementScreen:
         self.tree.grid(row=1, column=0, sticky="nsew")
         vsb.grid(row=1, column=1, sticky="ns")
 
-        self.tree.bind("<Double-1>",          lambda e: self.edit_product_popup())
-        self.tree.bind("<<TreeviewSelect>>",  lambda e: None)
+        if not self.cashier_mode:
+            self.tree.bind("<Double-1>", lambda e: self.edit_product_popup())
+        self.tree.bind("<<TreeviewSelect>>", lambda e: None)
 
         # Footer
         tk.Label(self.frame,
@@ -490,6 +503,7 @@ class ProductManagementScreen:
         key_map = {
             "Barcode": lambda p: str(p.get("barcode", "")),
             "Name":    lambda p: p.get("name", "").lower(),
+            "Category": lambda p: p.get("category", "").lower(),
             "Price":   lambda p: float(p.get("price", 0)),
             "Qty":     lambda p: int(p.get("quantity", 0)),
         }
@@ -523,9 +537,10 @@ class ProductManagementScreen:
             tag = ("low_odd" if (is_low and idx % 2) else
                    "low"     if is_low else tag_base)
 
+            category = p.get("category", "") or "None"
             iid = "bc_" + barcode_str
             self.tree.insert("", "end", iid=iid, tags=(tag,),
-                             values=(barcode_str, p["name"],
+                             values=(barcode_str, p["name"], category,
                                      f"EGP {float(p['price']):.2f}",
                                      qty, status))
 
@@ -563,13 +578,15 @@ class ProductManagementScreen:
 
         filtered = []
         for p in self.all_products:
-            bc    = str(p.get("barcode", "")).lower()
-            name  = str(p.get("name",    "")).lower()
-            price = str(p.get("price",   "")).lower()
-            qty   = str(p.get("quantity", 0)).lower()
-            if (field == "All"      and (query in bc or query in name or query in price or query in qty) or
+            bc       = str(p.get("barcode", "")).lower()
+            name     = str(p.get("name",    "")).lower()
+            category = str(p.get("category", "None") or "None").lower()
+            price    = str(p.get("price",   "")).lower()
+            qty      = str(p.get("quantity", 0)).lower()
+            if (field == "All"      and (query in bc or query in name or query in category or query in price or query in qty) or
                 field == "Barcode"  and query in bc   or
                 field == "Name"     and query in name or
+                field == "Category" and query in category or
                 field == "Price"    and query in price or
                 field == "Quantity" and query in qty):
                 filtered.append(p)
@@ -586,13 +603,19 @@ class ProductManagementScreen:
     # ══════════════════════════════════════════════════════════════════════════
 
     def add_product_popup(self):
-        def _save(barcode, name, price, qty):
+        if self.cashier_mode:
+            messagebox.showinfo("Access Denied",
+                                "Cashiers can only view products.")
+            return
+
+        def _save(barcode, name, category, price, qty):
             products = load_json(self._products_path())
             if any(str(p["barcode"]) == str(barcode) for p in products):
                 messagebox.showerror("Duplicate",
                     "A product with this barcode already exists.\nUse Edit to modify it.")
                 return
             products.append({"barcode": barcode, "name": name,
+                              "category": category if category != "None" else "",
                               "price": price, "quantity": qty})
             save_json(self._products_path(), products)
             self.load_products()
@@ -600,6 +623,11 @@ class ProductManagementScreen:
         _ProductPopup(self.root, "Add Product", _save)
 
     def edit_product_popup(self):
+        if self.cashier_mode:
+            messagebox.showinfo("Access Denied",
+                                "Cashiers can only view products.")
+            return
+
         selected = self.tree.selection()
         if not selected:
             messagebox.showinfo("Select Product", "Please select a product to edit.")
@@ -612,10 +640,11 @@ class ProductManagementScreen:
         old_barcode = iid[3:] if iid.startswith("bc_") else iid
         vals = self.tree.item(iid)["values"]
         old_name  = vals[1]
-        old_price = str(vals[2]).replace("EGP ", "")
-        old_qty   = vals[3]
+        old_category = vals[2] if len(vals) > 4 else ""
+        old_price = str(vals[3] if len(vals) > 4 else vals[2]).replace("EGP ", "")
+        old_qty   = vals[4] if len(vals) > 4 else vals[3]
 
-        def _save(barcode, name, price, qty):
+        def _save(barcode, name, category, price, qty):
             products = load_json(self._products_path())
             if str(barcode) != str(old_barcode):
                 if any(str(p["barcode"]) == str(barcode) for p in products):
@@ -624,6 +653,7 @@ class ProductManagementScreen:
             for p in products:
                 if str(p["barcode"]) == str(old_barcode):
                     p.update({"barcode": barcode, "name": name,
+                               "category": category if category != "None" else "",
                                "price": price, "quantity": qty})
                     break
             save_json(self._products_path(), products)
@@ -631,10 +661,16 @@ class ProductManagementScreen:
 
         _ProductPopup(self.root, "Edit Product", _save,
                       barcode=old_barcode, name=old_name,
+                      category=old_category or "None",
                       price=old_price, qty=str(old_qty),
                       lock_barcode=True)
 
     def delete_product(self):
+        if self.cashier_mode:
+            messagebox.showinfo("Access Denied",
+                                "Cashiers can only view products.")
+            return
+
         selected = self.tree.selection()
         if not selected:
             messagebox.showinfo("Select Product", "Select product(s) to delete.")

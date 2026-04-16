@@ -131,5 +131,25 @@
         "payment_method": "Cash",
         "date": "2026-03-29",
         "time": "19:54:32"
+    },
+    {
+        "id": 8,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "45",
+                "name": "sui",
+                "price": 20.0,
+                "quantity": 1
+            }
+        ],
+        "subtotal": 20.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "total": 20.0,
+        "promo_code": "",
+        "payment_method": "Cash",
+        "date": "2026-03-30",
+        "time": "16:01:41"
     }
 ]

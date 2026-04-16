@@ -6,7 +6,7 @@
     },
     {
         "username": "cashier",
-        "password": "$2b$12$Ye89mb1RlbFF73VuKqtbWuapT0yEBcM4v/hD1SPreQZwIk3VMaU6O",
-        "role": "Cashier"
+        "password": "$2b$12$zoFjqtBlY03MjWw2415MWekRFhq8OvkKmSOhwCU9t/.VsnOBafpAS",
+        "role": "worker"
     }
 ]

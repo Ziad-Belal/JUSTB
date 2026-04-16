@@ -322,8 +322,6 @@ class SettingsScreen:
             _set_status(self.create_status, "Both password fields are required.", error=True); return
         if pwd != confirm:
             _set_status(self.create_status, "Passwords do not match.", error=True); return
-        if len(pwd) < 6:
-            _set_status(self.create_status, "Minimum 6 characters for password.", error=True); return
 
         users = load_json(self._users_path())
         if any(u.get("username", "").strip().lower() == uname.lower() for u in users):
