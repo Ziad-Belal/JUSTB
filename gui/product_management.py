@@ -406,30 +406,45 @@ class ProductManagementScreen:
         ts.layout("PM.Treeview",
                   [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        cols = ("Barcode", "Name", "Category", "Price", "Qty", "Status")
-        self.tree = ttk.Treeview(tree_card, columns=cols,
-                                  show="headings", selectmode="extended",
-                                  style="PM.Treeview")
-        cw = {"Barcode": 120, "Name": 230, "Category": 160, "Price": 100, "Qty": 80, "Status": 100}
-        for col in cols:
-            self.tree.heading(col, text=col,
-                              command=lambda c=col: self._sort_by(c))
-            self.tree.column(col, anchor="center",
-                              width=cw[col], minwidth=60)
+        self.trees = {}
+        self.inventory_tabs = ttk.Notebook(tree_card, style="JB.TNotebook")
+        self.inventory_tabs.grid(row=1, column=0, columnspan=2,
+                                 sticky="nsew")
 
-        self.tree.tag_configure("even",     background=C["bg_card"])
-        self.tree.tag_configure("odd",      background=C["bg_row_alt"])
-        self.tree.tag_configure("low",      foreground=C["warning"])
-        self.tree.tag_configure("low_odd",  background=C["bg_row_alt"], foreground=C["warning"])
+        for tab_name in ["Stationary", "Makeup & Cosmetics", "None"]:
+            frame = tk.Frame(tree_card, bg=C["bg_card"])
+            frame.grid_rowconfigure(0, weight=1)
+            frame.grid_columnconfigure(0, weight=1)
 
-        vsb = ttk.Scrollbar(tree_card, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=vsb.set)
-        self.tree.grid(row=1, column=0, sticky="nsew")
-        vsb.grid(row=1, column=1, sticky="ns")
+            tree = ttk.Treeview(frame, columns=("Barcode", "Name", "Category", "Price", "Qty", "Status"),
+                                show="headings", selectmode="extended",
+                                style="PM.Treeview")
+            cw = {"Barcode": 120, "Name": 230, "Category": 160,
+                  "Price": 100, "Qty": 80, "Status": 100}
+            for col in ("Barcode", "Name", "Category", "Price", "Qty", "Status"):
+                tree.heading(col, text=col,
+                             command=lambda c=col: self._sort_by(c))
+                tree.column(col, anchor="center",
+                            width=cw[col], minwidth=60)
 
-        if not self.cashier_mode:
-            self.tree.bind("<Double-1>", lambda e: self.edit_product_popup())
-        self.tree.bind("<<TreeviewSelect>>", lambda e: None)
+            tree.tag_configure("even",     background=C["bg_card"])
+            tree.tag_configure("odd",      background=C["bg_row_alt"])
+            tree.tag_configure("low",      foreground=C["warning"])
+            tree.tag_configure("low_odd",  background=C["bg_row_alt"], foreground=C["warning"])
+
+            vsb = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
+            tree.configure(yscrollcommand=vsb.set)
+            tree.grid(row=0, column=0, sticky="nsew")
+            vsb.grid(row=0, column=1, sticky="ns")
+
+            if not self.cashier_mode:
+                tree.bind("<Double-1>", lambda e: self.edit_product_popup())
+            tree.bind("<<TreeviewSelect>>", lambda e: None)
+
+            self.inventory_tabs.add(frame, text=tab_name)
+            self.trees[tab_name] = tree
+
+        self.inventory_tabs.bind("<<NotebookTabChanged>>", lambda e: self._on_tab_changed())
 
         # Footer
         tk.Label(self.frame,
@@ -512,6 +527,14 @@ class ProductManagementScreen:
         self._sort_state[col] = not reverse
         self.display_products(self.all_products)
 
+    def _current_tree(self):
+        selected = self.inventory_tabs.select()
+        tab_text = self.inventory_tabs.tab(selected, "text")
+        return self.trees.get(tab_text)
+
+    def _on_tab_changed(self):
+        self.display_products(self.all_products)
+
     # ══════════════════════════════════════════════════════════════════════════
     #  Data
     # ══════════════════════════════════════════════════════════════════════════
@@ -521,34 +544,41 @@ class ProductManagementScreen:
         self.display_products(self.all_products)
 
     def display_products(self, products):
-        for i in self.tree.get_children():
-            self.tree.delete(i)
+        for tree in self.trees.values():
+            for i in tree.get_children():
+                tree.delete(i)
 
-        low_count = 0
-        for idx, p in enumerate(products):
-            barcode_str = str(p["barcode"])
-            qty = int(p.get("quantity", 0))
-            is_low = qty <= LOW_STOCK_QTY
-            if is_low:
-                low_count += 1
+        categorized = {
+            "Stationary": [],
+            "Makeup & Cosmetics": [],
+            "None": [],
+        }
 
-            status = "⚠ Low Stock" if is_low else "✓ OK"
-            tag_base = "odd" if idx % 2 else "even"
-            tag = ("low_odd" if (is_low and idx % 2) else
-                   "low"     if is_low else tag_base)
+        for p in products:
+            category = str(p.get("category", "") or "None")
+            if category not in categorized:
+                category = "None"
+            categorized[category].append(p)
 
-            category = p.get("category", "") or "None"
-            iid = "bc_" + barcode_str
-            self.tree.insert("", "end", iid=iid, tags=(tag,),
-                             values=(barcode_str, p["name"], category,
-                                     f"EGP {float(p['price']):.2f}",
-                                     qty, status))
+        for tab_name, items in categorized.items():
+            tree = self.trees.get(tab_name)
+            for idx, p in enumerate(items):
+                barcode_str = str(p["barcode"])
+                qty = int(p.get("quantity", 0))
+                is_low = qty <= LOW_STOCK_QTY
+                status = "⚠ Low Stock" if is_low else "✓ OK"
+                tag_base = "odd" if idx % 2 else "even"
+                tag = ("low_odd" if (is_low and idx % 2) else
+                       "low"     if is_low else tag_base)
+                category = p.get("category", "") or "None"
+                iid = "bc_" + barcode_str
+                tree.insert("", "end", iid=iid, tags=(tag,),
+                            values=(barcode_str, p["name"], category,
+                                    f"EGP {float(p['price']):.2f}",
+                                    qty, status))
 
         total   = len(self.all_products)
-        shown   = len(products)
         stock   = sum(int(p.get("quantity", 0)) for p in self.all_products)
-        value   = sum(float(p.get("price", 0)) * int(p.get("quantity", 0))
-                      for p in self.all_products)
         low_all = sum(1 for p in self.all_products
                       if int(p.get("quantity", 0)) <= LOW_STOCK_QTY)
 
@@ -557,13 +587,11 @@ class ProductManagementScreen:
         self._animate_counter(self._stat_stock,    stock)
         self._animate_counter(self._stat_lowstock, low_all)
 
-        # Results label
-        if shown == total:
-            self.results_lbl.config(text=f"Showing all {total} product(s)")
-        else:
-            self.results_lbl.config(
-                text=f"Showing {shown} of {total} product(s)")
-
+        active_tree = self._current_tree()
+        shown = len(active_tree.get_children()) if active_tree else 0
+        active_tab = self.inventory_tabs.tab(self.inventory_tabs.select(), "text")
+        self.results_lbl.config(
+            text=f"Showing {shown} product(s) in {active_tab}")
         self._item_count_lbl.config(
             text=f"{shown} item{'s' if shown != 1 else ''}")
 
@@ -628,7 +656,8 @@ class ProductManagementScreen:
                                 "Cashiers can only view products.")
             return
 
-        selected = self.tree.selection()
+        tree = self._current_tree()
+        selected = tree.selection() if tree else ()
         if not selected:
             messagebox.showinfo("Select Product", "Please select a product to edit.")
             return
@@ -638,11 +667,11 @@ class ProductManagementScreen:
 
         iid = selected[0]
         old_barcode = iid[3:] if iid.startswith("bc_") else iid
-        vals = self.tree.item(iid)["values"]
+        vals = tree.item(iid)["values"]
         old_name  = vals[1]
-        old_category = vals[2] if len(vals) > 4 else ""
-        old_price = str(vals[3] if len(vals) > 4 else vals[2]).replace("EGP ", "")
-        old_qty   = vals[4] if len(vals) > 4 else vals[3]
+        old_category = vals[2] if len(vals) > 4 else "None"
+        old_price = str(vals[3]).replace("EGP ", "")
+        old_qty   = vals[4]
 
         def _save(barcode, name, category, price, qty):
             products = load_json(self._products_path())
@@ -671,7 +700,8 @@ class ProductManagementScreen:
                                 "Cashiers can only view products.")
             return
 
-        selected = self.tree.selection()
+        tree = self._current_tree()
+        selected = tree.selection() if tree else ()
         if not selected:
             messagebox.showinfo("Select Product", "Select product(s) to delete.")
             return
@@ -686,7 +716,8 @@ class ProductManagementScreen:
         self.load_products()
 
     def print_product(self):
-        selected = self.tree.selection()
+        tree = self._current_tree()
+        selected = tree.selection() if tree else ()
         if not selected:
             messagebox.showinfo("Select Product", "Select a product to print.")
             return
@@ -694,14 +725,14 @@ class ProductManagementScreen:
             for sel in selected:
                 iid = sel
                 barcode = iid[3:] if iid.startswith("bc_") else iid
-                vals = self.tree.item(sel)["values"]
+                vals = tree.item(sel)["values"] if tree else []
                 if not vals:
                     continue
                 text = (f"Product\n-------\n"
                         f"Name:     {vals[1]}\n"
                         f"Barcode:  {barcode}\n"
-                        f"Price:    {vals[2]}\n"
-                        f"Quantity: {vals[3]}\n")
+                        f"Price:    {vals[3]}\n"
+                        f"Quantity: {vals[4]}\n")
                 tmp = tempfile.NamedTemporaryFile(
                     delete=False, suffix=".txt", mode="w", encoding="utf-8")
                 tmp.write(text)
