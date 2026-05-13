@@ -6,7 +6,7 @@ Dynamic features:
   • Live receipt list with time-sorted transactions
   • Hover to preview formatted receipt
   • Filter by date
-  • Search receipts by ID or amount
+  • Search receipts by ID, amount, product name, or receipt barcode code (RCPT-XXXXXX)
   • Export receipt data
 """
 
@@ -135,7 +135,7 @@ class ReceiptDatabaseScreen:
         search_frame = tk.Frame(self.frame, bg=C["bg_root"])
         search_frame.pack(fill="x", padx=14, pady=(8, 0))
 
-        tk.Label(search_frame, text="Search ID or Amount:",
+        tk.Label(search_frame, text="Search:",
                  font=FONT_SMALL, bg=C["bg_root"],
                  fg=C["text_mid"]).pack(side="left", padx=(0, 8))
 
@@ -143,9 +143,15 @@ class ReceiptDatabaseScreen:
         self.search_var.trace("w", lambda *args: self._filter_receipts())
         search_entry = tk.Entry(search_frame, textvariable=self.search_var,
                                 font=FONT_SMALL, bg=C["bg_input"],
-                                fg=C["text_dark"], width=30,
+                                fg=C["text_dark"], width=36,
                                 relief="solid", borderwidth=1)
         search_entry.pack(side="left", padx=(0, 8))
+
+        # Search hint label
+        tk.Label(search_frame,
+                 text="by ID · amount · product name · barcode code (RCPT-000001)",
+                 font=("Segoe UI", 8), bg=C["bg_root"],
+                 fg=C["text_light"]).pack(side="left")
 
         # ── Main content: Receipts list + Preview ─────────────────────────────
         body = tk.Frame(self.frame, bg=C["bg_root"])
@@ -168,6 +174,11 @@ class ReceiptDatabaseScreen:
         tk.Label(list_hdr, text="📋  RECEIPTS",
                  font=FONT_SECTION, bg=C["bg_panel"],
                  fg=C["text_mid"]).pack(side="left")
+
+        self.results_lbl = tk.Label(list_hdr, text="",
+                                     font=FONT_SMALL,
+                                     bg=C["bg_panel"], fg=C["purple"])
+        self.results_lbl.pack(side="right")
 
         # Receipts treeview
         ts = ttk.Style()
@@ -319,7 +330,7 @@ class ReceiptDatabaseScreen:
         else:
             lines.append("No items in receipt")
             lines.append("-" * 42)
-        
+
         lines.append("")
 
         # Totals
@@ -349,24 +360,47 @@ class ReceiptDatabaseScreen:
     # ── Search / Filter ───────────────────────────────────────────────────────
 
     def _filter_receipts(self):
-        """Filter receipts based on search term."""
+        """
+        Filter receipts by:
+          - Receipt ID (numeric)
+          - Total amount
+          - Product name (any item in the receipt)
+          - Receipt barcode code e.g. 'RCPT-000001' or just '000001'
+        """
         search_term = self.search_var.get().lower().strip()
 
         # Clear tree
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        # Repopulate with filtered results
         if not search_term:
             self._populate_receipts(self.receipts_data)
-        else:
-            filtered = []
-            for receipt in self.receipts_data:
-                receipt_id = str(receipt.get("id", "")).lower()
-                total = str(receipt.get("total", "")).lower()
-                if search_term in receipt_id or search_term in total:
-                    filtered.append(receipt)
-            self._populate_receipts(filtered)
+            return
+
+        # Strip RCPT- prefix so typing either form works
+        code_term = search_term
+        if code_term.startswith("rcpt-"):
+            code_term = code_term[5:]   # e.g. "000001"
+
+        filtered = []
+        for receipt in self.receipts_data:
+            receipt_id  = str(receipt.get("id", "")).lower()
+            total       = str(receipt.get("total", "")).lower()
+            rcpt_code   = f"rcpt-{receipt.get('id', 0):06d}"   # e.g. rcpt-000001
+
+            # Check product names inside the receipt
+            items = receipt.get("items", [])
+            product_names = [str(item.get("name", "")).lower() for item in items]
+            product_match = any(search_term in name for name in product_names)
+
+            if (search_term in receipt_id
+                    or search_term in total
+                    or search_term in rcpt_code
+                    or code_term   in receipt_id
+                    or product_match):
+                filtered.append(receipt)
+
+        self._populate_receipts(filtered)
 
     # ── Date picker ───────────────────────────────────────────────────────────
 
@@ -395,7 +429,7 @@ class ReceiptDatabaseScreen:
         for sale in sales:
             if sale.get("date", "") == self.view_date:
                 receipt_id = sale.get("id", "?")
-                
+
                 # If we already have this receipt ID, consolidate items
                 if receipt_id in receipt_map:
                     # Merge items and recalculate totals
@@ -434,19 +468,23 @@ class ReceiptDatabaseScreen:
         # Clear tree first to prevent duplicates
         for item in self.tree.get_children():
             self.tree.delete(item)
-        
+
         for r in receipts:
-            receipt_id = r["id"]
-            time_str = r["time"]
-            # Sum total quantity of all items in this receipt
+            receipt_id  = r["id"]
+            time_str    = r["time"]
             items_count = sum(int(item.get("quantity", 1)) for item in r["items"])
-            total = r["total"]
+            total       = r["total"]
 
             self.tree.insert("", "end",
                              values=(receipt_id,
                                      time_str,
                                      items_count,
                                      f"EGP {total:,.2f}"))
+
+        # Update results counter
+        count = len(receipts)
+        self.results_lbl.config(
+            text=f"{count} receipt{'s' if count != 1 else ''}")
 
     # ══════════════════════════════════════════════════════════════════════════
     #  Print Report
@@ -459,7 +497,7 @@ class ReceiptDatabaseScreen:
         dialog.geometry("400x300")
         dialog.transient(self.frame)
         dialog.resizable(False, False)
-        
+
         # Center the dialog
         dialog.grab_set()
 
@@ -511,7 +549,7 @@ class ReceiptDatabaseScreen:
         btn_frame = tk.Frame(main, bg=C["bg_root"])
         btn_frame.pack(fill="x", pady=(20, 0))
 
-        _btn(btn_frame, "Print", 
+        _btn(btn_frame, "Print",
              lambda: self._print_report(self.from_date_entry.get(),
                                        self.to_date_entry.get(),
                                        self.print_method.get()),
@@ -535,7 +573,7 @@ class ReceiptDatabaseScreen:
 
         # Load all sales
         sales = load_json(self._sales_path())
-        
+
         # Filter by date range
         report_sales = []
         for sale in sales:
@@ -564,7 +602,7 @@ class ReceiptDatabaseScreen:
 
         lines = []
         lines.append("")
-        
+
         # Logo placeholder (text-based)
         lines.append("        J U S T B")
         lines.append("   Stationery & Gifts")
@@ -632,11 +670,11 @@ class ReceiptDatabaseScreen:
             lines.append(f"Receipt #{sale.get('id', '?')} | Date: {sale.get('date', '')} | Time: {sale.get('time', '')}")
             lines.append(f"Cashier: {sale.get('user', '—')} | Payment: {sale.get('payment_method', '—')}")
             lines.append("-" * 80)
-            
+
             items = sale.get("items", [])
             lines.append(f"{'Item':<40} {'Qty':>8} {'Price':>12} {'Total':>15}")
             lines.append("-" * 80)
-            
+
             for item in items:
                 name = item.get("name", "?")[:38]
                 qty = item.get("quantity", 1)
@@ -644,7 +682,7 @@ class ReceiptDatabaseScreen:
                 subtotal = qty * price
                 lines.append(f"{name:<40} {qty:>8} EGP {price:>10.2f} EGP {subtotal:>12.2f}")
                 total_items += qty
-            
+
             subtotal = sale.get("subtotal", 0)
             discount_amt = sale.get("discount_amt", 0)
             discount_pct = sale.get("discount_pct", 0)
@@ -680,14 +718,14 @@ class ReceiptDatabaseScreen:
         lines.append("")
 
         report_text = "\n".join(lines)
-        
+
         # Save to file
         file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
             initialfile=f"JustB_Report_{from_date}_to_{to_date}.txt"
         )
-        
+
         if file_path:
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(report_text)

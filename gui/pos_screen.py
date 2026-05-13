@@ -110,7 +110,7 @@ def _divider(char='-', w=RECEIPT_CHAR_WIDTH):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  Logo → ESC/POS  (receipt — untouched)
+#  Logo → ESC/POS  (receipt)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _logo_escpos(path):
@@ -190,7 +190,7 @@ def _qr_escpos(url):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  Receipt assembler  (untouched)
+#  Barcode → ESC/POS
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _barcode_escpos(sale_id):
@@ -240,17 +240,28 @@ def _barcode_escpos(sale_id):
         return ALIGN_CENTER + _enc(f"[ {code} ]") + b'\n'
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  Receipt assembler
+# ══════════════════════════════════════════════════════════════════════════════
+
 def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code="", payment_method="Cash"):
     W        = RECEIPT_CHAR_WIDTH
     date_str = datetime.now().strftime("%d/%m/%Y  %H:%M")
     raw      = bytearray()
 
     raw += INIT
-    raw += _logo_escpos(LOGO_PATH)
-    raw += ALIGN_CENTER
-    raw += BOLD_ON + DBL_HEIGHT
-    raw += _enc("JustB") + b'\n'
-    raw += NORMAL_SIZE + BOLD_OFF
+
+    # ── Logo image at the top (same as receipt_preview.png) ───────────────────
+    logo_bytes = _logo_escpos(LOGO_PATH)
+    if logo_bytes:
+        raw += logo_bytes
+    else:
+        # Fallback: only print "JustB" text if logo image is missing
+        raw += ALIGN_CENTER
+        raw += BOLD_ON + DBL_HEIGHT
+        raw += _enc("JustB") + b'\n'
+        raw += NORMAL_SIZE + BOLD_OFF
+
     raw += b'\n'
     raw += _divider('=')
     raw += ALIGN_LEFT
@@ -569,7 +580,7 @@ class POSScreen:
         self.tree = ttk.Treeview(tree_card, columns=cols,
                                   show="headings", selectmode="browse",
                                   style="JB.Treeview")
-        cw = {"Name": 290, "Qty": 60, "Unit Price": 110, "Total": 110}
+        cw = {"Name": 260, "Qty": 60, "Unit Price": 110, "Total": 110}
         for col in cols:
             self.tree.heading(col, text=col.upper())
             self.tree.column(col, anchor="center",
@@ -582,6 +593,26 @@ class POSScreen:
         self.tree.configure(yscrollcommand=vsb.set)
         self.tree.grid(row=1, column=0, sticky="nsew")
         vsb.grid(row=1,  column=1, sticky="ns")
+
+        # ── Remove selected item button (below cart) ──────────────────
+        remove_bar = tk.Frame(tree_card, bg=C["bg_card"], padx=14, pady=8)
+        remove_bar.grid(row=2, column=0, columnspan=2, sticky="ew")
+
+        remove_btn = tk.Label(
+            remove_bar,
+            text="✕  REMOVE SELECTED ITEM",
+            font=FONT_BTN,
+            bg=C["bg_card"], fg=C["danger"],
+            cursor="hand2",
+            relief="flat",
+            highlightthickness=1,
+            highlightbackground="#FECACA",
+            padx=14, pady=7
+        )
+        remove_btn.pack(fill="x")
+        remove_btn.bind("<Button-1>", lambda e: self.remove_selected_item())
+        remove_btn.bind("<Enter>",    lambda e: remove_btn.config(bg="#FEF2F2"))
+        remove_btn.bind("<Leave>",    lambda e: remove_btn.config(bg=C["bg_card"]))
 
         # ════════════════════════
         #  RIGHT COLUMN
@@ -787,6 +818,51 @@ class POSScreen:
         self.barcode_entry.delete(0, tk.END)
         self._refocus()
 
+    def remove_selected_item(self):
+        """Remove the selected cart item and restore its quantity to inventory."""
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showinfo("No Selection", "Please select an item in the cart to remove.")
+            self._refocus()
+            return
+
+        # Get the index of the selected row
+        all_items = self.tree.get_children()
+        idx = list(all_items).index(selected[0])
+
+        if idx < 0 or idx >= len(self.cart):
+            self._refocus()
+            return
+
+        item_to_remove = self.cart[idx]
+        item_name      = item_to_remove["name"]
+        item_barcode   = item_to_remove["barcode"]
+        item_qty       = item_to_remove["quantity"]
+
+        confirm = messagebox.askyesno(
+            "Remove Item",
+            f"Remove  '{item_name}'  (×{item_qty})  from the cart?\n"
+            f"Its stock will be restored."
+        )
+        if not confirm:
+            self._refocus()
+            return
+
+        # Remove from cart list
+        self.cart.pop(idx)
+
+        # Restore quantity in inventory
+        products = load_json(self._products_path())
+        for prod in products:
+            if str(prod.get("barcode", "")) == str(item_barcode):
+                prod["quantity"] = int(prod.get("quantity", 0)) + item_qty
+                break
+        save_json(self._products_path(), products)
+
+        self.update_tree()
+        self.update_total()
+        self._refocus()
+
     def update_tree(self):
         for i in self.tree.get_children():
             self.tree.delete(i)
@@ -963,13 +1039,13 @@ class POSScreen:
         save_json(self._products_path(), products)
 
         sales    = load_json(self._sales_path())
-        
+
         # Generate unique receipt ID - skip if already exists
         sale_id  = len(sales) + 1
         existing_ids = {s.get("id", 0) for s in sales}
         while sale_id in existing_ids:
             sale_id += 1
-        
+
         subtotal = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
         disc_amt = subtotal * (self._discount_pct / 100.0)
         final    = subtotal - disc_amt
