@@ -12,6 +12,7 @@ C = {
     "bg_panel":   "#F0EDFF",
     "bg_row_alt": "#FAF8FF",
     "purple":     "#8B5CF6",
+    "orange":     "#F97316",
     "teal":       "#1BBFBF",
     "green":      "#22C55E",
     "danger":     "#DC2626",
@@ -149,11 +150,16 @@ class SettingsScreen:
         self._build_create_cashier(inner2)
 
         card3, inner3 = _card(self.body, accent=C["teal"])
-        card3.pack(padx=30, pady=(16, 30), fill="x")
+        card3.pack(**pad)
         self._build_cashier_password(inner3)
+
+        card4, inner4 = _card(self.body, accent=C["orange"])
+        card4.pack(padx=30, pady=(16, 0), fill="x")
+        self._build_system_settings(inner4)
 
         # Now all widgets exist — safe to populate
         self._refresh_cashier_list()
+        self._load_system_settings()
 
     # ══════════════════════════════════════════════════════════════════
     #  Card 1 — Change MY password
@@ -263,6 +269,42 @@ class SettingsScreen:
              self._change_cashier_password,
              C["teal"], "#159F9F").grid(
                  row=5, column=0, columnspan=2, sticky="w", pady=(14, 4))
+
+    def _settings_path(self):
+        return os.path.join(self.data_dir, "system_settings.json")
+
+    def _build_system_settings(self, p):
+        _section_title(p, "SYSTEM SETTINGS")
+
+        self.tax_rate_entry = _entry(p)
+        _field(p, 1, "Tax rate (%)", self.tax_rate_entry)
+
+        self.tax_status = _status_lbl(p, 2)
+        _btn(p, "Save settings",
+             self._save_system_settings,
+             C["orange"], "#D97706").grid(
+                 row=3, column=0, columnspan=2, sticky="w", pady=(14, 4))
+
+    def _load_system_settings(self):
+        settings = load_json(self._settings_path())
+        if not isinstance(settings, dict):
+            settings = {}
+        self.system_settings = settings
+        self.tax_rate_entry.delete(0, tk.END)
+        self.tax_rate_entry.insert(0, str(settings.get("tax_pct", 0.0)))
+
+    def _save_system_settings(self):
+        try:
+            tax_pct = float(self.tax_rate_entry.get().strip() or 0.0)
+            if tax_pct < 0:
+                raise ValueError
+        except Exception:
+            _set_status(self.tax_status, "Enter a valid non-negative tax rate.", error=True)
+            return
+
+        self.system_settings["tax_pct"] = round(tax_pct, 2)
+        save_json(self._settings_path(), self.system_settings)
+        _set_status(self.tax_status, "Settings saved successfully.")
 
 
     # ─────────────────────────────────────────────────────────────────

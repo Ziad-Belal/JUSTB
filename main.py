@@ -32,4 +32,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        # Allow clean exit when user interrupts via Ctrl+C in terminal
+        print("Interrupted by user. Exiting...")

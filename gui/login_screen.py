@@ -441,21 +441,62 @@ class LoginScreen:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+#  Shared helper: toolbar button
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _tb_btn(parent, text, command, bg=C["purple"], hover=C["purple_dk"], fg="#FFFFFF"):
+    b = tk.Label(parent, text=text, font=("Segoe UI", 9, "bold"),
+                 bg=bg, fg=fg, cursor="hand2",
+                 relief="flat", padx=10, pady=5)
+    b.bind("<Button-1>", lambda e: command())
+    b.bind("<Enter>",    lambda e: b.config(bg=hover))
+    b.bind("<Leave>",    lambda e: b.config(bg=bg))
+    return b
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 #  Admin Dashboard
 # ══════════════════════════════════════════════════════════════════════════════
 
 class AdminDashboard:
     def __init__(self, root, data_dir, user=None):
-        self.root     = root
-        self.data_dir = data_dir
-        self.user     = user or {"username": "Admin", "role": "admin"}
+        self.root       = root
+        self.data_dir   = data_dir
+        self.user       = user or {"username": "Admin", "role": "admin"}
+        self._pos_count = 1   # how many POS tabs exist
 
-        self.notebook = ttk.Notebook(root)
+        # ── Outer frame holds toolbar + notebook ──────────────────────────────
+        outer = tk.Frame(root, bg=C["bg_root"])
+        outer.pack(fill="both", expand=True)
+
+        # ── Top toolbar ───────────────────────────────────────────────────────
+        toolbar = tk.Frame(outer, bg=C["bg_panel"],
+                           highlightthickness=1,
+                           highlightbackground=C["border"])
+        toolbar.pack(fill="x", side="top")
+
+        tk.Label(toolbar, text="  ➕ POS Stations:",
+                 font=("Segoe UI", 9), bg=C["bg_panel"],
+                 fg=C["text_mid"]).pack(side="left", padx=(8, 4), pady=6)
+
+        _tb_btn(toolbar, "+ Add POS", self._add_pos_tab,
+                bg=C["teal"], hover="#159F9F").pack(side="left", padx=(0, 4), pady=6)
+
+        _tb_btn(toolbar, "✕ Remove POS", self._remove_pos_tab,
+                bg=C["danger"], hover="#B91C1C").pack(side="left", padx=(0, 12), pady=6)
+
+        # ── Notebook ──────────────────────────────────────────────────────────
+        self.notebook = ttk.Notebook(outer)
         self.notebook.pack(fill="both", expand=True)
 
-        self.pos_tab      = POSScreen(root, data_dir=self.data_dir,
-                                       frame_parent=self.notebook,
-                                       user=self.user).frame
+        # Fixed first POS tab
+        first_pos = POSScreen(root, data_dir=self.data_dir,
+                              frame_parent=self.notebook,
+                              user=self.user).frame
+        self.notebook.add(first_pos, text="POS 1")
+        self._pos_frames = [first_pos]
+
+        # Other tabs
         self.product_tab  = ProductManagementScreen(root, data_dir=self.data_dir,
                                                      frame_parent=self.notebook).frame
         self.promo_tab    = PromoManagementScreen(root, data_dir=self.data_dir,
@@ -470,12 +511,37 @@ class AdminDashboard:
                                             frame_parent=self.notebook,
                                             user=self.user).frame
 
-        self.notebook.add(self.pos_tab,      text="POS")
         self.notebook.add(self.product_tab,  text="Products")
         self.notebook.add(self.promo_tab,    text="Promotions")
-        self.notebook.add(self.feedback_tab, text="Daily Feedback")
+        self.notebook.add(self.feedback_tab, text="Feedback")
         self.notebook.add(self.receipt_tab,  text="Receipts")
         self.notebook.add(self.settings_tab, text="Settings")
+
+    def _add_pos_tab(self):
+        self._pos_count += 1
+        new_pos = POSScreen(self.root, data_dir=self.data_dir,
+                            frame_parent=self.notebook,
+                            user=self.user).frame
+        self._pos_frames.append(new_pos)
+        # Insert new POS tab right after the last existing POS tab
+        insert_pos = len(self._pos_frames) - 1
+        self.notebook.insert(insert_pos, new_pos, text=f"POS {self._pos_count}")
+        self.notebook.select(insert_pos)
+
+    def _remove_pos_tab(self):
+        if len(self._pos_frames) <= 1:
+            messagebox.showinfo("Cannot Remove",
+                "At least one POS tab must remain.")
+            return
+        # Always remove the last POS tab
+        last_frame = self._pos_frames.pop()
+        # Find its index in the notebook
+        for idx in range(self.notebook.index("end")):
+            if str(self.notebook.tabs()[idx]) == str(last_frame):
+                self.notebook.forget(idx)
+                last_frame.destroy()
+                break
+        self._pos_count -= 1
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -484,16 +550,41 @@ class AdminDashboard:
 
 class CashierDashboard:
     def __init__(self, root, data_dir, user=None):
-        self.root     = root
-        self.data_dir = data_dir
-        self.user     = user or {"username": "Cashier", "role": "worker"}
+        self.root       = root
+        self.data_dir   = data_dir
+        self.user       = user or {"username": "Cashier", "role": "worker"}
+        self._pos_count = 1
 
-        self.notebook = ttk.Notebook(root)
+        # ── Outer frame ───────────────────────────────────────────────────────
+        outer = tk.Frame(root, bg=C["bg_root"])
+        outer.pack(fill="both", expand=True)
+
+        # ── Top toolbar ───────────────────────────────────────────────────────
+        toolbar = tk.Frame(outer, bg=C["bg_panel"],
+                           highlightthickness=1,
+                           highlightbackground=C["border"])
+        toolbar.pack(fill="x", side="top")
+
+        tk.Label(toolbar, text="  ➕ POS Stations:",
+                 font=("Segoe UI", 9), bg=C["bg_panel"],
+                 fg=C["text_mid"]).pack(side="left", padx=(8, 4), pady=6)
+
+        _tb_btn(toolbar, "+ Add POS", self._add_pos_tab,
+                bg=C["teal"], hover="#159F9F").pack(side="left", padx=(0, 4), pady=6)
+
+        _tb_btn(toolbar, "✕ Remove POS", self._remove_pos_tab,
+                bg=C["danger"], hover="#B91C1C").pack(side="left", padx=(0, 12), pady=6)
+
+        # ── Notebook ──────────────────────────────────────────────────────────
+        self.notebook = ttk.Notebook(outer)
         self.notebook.pack(fill="both", expand=True)
 
-        self.pos_tab     = POSScreen(root, data_dir=self.data_dir,
-                                      frame_parent=self.notebook,
-                                      user=self.user).frame
+        first_pos = POSScreen(root, data_dir=self.data_dir,
+                              frame_parent=self.notebook,
+                              user=self.user).frame
+        self.notebook.add(first_pos, text="POS 1")
+        self._pos_frames = [first_pos]
+
         self.product_tab = ProductManagementScreen(root, data_dir=self.data_dir,
                                                     frame_parent=self.notebook,
                                                     cashier_mode=True).frame
@@ -501,6 +592,28 @@ class CashierDashboard:
                                                   frame_parent=self.notebook,
                                                   admin=False).frame
 
-        self.notebook.add(self.pos_tab,     text="POS")
         self.notebook.add(self.product_tab, text="Products")
         self.notebook.add(self.receipt_tab, text="Receipts")
+
+    def _add_pos_tab(self):
+        self._pos_count += 1
+        new_pos = POSScreen(self.root, data_dir=self.data_dir,
+                            frame_parent=self.notebook,
+                            user=self.user).frame
+        self._pos_frames.append(new_pos)
+        insert_pos = len(self._pos_frames) - 1
+        self.notebook.insert(insert_pos, new_pos, text=f"POS {self._pos_count}")
+        self.notebook.select(insert_pos)
+
+    def _remove_pos_tab(self):
+        if len(self._pos_frames) <= 1:
+            messagebox.showinfo("Cannot Remove",
+                "At least one POS tab must remain.")
+            return
+        last_frame = self._pos_frames.pop()
+        for idx in range(self.notebook.index("end")):
+            if str(self.notebook.tabs()[idx]) == str(last_frame):
+                self.notebook.forget(idx)
+                last_frame.destroy()
+                break
+        self._pos_count -= 1

@@ -116,17 +116,36 @@ class _ProductPopup(tk.Toplevel):
         self.configure(bg=C["bg_root"])
         self.grab_set()
 
-        pw, ph = 400, 340
+        pw, ph = 440, 420
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
         self.geometry(f"{pw}x{ph}+{(sw-pw)//2}+{(sh-ph)//2}")
 
+        # Scrollable container
+        container = tk.Frame(self, bg=C["bg_root"])
+        container.pack(fill="both", expand=True)
+
+        self.canvas = tk.Canvas(container, bg=C["bg_root"], highlightthickness=0)
+        self.vscroll = ttk.Scrollbar(container, orient="vertical",
+                                    command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.vscroll.set)
+        self.vscroll.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        self.inner_frame = tk.Frame(self.canvas, bg=C["bg_root"])
+        self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
+        self.inner_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+
         # Accent bar
         accent_col = C["teal"] if not lock_barcode else C["orange"]
-        tk.Frame(self, bg=accent_col, height=4).pack(fill="x")
+        tk.Frame(self.inner_frame, bg=accent_col, height=4).pack(fill="x")
 
         # Title row
-        hdr = tk.Frame(self, bg=C["bg_header"],
+        hdr = tk.Frame(self.inner_frame, bg=C["bg_header"],
                        highlightthickness=1,
                        highlightbackground=C["border"],
                        padx=20, pady=14)
@@ -141,7 +160,7 @@ class _ProductPopup(tk.Toplevel):
                  fg=C["text_dark"]).pack(side="left")
 
         # Form card
-        card = tk.Frame(self, bg=C["bg_card"],
+        card = tk.Frame(self.inner_frame, bg=C["bg_card"],
                         highlightthickness=1,
                         highlightbackground=C["border"],
                         padx=28, pady=20)
@@ -200,6 +219,9 @@ class _ProductPopup(tk.Toplevel):
         (self.name_e if lock_barcode else self.barcode_e).focus()
         self.bind("<Return>", lambda e: self._save())
         self.bind("<Escape>", lambda e: self.destroy())
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _save(self):
         barcode  = self.barcode_e.get().strip()
@@ -274,11 +296,12 @@ class ProductManagementScreen:
         stats_bar = tk.Frame(self.frame, bg=C["bg_root"])
         stats_bar.pack(fill="x", padx=14, pady=(10, 0))
 
-        self._stat_total   = self._stat_card(stats_bar, "TOTAL PRODUCTS", "0", C["purple"],  0)
-        self._stat_stock   = self._stat_card(stats_bar, "TOTAL STOCK",    "0", C["teal"],    1)
-        self._stat_lowstock= self._stat_card(stats_bar, "LOW STOCK (≤5)",  "0", C["pink"],   2)
+        self._stat_total    = self._stat_card(stats_bar, "TOTAL PRODUCTS", "0", C["purple"],  0)
+        self._stat_stock    = self._stat_card(stats_bar, "TOTAL STOCK",    "0", C["teal"],    1)
+        self._stat_value    = self._stat_card(stats_bar, "INVENTORY VALUE", "EGP 0.00", C["orange"], 2)
+        self._stat_lowstock = self._stat_card(stats_bar, "LOW STOCK (≤5)",  "0", C["pink"],   3)
 
-        for i in range(3):
+        for i in range(4):
             stats_bar.columnconfigure(i, weight=1)
 
         # ── Search bar card ───────────────────────────────────────────────────
@@ -579,12 +602,15 @@ class ProductManagementScreen:
 
         total   = len(self.all_products)
         stock   = sum(int(p.get("quantity", 0)) for p in self.all_products)
+        value   = sum(float(p.get("price", 0)) * int(p.get("quantity", 0))
+                      for p in self.all_products)
         low_all = sum(1 for p in self.all_products
                       if int(p.get("quantity", 0)) <= LOW_STOCK_QTY)
 
         # Animate stat counters
         self._animate_counter(self._stat_total,    total)
         self._animate_counter(self._stat_stock,    stock)
+        self._animate_float(self._stat_value, value, prefix="EGP ")
         self._animate_counter(self._stat_lowstock, low_all)
 
         active_tree = self._current_tree()
@@ -692,7 +718,7 @@ class ProductManagementScreen:
                       barcode=old_barcode, name=old_name,
                       category=old_category or "None",
                       price=old_price, qty=str(old_qty),
-                      lock_barcode=True)
+                      lock_barcode=False)
 
     def delete_product(self):
         if self.cashier_mode:

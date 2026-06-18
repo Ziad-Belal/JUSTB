@@ -6,8 +6,49 @@ import os
 from datetime import datetime
 
 # ── Logo path (receipt printing) ───────────────────────────────────────────────
-LOGO_PATH    = r"C:\Users\Ziad\JUSTB\logo.png"
-UI_LOGO_PATH = r"C:\Users\Ziad\JUSTB\logo.png"
+# Dynamic: look for logo.png next to this file, then next to main.py, then fallback.
+def _find_logo():
+    """
+    Locate logo.png robustly:
+      1. Next to the executable when bundled with PyInstaller (_MEIPASS)
+      2. Next to main.py (project root)
+      3. Inside the gui/ package folder
+      4. Two levels up (edge case)
+      5. Known dev paths as final fallback
+    Returns the first existing path, or the most likely project-root path
+    even if the file is missing (so the error message is useful).
+    """
+    import sys
+    base_dirs = []
+
+    # PyInstaller one-file bundle unpacks to a temp folder
+    if hasattr(sys, "_MEIPASS"):
+        base_dirs.append(sys._MEIPASS)
+
+    # Directory of this file (gui/)
+    gui_dir = os.path.dirname(os.path.abspath(__file__))
+    # Project root (one level up from gui/)
+    root_dir = os.path.normpath(os.path.join(gui_dir, ".."))
+
+    base_dirs += [root_dir, gui_dir,
+                  os.path.normpath(os.path.join(gui_dir, "..", ".."))]
+
+    for base in base_dirs:
+        p = os.path.join(base, "logo.png")
+        if os.path.exists(p):
+            return os.path.normpath(p)
+
+    # Dev-machine hard paths as last resort
+    for p in [r"C:\Users\A\Desktop\JUSTB\logo.png",
+              r"C:\Users\Ziad\JUSTB\logo.png"]:
+        if os.path.exists(p):
+            return p
+
+    # Nothing found — return project-root guess so failure msg is clear
+    return os.path.join(root_dir, "logo.png")
+
+LOGO_PATH    = _find_logo()
+UI_LOGO_PATH = LOGO_PATH
 
 # ── Win32 printing ─────────────────────────────────────────────────────────────
 try:
@@ -114,7 +155,11 @@ def _divider(char='-', w=RECEIPT_CHAR_WIDTH):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _logo_escpos(path):
-    if not PIL_AVAILABLE or not os.path.exists(path):
+    if not PIL_AVAILABLE:
+        print("[Logo] Pillow not installed — logo cannot print.")
+        return b''
+    if not os.path.exists(path):
+        print(f"[Logo] File not found at: {path}  →  receipt will show text fallback.")
         return b''
     try:
         img = Image.open(path).convert('RGBA')
@@ -294,10 +339,18 @@ def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""
 
     if discount_pct > 0:
         disc_amt = subtotal * (discount_pct / 100.0)
-        final    = subtotal - disc_amt
+        taxable  = subtotal - disc_amt
         raw += _enc(f"{'Discount (' + str(int(discount_pct)) + '%):':>{LW}} -{disc_amt:>8.2f} EGP") + b'\n'
     else:
-        final = subtotal
+        disc_amt = 0.0
+        taxable  = subtotal
+
+    if sale_record.get('tax_pct', 0):
+        tax_amt = taxable * (float(sale_record.get('tax_pct', 0)) / 100.0)
+        raw += _enc(f"{'Tax (' + str(int(float(sale_record.get('tax_pct', 0)))) + '%):':>{LW}} {tax_amt:>8.2f} EGP") + b'\n'
+        final = taxable + tax_amt
+    else:
+        final = taxable
 
     raw += _divider('=')
     raw += BOLD_ON + DBL_HEIGHT
@@ -397,6 +450,7 @@ class POSScreen:
         self.cart          = []
         self._discount_pct = 0.0
         self._promo_code   = ""
+        self._tax_pct      = self._load_tax_pct()
         self._logo_img     = None   # keep reference to avoid GC
 
         self._build_ui()
@@ -416,6 +470,22 @@ class POSScreen:
             if focused is None or isinstance(focused, (tk.Frame, tk.Canvas, ttk.Treeview)):
                 self.barcode_entry.focus_set()
         self.frame.after(150, _check)
+
+    def _settings_path(self):
+        return os.path.join(self.data_dir, "system_settings.json")
+
+    def _load_system_settings(self):
+        settings = load_json(self._settings_path())
+        if isinstance(settings, dict):
+            return settings
+        return {}
+
+    def _load_tax_pct(self):
+        settings = self._load_system_settings()
+        try:
+            return float(settings.get("tax_pct", 0.0))
+        except Exception:
+            return 0.0
 
     # ─────────────────────────────────────────────────────────────────────────
     def _build_ui(self):
@@ -576,17 +646,20 @@ class POSScreen:
         style.layout("JB.Treeview",
                      [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        cols = ("Name", "Qty", "Unit Price", "Total")
+        cols = ("Del", "Name", "Qty", "Unit Price", "Total")
         self.tree = ttk.Treeview(tree_card, columns=cols,
                                   show="headings", selectmode="browse",
                                   style="JB.Treeview")
-        cw = {"Name": 260, "Qty": 60, "Unit Price": 110, "Total": 110}
+        cw = {"Del": 40, "Name": 240, "Qty": 60, "Unit Price": 110, "Total": 110}
         for col in cols:
-            self.tree.heading(col, text=col.upper())
+            header = "" if col == "Del" else col.upper()
+            self.tree.heading(col, text=header)
             self.tree.column(col, anchor="center",
                               width=cw[col], minwidth=cw[col])
         self.tree.tag_configure("even", background=C["bg_card"])
         self.tree.tag_configure("odd",  background=C["bg_row_alt"])
+
+        self.tree.bind("<ButtonRelease-1>", self._on_tree_click)
 
         vsb = ttk.Scrollbar(tree_card, orient="vertical",
                              command=self.tree.yview)
@@ -685,19 +758,28 @@ class POSScreen:
                                       bg=C["bg_card"], fg=C["success"])
         self.discount_lbl.grid(row=3, column=1, sticky="e", pady=4)
 
+        # Tax
+        tk.Label(tot_card, text="Tax",
+                 font=FONT_LABEL, bg=C["bg_card"],
+                 fg=C["text_mid"]).grid(row=4, column=0, sticky="w", pady=4)
+        self.tax_lbl = tk.Label(tot_card, text="EGP 0.00",
+                                font=FONT_LABEL_B,
+                                bg=C["bg_card"], fg=C["text_dark"])
+        self.tax_lbl.grid(row=4, column=1, sticky="e", pady=4)
+
         # Separator
         tk.Frame(tot_card, bg=C["border"], height=1).grid(
-            row=4, column=0, columnspan=2, sticky="ew", pady=10)
+            row=5, column=0, columnspan=2, sticky="ew", pady=10)
 
         # Total
         tk.Label(tot_card, text="TOTAL",
                  font=("Segoe UI", 9, "bold"),
                  bg=C["bg_card"], fg=C["text_mid"]).grid(
-                     row=5, column=0, sticky="w")
+                     row=6, column=0, sticky="w")
         self.total_lbl = tk.Label(tot_card, text="EGP 0.00",
                                    font=FONT_TOTAL,
                                    bg=C["bg_card"], fg=C["gold"])
-        self.total_lbl.grid(row=5, column=1, sticky="e")
+        self.total_lbl.grid(row=6, column=1, sticky="e")
 
         # ── Spacer ────────────────────────────────────────────────────
         tk.Frame(right, bg=C["bg_root"]).grid(row=2, column=0, sticky="nsew")
@@ -834,34 +916,67 @@ class POSScreen:
             self._refocus()
             return
 
-        item_to_remove = self.cart[idx]
-        item_name      = item_to_remove["name"]
-        item_barcode   = item_to_remove["barcode"]
-        item_qty       = item_to_remove["quantity"]
+        self._remove_cart_item(idx)
+
+    def _remove_cart_item(self, idx, remove_qty=None):
+        item = self.cart[idx]
+        item_name    = item["name"]
+        item_barcode = item["barcode"]
+        item_qty     = int(item["quantity"])
+
+        if remove_qty is None:
+            remove_qty = item_qty
+            if item_qty > 1:
+                remove_qty = simpledialog.askinteger(
+                    "Remove Quantity",
+                    f"How many units of '{item_name}' do you want to remove?",
+                    minvalue=1, maxvalue=item_qty,
+                    parent=self.frame)
+                if remove_qty is None:
+                    self._refocus()
+                    return
+
+        if remove_qty < 1 or remove_qty > item_qty:
+            self._refocus()
+            return
 
         confirm = messagebox.askyesno(
             "Remove Item",
-            f"Remove  '{item_name}'  (×{item_qty})  from the cart?\n"
-            f"Its stock will be restored."
+            f"Remove {remove_qty} of '{item_name}' from the cart?\n"
+            f"Stock will be restored."
         )
         if not confirm:
             self._refocus()
             return
 
-        # Remove from cart list
-        self.cart.pop(idx)
-
         # Restore quantity in inventory
         products = load_json(self._products_path())
         for prod in products:
             if str(prod.get("barcode", "")) == str(item_barcode):
-                prod["quantity"] = int(prod.get("quantity", 0)) + item_qty
+                prod["quantity"] = int(prod.get("quantity", 0)) + remove_qty
                 break
         save_json(self._products_path(), products)
+
+        if remove_qty >= item_qty:
+            self.cart.pop(idx)
+        else:
+            self.cart[idx]["quantity"] = item_qty - remove_qty
 
         self.update_tree()
         self.update_total()
         self._refocus()
+
+    def _on_tree_click(self, event):
+        region = self.tree.identify_region(event.x, event.y)
+        if region != "cell":
+            return
+        column = self.tree.identify_column(event.x)
+        row_id = self.tree.identify_row(event.y)
+        if column != "#1" or not row_id:
+            return
+        idx = self.tree.index(row_id)
+        if 0 <= idx < len(self.cart):
+            self._remove_cart_item(idx)
 
     def update_tree(self):
         for i in self.tree.get_children():
@@ -870,7 +985,7 @@ class POSScreen:
             t   = float(item["price"]) * int(item["quantity"])
             tag = "even" if idx % 2 == 0 else "odd"
             self.tree.insert("", "end", tags=(tag,), values=(
-                item["name"], item["quantity"],
+                "🗑", item["name"], item["quantity"],
                 f"EGP {float(item['price']):.2f}",
                 f"EGP {t:.2f}"))
         count = len(self.cart)
@@ -880,10 +995,13 @@ class POSScreen:
     def update_total(self, discount=None):
         if discount is not None:
             self._discount_pct = discount
+        self._tax_pct = self._load_tax_pct()
         subtotal = sum(float(i["price"]) * int(i["quantity"])
                        for i in self.cart)
         disc_amt = subtotal * (self._discount_pct / 100.0)
-        final    = subtotal - disc_amt
+        taxable  = subtotal - disc_amt
+        tax_amt  = taxable * (self._tax_pct / 100.0)
+        final    = taxable + tax_amt
 
         self.subtotal_lbl.config(text=f"EGP {subtotal:.2f}")
         if disc_amt > 0:
@@ -891,6 +1009,7 @@ class POSScreen:
                 text=f"- EGP {disc_amt:.2f}", fg=C["success"])
         else:
             self.discount_lbl.config(text="—", fg=C["text_light"])
+        self.tax_lbl.config(text=f"EGP {tax_amt:.2f}")
         self.total_lbl.config(text=f"EGP {final:.2f}")
 
     def apply_promo(self):
@@ -1048,7 +1167,11 @@ class POSScreen:
 
         subtotal = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
         disc_amt = subtotal * (self._discount_pct / 100.0)
-        final    = subtotal - disc_amt
+        taxable  = subtotal - disc_amt
+        # ensure tax pct is current and compute tax amount
+        self._tax_pct = self._load_tax_pct()
+        tax_amt  = taxable * (self._tax_pct / 100.0)
+        final    = taxable + tax_amt
 
         sale_record = {
             "id":             sale_id,
@@ -1057,6 +1180,8 @@ class POSScreen:
             "subtotal":       round(subtotal, 2),
             "discount_pct":   self._discount_pct,
             "discount_amt":   round(disc_amt, 2),
+            "tax_pct":        round(self._tax_pct, 2),
+            "tax_amt":        round(tax_amt, 2),
             "total":          round(final, 2),
             "promo_code":     self._promo_code,
             "payment_method": payment_method,

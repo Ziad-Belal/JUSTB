@@ -151,5 +151,95 @@
         "payment_method": "Cash",
         "date": "2026-03-30",
         "time": "16:01:41"
+    },
+    {
+        "id": 9,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "1",
+                "name": "test",
+                "price": 100.0,
+                "quantity": 2
+            }
+        ],
+        "subtotal": 200.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "tax_pct": 0.0,
+        "tax_amt": 0.0,
+        "total": 200.0,
+        "promo_code": "",
+        "payment_method": "Cash",
+        "date": "2026-05-16",
+        "time": "11:20:12"
+    },
+    {
+        "id": 10,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "1",
+                "name": "test",
+                "price": 100.0,
+                "quantity": 2
+            }
+        ],
+        "subtotal": 200.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "tax_pct": 0.0,
+        "tax_amt": 0.0,
+        "total": 200.0,
+        "promo_code": "",
+        "payment_method": "Split: EGP 20.00 cash + EGP 20.00 visa",
+        "date": "2026-05-16",
+        "time": "11:23:19",
+        "status": "refunded"
+    },
+    {
+        "id": 11,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "1",
+                "name": "test",
+                "price": 100.0,
+                "quantity": 1
+            }
+        ],
+        "subtotal": 100.0,
+        "discount_pct": 10.0,
+        "discount_amt": 10.0,
+        "tax_pct": 0.0,
+        "tax_amt": 0.0,
+        "total": 90.0,
+        "promo_code": "PROMO10",
+        "payment_method": "Cash",
+        "date": "2026-05-27",
+        "time": "17:30:18",
+        "status": "refunded"
+    },
+    {
+        "id": 12,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "1",
+                "name": "test",
+                "price": 100.0,
+                "quantity": 2
+            }
+        ],
+        "subtotal": 200.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "tax_pct": 0.0,
+        "tax_amt": 0.0,
+        "total": 200.0,
+        "promo_code": "",
+        "payment_method": "Cash",
+        "date": "2026-05-27",
+        "time": "17:50:11"
     }
 ]

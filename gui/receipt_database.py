@@ -6,14 +6,14 @@ Dynamic features:
   • Live receipt list with time-sorted transactions
   • Hover to preview formatted receipt
   • Filter by date
-  • Search receipts by ID, amount, product name, or receipt barcode code (RCPT-XXXXXX)
+  • Search receipts by ID, amount, product name, product barcode, or receipt barcode code (RCPT-XXXXXX)
   • Export receipt data
 """
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 from tkinter.simpledialog import askstring
-from utils.helpers import load_json, get_today_date
+from utils.helpers import load_json, save_json, get_today_date
 import os
 from datetime import datetime, timedelta
 
@@ -119,11 +119,23 @@ class ReceiptDatabaseScreen:
         self.date_lbl.bind("<Enter>",    lambda e: self.date_lbl.config(bg="#159F9F"))
         self.date_lbl.bind("<Leave>",    lambda e: self.date_lbl.config(bg=C["teal"]))
 
+        # Allow Process Return for cashiers as well as admins
+        _btn(date_frame, "↺  Process Return",
+             self._process_refund,
+             C["danger"], "#B91C1C",
+             padx=12, pady=5).pack(side="left", padx=(0, 8))
+
         if self.admin:
-            _btn(date_frame, "⟳  Refresh",
-                 self.load_data,
+            _btn(date_frame, "🗑  Delete Receipt",
+                 self._delete_receipt,
                  C["orange"], "#E05F00",
-                 padx=12, pady=5).pack(side="left", padx=(8, 0))
+                 padx=12, pady=5).pack(side="left", padx=(0, 8))
+
+        # Refresh button available to ALL users (admin and cashier)
+        _btn(date_frame, "⟳  Refresh",
+             self.load_data,
+             C["teal"], "#159F9F",
+             padx=12, pady=5).pack(side="left", padx=(0, 8))
 
         # Print Report button
         _btn(date_frame, "🖨  Print Report",
@@ -149,7 +161,7 @@ class ReceiptDatabaseScreen:
 
         # Search hint label
         tk.Label(search_frame,
-                 text="by ID · amount · product name · barcode code (RCPT-000001)",
+                 text="by ID · amount · product name · product barcode · receipt code (RCPT-000001)",
                  font=("Segoe UI", 8), bg=C["bg_root"],
                  fg=C["text_light"]).pack(side="left")
 
@@ -200,11 +212,11 @@ class ReceiptDatabaseScreen:
         ts.layout("RDB.Treeview",
                   [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        cols = ("ID", "Time", "Items", "Total")
+        cols = ("ID", "Time", "Items", "Total", "Status")
         self.tree = ttk.Treeview(list_card, columns=cols,
                                   show="headings", selectmode="browse",
                                   style="RDB.Treeview")
-        cw = {"ID": 60, "Time": 70, "Items": 50, "Total": 100}
+        cw = {"ID": 60, "Time": 70, "Items": 50, "Total": 100, "Status": 100}
         for col in cols:
             self.tree.heading(col, text=col)
             self.tree.column(col, anchor="center", width=cw[col], minwidth=40)
@@ -342,6 +354,10 @@ class ReceiptDatabaseScreen:
         lines.append(f"Subtotal    : EGP {subtotal:.2f}")
         if discount_amt > 0:
             lines.append(f"Discount ({discount_pct}%) : -EGP {discount_amt:.2f}")
+        tax_pct = float(receipt.get("tax_pct", 0) or 0)
+        tax_amt = float(receipt.get("tax_amt", 0) or 0)
+        if tax_amt > 0:
+            lines.append(f"Tax ({tax_pct}%)   : EGP {tax_amt:.2f}")
         lines.append("=" * 42)
         lines.append(f"TOTAL       : EGP {total:.2f}")
         lines.append("=" * 42)
@@ -351,11 +367,92 @@ class ReceiptDatabaseScreen:
         if promo:
             lines.append(f"Promo Code  : {promo}")
 
+        status = str(receipt.get("status", "")).lower()
+        if status == "refunded":
+            lines.append("Status      : REFUNDED")
+
         lines.append("")
         lines.append("Thank you for shopping at JustB!")
         lines.append("justb-eg.com")
 
         return "\n".join(lines)
+
+    def _process_refund(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showinfo("Select Receipt", "Select one receipt to refund.")
+            return
+        if len(selected) > 1:
+            messagebox.showinfo("Select One", "Please select only one receipt at a time.")
+            return
+
+        receipt_id = self.tree.item(selected[0])["values"][0]
+        sales = load_json(self._sales_path())
+        matching = [s for s in sales if str(s.get("id", "")) == str(receipt_id)]
+        if not matching:
+            messagebox.showerror("Not Found", "Receipt could not be found in sales records.")
+            return
+
+        if any(str(s.get("status", "")).lower() == "refunded" for s in matching):
+            messagebox.showinfo("Already Refunded", "This receipt has already been refunded.")
+            return
+
+        if not messagebox.askyesno(
+                "Process Refund",
+                f"Refund receipt #{receipt_id}?\nThis will restore the sold items back to inventory."):
+            return
+
+        products = load_json(os.path.join(self.data_dir, "products.json"))
+        for sale in matching:
+            for item in sale.get("items", []):
+                barcode = str(item.get("barcode", ""))
+                qty = int(item.get("quantity", 0))
+                for prod in products:
+                    if str(prod.get("barcode", "")) == barcode:
+                        prod["quantity"] = int(prod.get("quantity", 0)) + qty
+                        break
+            sale["status"] = "refunded"
+
+        save_json(os.path.join(self.data_dir, "products.json"), products)
+        save_json(self._sales_path(), sales)
+
+        messagebox.showinfo("Refund Complete",
+                            f"Receipt #{receipt_id} has been refunded and inventory updated.")
+        self.load_data()
+
+    def _delete_receipt(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showinfo("Select Receipt", "Select one receipt to delete.")
+            return
+        if len(selected) > 1:
+            messagebox.showinfo("Select One", "Please select only one receipt at a time.")
+            return
+
+        receipt_id = self.tree.item(selected[0])["values"][0]
+        sales = load_json(self._sales_path())
+        matching = [s for s in sales if str(s.get("id", "")) == str(receipt_id)]
+        if not matching:
+            messagebox.showerror("Not Found", "Receipt could not be found in sales records.")
+            return
+
+        if any(str(s.get("status", "")).lower() == "refunded" for s in matching):
+            if not messagebox.askyesno(
+                    "Delete Refunded Receipt",
+                    f"Receipt #{receipt_id} is already refunded. Delete this receipt from the history anyway?"):
+                return
+        else:
+            if not messagebox.askyesno(
+                    "Delete Receipt",
+                    f"Delete receipt #{receipt_id} from sales history? This will remove the receipt data but will not adjust inventory."):
+                return
+
+        remaining_sales = [s for s in sales if str(s.get("id", "")) != str(receipt_id)]
+        save_json(self._sales_path(), remaining_sales)
+
+        messagebox.showinfo("Receipt Deleted",
+                            f"Receipt #{receipt_id} has been deleted from the database.")
+        self.load_data()
 
     # ── Search / Filter ───────────────────────────────────────────────────────
 
@@ -388,16 +485,19 @@ class ReceiptDatabaseScreen:
             total       = str(receipt.get("total", "")).lower()
             rcpt_code   = f"rcpt-{receipt.get('id', 0):06d}"   # e.g. rcpt-000001
 
-            # Check product names inside the receipt
+            # Check product names and product barcodes inside the receipt
             items = receipt.get("items", [])
-            product_names = [str(item.get("name", "")).lower() for item in items]
-            product_match = any(search_term in name for name in product_names)
+            product_names   = [str(item.get("name", "")).lower() for item in items]
+            product_barcodes = [str(item.get("barcode", "")).lower() for item in items]
+            product_match   = any(search_term in name for name in product_names)
+            barcode_match   = any(search_term in code for code in product_barcodes)
 
             if (search_term in receipt_id
                     or search_term in total
                     or search_term in rcpt_code
                     or code_term   in receipt_id
-                    or product_match):
+                    or product_match
+                    or barcode_match):
                 filtered.append(receipt)
 
         self._populate_receipts(filtered)
@@ -438,6 +538,10 @@ class ReceiptDatabaseScreen:
                     existing["subtotal"] = existing.get("subtotal", 0) + sale.get("subtotal", 0)
                     existing["discount_amt"] = existing.get("discount_amt", 0) + sale.get("discount_amt", 0)
                     existing["total"] = existing.get("total", 0) + sale.get("total", 0)
+                    existing_status = str(existing.get("status", "")).lower()
+                    sale_status = str(sale.get("status", "")).lower()
+                    if "refunded" in (existing_status, sale_status):
+                        existing["status"] = "refunded"
                 else:
                     # New receipt ID
                     receipt_dict = {
@@ -449,8 +553,11 @@ class ReceiptDatabaseScreen:
                         "subtotal": sale.get("subtotal", 0),
                         "discount_amt": sale.get("discount_amt", 0),
                         "discount_pct": sale.get("discount_pct", 0),
+                        "tax_pct": sale.get("tax_pct", 0),
+                        "tax_amt": sale.get("tax_amt", 0),
                         "user": sale.get("user", "—"),
                         "promo_code": sale.get("promo_code", ""),
+                        "status": sale.get("status", ""),
                     }
                     receipt_map[receipt_id] = receipt_dict
 
@@ -474,12 +581,14 @@ class ReceiptDatabaseScreen:
             time_str    = r["time"]
             items_count = sum(int(item.get("quantity", 1)) for item in r["items"])
             total       = r["total"]
+            status      = "REFUNDED" if str(r.get("status", "")).lower() == "refunded" else "Completed"
 
             self.tree.insert("", "end",
                              values=(receipt_id,
                                      time_str,
                                      items_count,
-                                     f"EGP {total:,.2f}"))
+                                     f"EGP {total:,.2f}",
+                                     status))
 
         # Update results counter
         count = len(receipts)
