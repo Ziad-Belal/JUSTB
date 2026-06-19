@@ -425,8 +425,27 @@ class LoginScreen:
         self._launch(role, user)
 
     def _show_status(self, msg):
-        self.status_label.config(text=msg)
-        self.root.after(4000, lambda: self.status_label.config(text=""))
+        # Cancel any previous pending clear so we don't update a dead widget
+        if hasattr(self, "_status_after_id") and self._status_after_id:
+            try:
+                self.root.after_cancel(self._status_after_id)
+            except Exception:
+                pass
+            self._status_after_id = None
+
+        try:
+            self.status_label.config(text=msg)
+        except Exception:
+            return
+
+        def _clear():
+            try:
+                self.status_label.config(text="")
+            except Exception:
+                pass
+            self._status_after_id = None
+
+        self._status_after_id = self.root.after(4000, _clear)
 
     def _launch(self, role, user):
         for w in self.root.winfo_children():
