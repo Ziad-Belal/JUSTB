@@ -427,7 +427,7 @@ class POSScreen:
         # Restore focus to barcode entry whenever it loses focus to a non-entry widget
         self.barcode_entry.bind("<FocusOut>", self._on_barcode_focus_out)
         # Check for low stock on startup
-        self.frame.after(1500, self._check_low_stock_alert)
+
 
     def _refocus(self):
         """Snap focus back to the barcode entry."""
