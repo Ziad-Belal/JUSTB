@@ -125,6 +125,12 @@ class ReceiptDatabaseScreen:
              C["danger"], "#B91C1C",
              padx=12, pady=5).pack(side="left", padx=(0, 8))
 
+        # Reprint button — available to all users
+        _btn(date_frame, "🖨  Reprint Receipt",
+             self._reprint_receipt,
+             C["purple"], C["purple_dk"],
+             padx=12, pady=5).pack(side="left", padx=(0, 8))
+
         if self.admin:
             _btn(date_frame, "🗑  Delete Receipt",
                  self._delete_receipt,
@@ -376,6 +382,58 @@ class ReceiptDatabaseScreen:
         lines.append("justb-eg.com")
 
         return "\n".join(lines)
+
+    def _reprint_receipt(self):
+        """Reprint a previously saved receipt to the thermal printer."""
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showinfo("Select Receipt", "Select a receipt to reprint.")
+            return
+        if len(selected) > 1:
+            messagebox.showinfo("Select One", "Please select only one receipt to reprint.")
+            return
+
+        receipt_id = self.tree.item(selected[0])["values"][0]
+        sales = load_json(self._sales_path())
+        receipt = next((s for s in sales if str(s.get("id", "")) == str(receipt_id)), None)
+        if not receipt:
+            messagebox.showerror("Not Found", "Receipt data not found in sales records.")
+            return
+
+        # Import receipt builder from pos_screen
+        try:
+            from gui.pos_screen import build_receipt
+        except ImportError:
+            messagebox.showerror("Error", "Could not import receipt builder.")
+            return
+
+        receipt_bytes = build_receipt(
+            sale_id        = receipt["id"],
+            sale_record    = receipt,
+            cashier        = receipt.get("user", "—"),
+            discount_pct   = float(receipt.get("discount_pct", 0)),
+            promo_code     = receipt.get("promo_code", ""),
+            payment_method = receipt.get("payment_method", "Cash"),
+        )
+
+        # Send to printer
+        try:
+            import win32print
+            printer_name = win32print.GetDefaultPrinter()
+            h = win32print.OpenPrinter(printer_name)
+            try:
+                win32print.StartDocPrinter(h, 1, ("JustB Receipt Reprint", None, "RAW"))
+                win32print.StartPagePrinter(h)
+                win32print.WritePrinter(h, receipt_bytes)
+                win32print.EndPagePrinter(h)
+                win32print.EndDocPrinter(h)
+            finally:
+                win32print.ClosePrinter(h)
+            messagebox.showinfo("Reprinted", f"Receipt #{receipt_id} sent to printer.")
+        except ImportError:
+            messagebox.showerror("No Printer", "win32print not available.\nInstall pywin32 for printing.")
+        except Exception as e:
+            messagebox.showwarning("Reprint Error", f"Could not reprint:\n{e}")
 
     def _process_refund(self):
         selected = self.tree.selection()

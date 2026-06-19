@@ -605,8 +605,12 @@ class DailyFeedbackScreen:
         return popup
 
     def _load_product_category_map(self):
-        if hasattr(self, "_product_category_map"):
-            return self._product_category_map
+        """Build barcode→category map fresh from products.json every time load_data runs.
+        We intentionally do NOT cache this permanently — products can be added/edited
+        at any time and the category filter must reflect the current state.
+        The map is stored as _product_category_map and rebuilt at the start of
+        each load_data() call via _refresh_category_map().
+        """
         products = load_json(os.path.join(self.data_dir, "products.json"))
         self._product_category_map = {
             str(p.get("barcode", "")): str(p.get("category", "")).strip()
@@ -619,15 +623,19 @@ class DailyFeedbackScreen:
         if selected == "Both":
             return True
 
-        category = str(item.get("category", "") or "").strip()
+        # Try category stored directly on the sale item first
+        category = str(item.get("category", "") or "").strip().lower()
+
+        # Fall back to the product map (looked up by barcode)
         if not category and item.get("barcode") is not None:
-            category = self._load_product_category_map().get(
-                str(item.get("barcode", "")), "").strip()
+            category = self._product_category_map.get(
+                str(item.get("barcode", "")), "").strip().lower()
 
         if selected == "Makeup & Cosmetics":
-            return category.lower() == "makeup & cosmetics"
-        if selected == "Library Stuff":
-            return category.lower() in {"stationary", "library stuff"}
+            return category == "makeup & cosmetics"
+        if selected == "Stationary":
+            # Accept both spellings that may appear in products.json
+            return category in {"stationary", "stationery", "library stuff"}
         return True
 
     def _parse_date(self, value, default=None):
@@ -755,6 +763,9 @@ class DailyFeedbackScreen:
             self.load_data()
 
     def load_data(self):
+        # Refresh product→category map so new/edited products are reflected
+        self._load_product_category_map()
+
         for i in self.tree.get_children():
             self.tree.delete(i)
 
@@ -824,19 +835,53 @@ class DailyFeedbackScreen:
         # Reload best sellers for current range
         self._load_best_sellers()
 
-    # ── Print ─────────────────────────────────────────────────────────────────
+    # ── Print / Export ─────────────────────────────────────────────────────────
 
     def print_report(self):
+        """Export options: TXT or CSV."""
+        dialog = tk.Toplevel(self.frame)
+        dialog.title("Export Report")
+        dialog.resizable(False, False)
+        dialog.configure(bg=C["bg_card"])
+        dialog.grab_set()
+
+        pw, ph = 300, 160
+        sx = dialog.winfo_screenwidth()
+        sy = dialog.winfo_screenheight()
+        dialog.geometry(f"{pw}x{ph}+{(sx-pw)//2}+{(sy-ph)//2}")
+
+        tk.Frame(dialog, bg=C["purple"], height=3).pack(fill="x")
+        tk.Label(dialog, text="Export Report As",
+                 font=("Segoe UI", 11, "bold"),
+                 bg=C["bg_card"], fg=C["text_dark"]).pack(pady=(16, 12))
+
+        btn_row = tk.Frame(dialog, bg=C["bg_card"])
+        btn_row.pack(padx=20, fill="x")
+
+        def _do(fmt):
+            dialog.destroy()
+            if fmt == "txt":
+                self._export_txt()
+            elif fmt == "csv":
+                self._export_csv()
+
+        _btn(btn_row, "📄  TXT", lambda: _do("txt"),
+             C["text_mid"], C["text_dark"], padx=14, pady=10).pack(
+                 side="left", expand=True, fill="x", padx=(0, 8))
+        _btn(btn_row, "📊  CSV", lambda: _do("csv"),
+             C["teal"], "#159F9F", padx=14, pady=10).pack(
+                 side="left", expand=True, fill="x")
+
+    def _export_txt(self):
         file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[("Text files", "*.txt")],
-            title="Save Report As",
+            title="Save TXT Report",
             initialfile=f"JustB_Report_{self.feedback_date}.txt"
         )
         if not file_path:
             return
 
-        # Get current best sellers range label
         range_key = self._bs_range.get()
         if self._custom_range:
             range_label = "Custom Range"
@@ -850,10 +895,10 @@ class DailyFeedbackScreen:
             "=" * 46,
             f"  JustB Daily Report — {self.feedback_date}",
             "=" * 46,
-            f"  Revenue:     {self.total_lbl.cget('text')}",
-            f"  Transactions:{self._kpi_sales.cget('text')}",
-            f"  Items Sold:  {self._kpi_items.cget('text')}",
-            f"  Avg Sale:    {self._kpi_avg.cget('text')}",
+            f"  Revenue:      {self.total_lbl.cget('text')}",
+            f"  Transactions: {self._kpi_sales.cget('text')}",
+            f"  Items Sold:   {self._kpi_items.cget('text')}",
+            f"  Avg Sale:     {self._kpi_avg.cget('text')}",
             "-" * 46,
             f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
             "-" * 46,
@@ -862,31 +907,385 @@ class DailyFeedbackScreen:
             v = self.tree.item(item)["values"]
             lines.append(f"  {str(v[0]):<6} {str(v[1]):<24} {str(v[2]):>5}  {str(v[3]):>12}")
 
-        # ── Best Sellers section ──────────────────────────────────────────────
         lines += [
             "",
             "=" * 46,
-            f"  🏆 BEST SELLING PRODUCTS — {range_label}",
+            f"  BEST SELLING PRODUCTS — {range_label}",
             f"  (Period: {start}  to  {end})",
             "=" * 46,
             f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
             "-" * 46,
         ]
+        for idx, item in enumerate(best_sellers):
+            lines.append(
+                f"  #{idx+1:<5} {item['name']:<24} {item['qty']:>5}  "
+                f"EGP {item['revenue']:>9,.2f}"
+            )
+        if not best_sellers:
+            lines.append("  No sales data for this period.")
+        lines += ["-" * 46, "  justb-eg.com", "=" * 46]
 
-        rank_labels = ["#1", "#2", "#3"] + [f"#{i+1}" for i in range(3, 50)]
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        messagebox.showinfo("Saved", f"TXT report saved:\n{file_path}")
+
+    def _export_csv(self):
+        """Export today's individual sale line-items to CSV."""
+        import csv
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")],
+            title="Save CSV Report",
+            initialfile=f"JustB_Sales_{self.feedback_date}.csv"
+        )
+        if not file_path:
+            return
+
+        sales = load_json(self._sales_path())
+        day_sales = [s for s in sales if s.get("date", "") == self.feedback_date]
+
+        with open(file_path, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Receipt ID", "Date", "Time", "Cashier",
+                "Item Barcode", "Item Name", "Qty", "Unit Price", "Line Total",
+                "Subtotal", "Discount %", "Discount Amt",
+                "Tax %", "Tax Amt", "Total",
+                "Promo Code", "Payment Method", "Status"
+            ])
+            for sale in day_sales:
+                for item in sale.get("items", []):
+                    qty   = int(item.get("quantity", 1))
+                    price = float(item.get("price", 0))
+                    writer.writerow([
+                        sale.get("id", ""),
+                        sale.get("date", ""),
+                        sale.get("time", ""),
+                        sale.get("user", ""),
+                        item.get("barcode", ""),
+                        item.get("name", ""),
+                        qty,
+                        f"{price:.2f}",
+                        f"{qty * price:.2f}",
+                        f"{sale.get('subtotal', 0):.2f}",
+                        sale.get("discount_pct", 0),
+                        f"{sale.get('discount_amt', 0):.2f}",
+                        sale.get("tax_pct", 0),
+                        f"{sale.get('tax_amt', 0):.2f}",
+                        f"{sale.get('total', 0):.2f}",
+                        sale.get("promo_code", ""),
+                        sale.get("payment_method", ""),
+                        sale.get("status", "Completed"),
+                    ])
+        messagebox.showinfo("Saved", f"CSV report saved:\n{file_path}")
+        dialog = tk.Toplevel(self.frame)
+        dialog.title("Export Daily Report")
+        dialog.resizable(False, False)
+        dialog.configure(bg=C["bg_card"])
+        dialog.grab_set()
+
+        pw, ph = 340, 220
+        sx = dialog.winfo_screenwidth()
+        sy = dialog.winfo_screenheight()
+        dialog.geometry(f"{pw}x{ph}+{(sx-pw)//2}+{(sy-ph)//2}")
+
+        tk.Frame(dialog, bg=C["purple"], height=3).pack(fill="x")
+        tk.Label(dialog, text="Export Report As",
+                 font=("Segoe UI", 11, "bold"),
+                 bg=C["bg_card"], fg=C["text_dark"]).pack(pady=(16, 12))
+
+        btn_row = tk.Frame(dialog, bg=C["bg_card"])
+        btn_row.pack(padx=20, fill="x")
+
+        def _do(fmt):
+            dialog.destroy()
+            if fmt == "txt":
+                self._export_txt()
+            elif fmt == "csv":
+                self._export_csv()
+            elif fmt == "pdf":
+                self._export_pdf()
+
+        _btn(btn_row, "📄  TXT",  lambda: _do("txt"),
+             C["text_mid"], C["text_dark"], padx=14, pady=10).pack(
+                 side="left", expand=True, fill="x", padx=(0, 6))
+        _btn(btn_row, "📊  CSV",  lambda: _do("csv"),
+             C["teal"], "#159F9F", padx=14, pady=10).pack(
+                 side="left", expand=True, fill="x", padx=(0, 6))
+        _btn(btn_row, "📑  PDF",  lambda: _do("pdf"),
+             C["purple"], C["purple_dk"], padx=14, pady=10).pack(
+                 side="left", expand=True, fill="x")
+
+        tk.Label(dialog, text="PDF requires reportlab  (pip install reportlab)",
+                 font=("Segoe UI", 8), bg=C["bg_card"],
+                 fg=C["text_light"]).pack(pady=(14, 0))
+
+    # ─────────────────────────────────────────────────────────────────────────
+    def _report_lines(self):
+        """Build the report body as a list of strings (shared by TXT and PDF)."""
+        range_key = self._bs_range.get()
+        if self._custom_range:
+            range_label = "Custom Range"
+            start, end = self._selected_bs_range()
+        else:
+            range_label = next(lbl for lbl, k in TIME_RANGES if k == range_key)
+            start, end = _date_range_for(range_key)
+        best_sellers = self._get_best_sellers_data()
+
+        lines = [
+            "=" * 46,
+            f"  JustB Daily Report — {self.feedback_date}",
+            "=" * 46,
+            f"  Revenue:      {self.total_lbl.cget('text')}",
+            f"  Transactions: {self._kpi_sales.cget('text')}",
+            f"  Items Sold:   {self._kpi_items.cget('text')}",
+            f"  Avg Sale:     {self._kpi_avg.cget('text')}",
+            "-" * 46,
+            f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
+            "-" * 46,
+        ]
+        for item in self.tree.get_children():
+            v = self.tree.item(item)["values"]
+            lines.append(f"  {str(v[0]):<6} {str(v[1]):<24} {str(v[2]):>5}  {str(v[3]):>12}")
+
+        lines += [
+            "",
+            "=" * 46,
+            f"  BEST SELLING PRODUCTS — {range_label}",
+            f"  (Period: {start}  to  {end})",
+            "=" * 46,
+            f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
+            "-" * 46,
+        ]
+        rank_labels = [f"#{i+1}" for i in range(50)]
         for idx, item in enumerate(best_sellers):
             rank = rank_labels[idx] if idx < len(rank_labels) else f"#{idx+1}"
             lines.append(
                 f"  {rank:<6} {item['name']:<24} {item['qty']:>5}  "
                 f"EGP {item['revenue']:>9,.2f}"
             )
-
         if not best_sellers:
             lines.append("  No sales data for this period.")
-
         lines += ["-" * 46, "  justb-eg.com", "=" * 46]
+        return lines
 
+    def _export_txt(self):
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt")],
+            title="Save TXT Report",
+            initialfile=f"JustB_Report_{self.feedback_date}.txt"
+        )
+        if not file_path:
+            return
         with open(file_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines))
+            f.write("\n".join(self._report_lines()))
+        messagebox.showinfo("Saved", f"TXT report saved:\n{file_path}")
 
-        messagebox.showinfo("Report Saved", f"Report saved:\n{file_path}")
+    def _export_csv(self):
+        """Export today's sales to a proper CSV file."""
+        import csv
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")],
+            title="Save CSV Report",
+            initialfile=f"JustB_Sales_{self.feedback_date}.csv"
+        )
+        if not file_path:
+            return
+
+        sales = load_json(self._sales_path())
+        day_sales = [s for s in sales if s.get("date", "") == self.feedback_date]
+
+        with open(file_path, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.writer(f)
+            # Header
+            writer.writerow([
+                "Receipt ID", "Date", "Time", "Cashier",
+                "Item Barcode", "Item Name", "Qty", "Unit Price", "Line Total",
+                "Subtotal", "Discount %", "Discount Amt", "Tax %", "Tax Amt",
+                "Total", "Promo Code", "Payment Method", "Status"
+            ])
+            for sale in day_sales:
+                items = sale.get("items", [])
+                for item in items:
+                    qty   = int(item.get("quantity", 1))
+                    price = float(item.get("price", 0))
+                    writer.writerow([
+                        sale.get("id", ""),
+                        sale.get("date", ""),
+                        sale.get("time", ""),
+                        sale.get("user", ""),
+                        item.get("barcode", ""),
+                        item.get("name", ""),
+                        qty,
+                        f"{price:.2f}",
+                        f"{qty * price:.2f}",
+                        f"{sale.get('subtotal', 0):.2f}",
+                        sale.get("discount_pct", 0),
+                        f"{sale.get('discount_amt', 0):.2f}",
+                        sale.get("tax_pct", 0),
+                        f"{sale.get('tax_amt', 0):.2f}",
+                        f"{sale.get('total', 0):.2f}",
+                        sale.get("promo_code", ""),
+                        sale.get("payment_method", ""),
+                        sale.get("status", "Completed"),
+                    ])
+
+        messagebox.showinfo("Saved", f"CSV report saved:\n{file_path}")
+
+    def _export_pdf(self):
+        """Export daily report as a formatted PDF using reportlab."""
+        try:
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib import colors
+            from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle,
+                                            Paragraph, Spacer)
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import cm
+        except ImportError:
+            messagebox.showerror(
+                "Missing Library",
+                "reportlab is not installed.\n\nRun:  pip install reportlab\n\nThen try again."
+            )
+            return
+
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            title="Save PDF Report",
+            initialfile=f"JustB_Report_{self.feedback_date}.pdf"
+        )
+        if not file_path:
+            return
+
+        doc = SimpleDocTemplate(file_path, pagesize=A4,
+                                leftMargin=2*cm, rightMargin=2*cm,
+                                topMargin=2*cm, bottomMargin=2*cm)
+        styles = getSampleStyleSheet()
+        story  = []
+
+        title_style = ParagraphStyle("title", parent=styles["Heading1"],
+                                     textColor=colors.HexColor("#8B5CF6"),
+                                     fontSize=18, spaceAfter=4)
+        sub_style   = ParagraphStyle("sub", parent=styles["Normal"],
+                                     textColor=colors.HexColor("#6B6B8A"),
+                                     fontSize=10, spaceAfter=12)
+        head_style  = ParagraphStyle("head", parent=styles["Heading2"],
+                                     textColor=colors.HexColor("#1A1035"),
+                                     fontSize=13, spaceBefore=14, spaceAfter=6)
+
+        story.append(Paragraph("JustB — Daily Sales Report", title_style))
+        story.append(Paragraph(f"Date: {self.feedback_date}  |  Generated: "
+                                f"{datetime.now().strftime('%H:%M:%S')}", sub_style))
+
+        # KPI summary table
+        kpi_data = [
+            ["Revenue", "Transactions", "Items Sold", "Avg Sale"],
+            [self.total_lbl.cget("text"),
+             self._kpi_sales.cget("text"),
+             self._kpi_items.cget("text"),
+             self._kpi_avg.cget("text")],
+        ]
+        kpi_table = Table(kpi_data, colWidths=[4*cm]*4)
+        kpi_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F0EDFF")),
+            ("TEXTCOLOR",  (0, 0), (-1, 0), colors.HexColor("#6B6B8A")),
+            ("FONTNAME",   (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE",   (0, 0), (-1, 0), 9),
+            ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#FFFFFF")),
+            ("FONTNAME",   (0, 1), (-1, 1), "Helvetica-Bold"),
+            ("FONTSIZE",   (0, 1), (-1, 1), 13),
+            ("TEXTCOLOR",  (0, 1), (-1, 1), colors.HexColor("#8B5CF6")),
+            ("ALIGN",      (0, 0), (-1, -1), "CENTER"),
+            ("BOX",        (0, 0), (-1, -1), 0.5, colors.HexColor("#E8E4F8")),
+            ("INNERGRID",  (0, 0), (-1, -1), 0.5, colors.HexColor("#E8E4F8")),
+            ("TOPPADDING",    (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ]))
+        story.append(kpi_table)
+        story.append(Spacer(1, 0.5*cm))
+
+        # Today's sales detail table
+        story.append(Paragraph("Today's Sales by Product", head_style))
+        sales = load_json(self._sales_path())
+        day_sales = [s for s in sales if s.get("date", "") == self.feedback_date]
+
+        detail_data = [["Receipt", "Cashier", "Item", "Qty", "Price", "Line Total",
+                        "Payment", "Status"]]
+        for sale in day_sales:
+            for item in sale.get("items", []):
+                qty   = int(item.get("quantity", 1))
+                price = float(item.get("price", 0))
+                detail_data.append([
+                    f"#{sale.get('id', '')}",
+                    sale.get("user", "—"),
+                    item.get("name", "")[:28],
+                    str(qty),
+                    f"EGP {price:.2f}",
+                    f"EGP {qty*price:.2f}",
+                    sale.get("payment_method", "Cash"),
+                    sale.get("status", "Completed"),
+                ])
+
+        if len(detail_data) > 1:
+            col_w = [1.5*cm, 2.2*cm, 5*cm, 1.2*cm, 2.2*cm, 2.5*cm, 2.2*cm, 2.2*cm]
+            det_table = Table(detail_data, colWidths=col_w, repeatRows=1)
+            det_table.setStyle(TableStyle([
+                ("BACKGROUND",  (0, 0), (-1, 0), colors.HexColor("#8B5CF6")),
+                ("TEXTCOLOR",   (0, 0), (-1, 0), colors.white),
+                ("FONTNAME",    (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE",    (0, 0), (-1, -1), 8),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                 [colors.HexColor("#FFFFFF"), colors.HexColor("#FAF8FF")]),
+                ("ALIGN",       (0, 0), (-1, -1), "CENTER"),
+                ("ALIGN",       (2, 1), (2, -1), "LEFT"),
+                ("BOX",         (0, 0), (-1, -1), 0.4, colors.HexColor("#E8E4F8")),
+                ("INNERGRID",   (0, 0), (-1, -1), 0.3, colors.HexColor("#E8E4F8")),
+                ("TOPPADDING",    (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            story.append(det_table)
+        else:
+            story.append(Paragraph("No sales recorded for this date.", styles["Normal"]))
+
+        # Best sellers section
+        story.append(Spacer(1, 0.5*cm))
+        story.append(Paragraph("Best Selling Products", head_style))
+        best_sellers = self._get_best_sellers_data()
+        if best_sellers:
+            bs_data = [["Rank", "Product", "Qty Sold", "Revenue"]]
+            for idx, item in enumerate(best_sellers):
+                bs_data.append([
+                    f"#{idx+1}", item["name"],
+                    str(item["qty"]),
+                    f"EGP {item['revenue']:,.2f}"
+                ])
+            bs_table = Table(bs_data, colWidths=[1.5*cm, 9*cm, 2.5*cm, 3.5*cm],
+                             repeatRows=1)
+            bs_table.setStyle(TableStyle([
+                ("BACKGROUND",  (0, 0), (-1, 0), colors.HexColor("#1BBFBF")),
+                ("TEXTCOLOR",   (0, 0), (-1, 0), colors.white),
+                ("FONTNAME",    (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE",    (0, 0), (-1, -1), 9),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                 [colors.HexColor("#FFFFFF"), colors.HexColor("#F0FFFF")]),
+                ("ALIGN",       (0, 0), (-1, -1), "CENTER"),
+                ("ALIGN",       (1, 1), (1, -1), "LEFT"),
+                ("BOX",         (0, 0), (-1, -1), 0.4, colors.HexColor("#E8E4F8")),
+                ("INNERGRID",   (0, 0), (-1, -1), 0.3, colors.HexColor("#E8E4F8")),
+                ("TOPPADDING",    (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            story.append(bs_table)
+        else:
+            story.append(Paragraph("No best-seller data for selected range.", styles["Normal"]))
+
+        story.append(Spacer(1, 1*cm))
+        story.append(Paragraph("justb-eg.com  ·  Stationery & Gifts",
+                                ParagraphStyle("footer", parent=styles["Normal"],
+                                               textColor=colors.HexColor("#A8A8C0"),
+                                               fontSize=8, alignment=1)))
+
+        doc.build(story)
+        messagebox.showinfo("PDF Saved", f"PDF report saved:\n{file_path}")

@@ -8,44 +8,17 @@ from datetime import datetime
 # ── Logo path (receipt printing) ───────────────────────────────────────────────
 # Dynamic: look for logo.png next to this file, then next to main.py, then fallback.
 def _find_logo():
-    """
-    Locate logo.png robustly:
-      1. Next to the executable when bundled with PyInstaller (_MEIPASS)
-      2. Next to main.py (project root)
-      3. Inside the gui/ package folder
-      4. Two levels up (edge case)
-      5. Known dev paths as final fallback
-    Returns the first existing path, or the most likely project-root path
-    even if the file is missing (so the error message is useful).
-    """
-    import sys
-    base_dirs = []
-
-    # PyInstaller one-file bundle unpacks to a temp folder
-    if hasattr(sys, "_MEIPASS"):
-        base_dirs.append(sys._MEIPASS)
-
-    # Directory of this file (gui/)
-    gui_dir = os.path.dirname(os.path.abspath(__file__))
-    # Project root (one level up from gui/)
-    root_dir = os.path.normpath(os.path.join(gui_dir, ".."))
-
-    base_dirs += [root_dir, gui_dir,
-                  os.path.normpath(os.path.join(gui_dir, "..", ".."))]
-
-    for base in base_dirs:
-        p = os.path.join(base, "logo.png")
+    candidates = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logo.png"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "logo.png"),
+        r"C:\Users\A\Desktop\JUSTB\logo.png",
+        r"C:\Users\Ziad\JUSTB\logo.png",
+    ]
+    for p in candidates:
         if os.path.exists(p):
             return os.path.normpath(p)
-
-    # Dev-machine hard paths as last resort
-    for p in [r"C:\Users\A\Desktop\JUSTB\logo.png",
-              r"C:\Users\Ziad\JUSTB\logo.png"]:
-        if os.path.exists(p):
-            return p
-
-    # Nothing found — return project-root guess so failure msg is clear
-    return os.path.join(root_dir, "logo.png")
+    return candidates[0]   # return first candidate even if missing (will fail gracefully)
 
 LOGO_PATH    = _find_logo()
 UI_LOGO_PATH = LOGO_PATH
@@ -155,11 +128,7 @@ def _divider(char='-', w=RECEIPT_CHAR_WIDTH):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _logo_escpos(path):
-    if not PIL_AVAILABLE:
-        print("[Logo] Pillow not installed — logo cannot print.")
-        return b''
-    if not os.path.exists(path):
-        print(f"[Logo] File not found at: {path}  →  receipt will show text fallback.")
+    if not PIL_AVAILABLE or not os.path.exists(path):
         return b''
     try:
         img = Image.open(path).convert('RGBA')
@@ -452,10 +421,13 @@ class POSScreen:
         self._promo_code   = ""
         self._tax_pct      = self._load_tax_pct()
         self._logo_img     = None   # keep reference to avoid GC
+        self._products_cache = None  # cache for speed
 
         self._build_ui()
         # Restore focus to barcode entry whenever it loses focus to a non-entry widget
         self.barcode_entry.bind("<FocusOut>", self._on_barcode_focus_out)
+        # Check for low stock on startup
+        self.frame.after(1500, self._check_low_stock_alert)
 
     def _refocus(self):
         """Snap focus back to the barcode entry."""
@@ -844,13 +816,37 @@ class POSScreen:
     def _products_path(self): return os.path.join(self.data_dir, "products.json")
     def _sales_path(self):    return os.path.join(self.data_dir, "sales.json")
 
+    def _load_products(self, force=False):
+        """Return products list from cache; reload from disk only when forced."""
+        if self._products_cache is None or force:
+            self._products_cache = load_json(self._products_path())
+        return self._products_cache
+
+    def _invalidate_product_cache(self):
+        self._products_cache = None
+
+    def _check_low_stock_alert(self):
+        """Show a non-blocking low-stock warning banner if any products are low."""
+        LOW = 5
+        products = self._load_products(force=True)
+        low_items = [p for p in products if int(p.get("quantity", 0)) <= LOW]
+        if not low_items:
+            return
+        names = ", ".join(p["name"] for p in low_items[:5])
+        extra = f" (+{len(low_items)-5} more)" if len(low_items) > 5 else ""
+        messagebox.showwarning(
+            "⚠ Low Stock Alert",
+            f"{len(low_items)} product(s) are low or out of stock:\n\n"
+            f"{names}{extra}\n\nPlease restock soon."
+        )
+
     # ── cart logic ────────────────────────────────────────────────────────────
 
     def add_to_cart(self):
         barcode = self.barcode_entry.get().strip()
         if not barcode:
             return
-        products = load_json(self._products_path())
+        products = self._load_products()
         product  = next((p for p in products
                          if str(p.get("barcode", "")) == barcode), None)
         if not product:
@@ -956,6 +952,7 @@ class POSScreen:
                 prod["quantity"] = int(prod.get("quantity", 0)) + remove_qty
                 break
         save_json(self._products_path(), products)
+        self._invalidate_product_cache()
 
         if remove_qty >= item_qty:
             self.cart.pop(idx)
@@ -1156,6 +1153,7 @@ class POSScreen:
                 prod["quantity"] = max(
                     0, int(prod.get("quantity", 0)) - int(item["quantity"]))
         save_json(self._products_path(), products)
+        self._invalidate_product_cache()
 
         sales    = load_json(self._sales_path())
 
@@ -1190,6 +1188,16 @@ class POSScreen:
         }
         sales.append(sale_record)
         save_json(self._sales_path(), sales)
+
+        # ── Decrement promo uses_left ──────────────────────────────────────
+        if self._promo_code:
+            promo_path = os.path.join(self.data_dir, "promo_codes.json")
+            promos = load_json(promo_path)
+            for p in promos:
+                if p.get("code") == self._promo_code:
+                    p["uses_left"] = max(0, int(p.get("uses_left", 0)) - 1)
+                    break
+            save_json(promo_path, promos)
 
         receipt_bytes = build_receipt(
             sale_id, sale_record,
