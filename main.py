@@ -8,11 +8,9 @@ import tkinter as tk
 from gui.login_screen import LoginScreen
 from gui.splash_screen import SplashScreen
 import os
-<<<<<<< HEAD
+
 DATA_DIR = r"C:\Users\A\OneDrive\Desktop"
-=======
-DATA_DIR = r"C:\Users\Ziad\JUSTB\gui\data"
->>>>>>> e017c6acf33078fe64b9b5f10819fdf04ced4c9a
+
 def main():
     root = tk.Tk()
     root.title("JustB — Retail Management System")
