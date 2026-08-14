@@ -9,7 +9,7 @@ from gui.settings_screen import SettingsScreen
 from utils.helpers import load_json, save_json
 from utils.security import verify_password, hash_password, is_hashed
 from gui.theme import (
-    Palette as C,
+    C,
     Font,
     BRAND_COLORS,
     BRAND_LETTERS,

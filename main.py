@@ -1,8 +1,4 @@
-"""
-main.py  —  JustB Retail Management System
-==========================================
-Entry point.  Run with:   python main.py
-"""
+
 
 import tkinter as tk
 from gui.login_screen import LoginScreen
