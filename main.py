@@ -5,7 +5,7 @@ from gui.login_screen import LoginScreen
 from gui.splash_screen import SplashScreen
 import os
 
-DATA_DIR = r"C:\Users\A\OneDrive\Desktop"
+DATA_DIR = r"C:\Users\A\OneDrive\Desktop\JUSTB\data"
 
 def main():
     root = tk.Tk()

@@ -241,5 +241,27 @@
         "payment_method": "Cash",
         "date": "2026-05-27",
         "time": "17:50:11"
+    },
+    {
+        "id": 13,
+        "user": "admin",
+        "items": [
+            {
+                "barcode": "8991761162521",
+                "name": "Faber castell الوان خشب 12 جريب",
+                "price": 105.0,
+                "quantity": 2
+            }
+        ],
+        "subtotal": 210.0,
+        "discount_pct": 0.0,
+        "discount_amt": 0.0,
+        "tax_pct": 0.0,
+        "tax_amt": 0.0,
+        "total": 210.0,
+        "promo_code": "",
+        "payment_method": "Cash",
+        "date": "2026-08-14",
+        "time": "09:26:36"
     }
 ]
