@@ -8,208 +8,36 @@ from gui.receipt_database import ReceiptDatabaseScreen
 from gui.settings_screen import SettingsScreen
 from utils.helpers import load_json, save_json
 from utils.security import verify_password, hash_password, is_hashed
+from gui.theme import (
+    Palette as C,
+    Font,
+    BRAND_COLORS,
+    BRAND_LETTERS,
+    make_rounded_button,
+    make_pill,
+)
+from gui.widgets import (
+    RoundedCard,
+    BrandWordmark,
+    FocusRing,
+    Pill,
+)
+from gui.animation import Animator, Easing
 import os
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  Design tokens  — identical to the rest of the JustB system
-# ══════════════════════════════════════════════════════════════════════════════
-C = {
-    "bg_root":    "#F7F5FF",
-    "bg_card":    "#FFFFFF",
-    "bg_panel":   "#F0EDFF",
-    "bg_input":   "#FFFFFF",
-    "purple":     "#8B5CF6",
-    "purple_dk":  "#7C3AED",
-    "teal":       "#1BBFBF",
-    "pink":       "#F0569A",
-    "orange":     "#F97316",
-    "green":      "#22C55E",
-    "border":     "#E8E4F8",
-    "border_acc": "#C4B8F5",
-    "text_dark":  "#1A1035",
-    "text_mid":   "#6B6B8A",
-    "text_light": "#A8A8C0",
-    "success":    "#16A34A",
-    "danger":     "#DC2626",
-}
-BRAND_COLORS  = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]
-BRAND_LETTERS = list("JustB")
-
-FONT_BRAND   = ("Georgia",  28, "bold")
-FONT_HEAD    = ("Georgia",  13, "bold")
-FONT_LABEL_B = ("Segoe UI", 10, "bold")
-FONT_LABEL   = ("Segoe UI", 10)
-FONT_ENTRY   = ("Segoe UI", 12)
-FONT_BTN     = ("Segoe UI", 11, "bold")
-FONT_SMALL   = ("Segoe UI",  9)
-FONT_SECTION = ("Segoe UI",  8, "bold")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  Splash Screen
-# ══════════════════════════════════════════════════════════════════════════════
-
-class SplashScreen(tk.Toplevel):
-    """
-    Bright splash screen matching JustB's lavender-white theme.
-    Animations:
-      1. Each brand letter drops and bounces into place (staggered)
-      2. Tagline and dots fade in
-      3. Purple progress bar fills, then calls on_done()
-    """
-
-    BAR_STEPS = 55
-
-    def __init__(self, master, on_done):
-        super().__init__(master)
-        self.on_done = on_done
-
-        self.overrideredirect(True)
-        self.configure(bg=C["bg_root"])
-
-        W, H = 460, 300
-        sw = self.winfo_screenwidth()
-        sh = self.winfo_screenheight()
-        self.geometry(f"{W}x{H}+{(sw-W)//2}+{(sh-H)//2}")
-        self.lift()
-        self.attributes("-topmost", True)
-
-        self.canvas = tk.Canvas(self, width=W, height=H,
-                                bg=C["bg_root"], highlightthickness=0)
-        self.canvas.pack(fill="both", expand=True)
-
-        # Thin purple border
-        self.canvas.create_rectangle(1, 1, W-2, H-2,
-                                     outline=C["border_acc"], width=2)
-
-        # Soft lavender glow blob behind letters
-        self.canvas.create_oval(60, 30, 400, 200,
-                                fill="#EDE9FF", outline="")
-
-        # ── Brand letters (start above canvas, will drop in) ──────────────────
-        self._letter_ids = []
-        letter_y_final = 105
-        letter_start_x = W // 2 - 86
-
-        for i, (ch, col) in enumerate(zip(BRAND_LETTERS, BRAND_COLORS)):
-            lx  = letter_start_x + i * 36
-            lid = self.canvas.create_text(
-                lx, -30, text=ch,
-                font=FONT_BRAND, fill=col, anchor="center"
-            )
-            self._letter_ids.append((lid, lx, letter_y_final))
-
-        # ── Tagline ───────────────────────────────────────────────────────────
-        self._tag_id = self.canvas.create_text(
-            W // 2, 150,
-            text="Retail Management System",
-            font=("Segoe UI", 11, "italic"),
-            fill=C["bg_root"],
-            anchor="center"
-        )
-
-        # ── Rainbow dot row ───────────────────────────────────────────────────
-        dot_spacing = 18
-        dot_start   = W // 2 - (len(BRAND_COLORS) - 1) * dot_spacing // 2
-        self._dot_ids = []
-        for i, col in enumerate(BRAND_COLORS):
-            did = self.canvas.create_text(
-                dot_start + i * dot_spacing, 174,
-                text="●", font=("Segoe UI", 9),
-                fill=C["bg_root"], anchor="center"
-            )
-            self._dot_ids.append((did, col))
-
-        # ── Progress bar ──────────────────────────────────────────────────────
-        bar_y  = H - 38
-        bar_x1 = 60
-        bar_x2 = W - 60
-        self.canvas.create_rectangle(bar_x1, bar_y, bar_x2, bar_y + 5,
-                                     fill=C["border"], outline="")
-        self._bar    = self.canvas.create_rectangle(
-            bar_x1, bar_y, bar_x1, bar_y + 5,
-            fill=C["purple"], outline=""
-        )
-        self._bar_x1  = bar_x1
-        self._bar_x2  = bar_x2
-        self._bar_y   = bar_y
-        self._bar_step = 0
-
-        self.canvas.create_text(
-            W // 2, H - 16, text="v2.0",
-            font=FONT_SMALL, fill=C["text_light"], anchor="center"
-        )
-
-        # Kick off
-        self._drop_letter(0)
-
-    def _drop_letter(self, index):
-        if index >= len(self._letter_ids):
-            self.after(120, self._show_tagline)
-            return
-
-        lid, lx, target_y = self._letter_ids[index]
-        steps     = 16
-        overshoot = target_y + 10
-        bounce_at = steps - 4
-
-        def _step(i=0):
-            if i <= bounce_at:
-                t = i / bounce_at
-                y = -30 + (overshoot + 30) * (t * t)
-            else:
-                t = (i - bounce_at) / (steps - bounce_at)
-                y = overshoot - (overshoot - target_y) * t
-            self.canvas.coords(lid, lx, y)
-            if i < steps:
-                self.after(14, lambda: _step(i + 1))
-            else:
-                self.canvas.coords(lid, lx, target_y)
-                self.after(60, lambda: self._drop_letter(index + 1))
-
-        _step()
-
-    def _show_tagline(self):
-        steps = 16
-
-        def _step(i=0):
-            if i > steps:
-                self._animate_bar()
-                return
-            t  = i / steps
-            # interpolate bg_root (#F7F5FF) → text_mid (#6B6B8A)
-            r  = int(0xF7 + (0x6B - 0xF7) * t)
-            g  = int(0xF5 + (0x6B - 0xF5) * t)
-            b  = int(0xFF + (0x8A - 0xFF) * t)
-            self.canvas.itemconfig(self._tag_id, fill=f"#{r:02x}{g:02x}{b:02x}")
-
-            dot_threshold = max(1, steps // len(self._dot_ids))
-            dot_idx = min(i // dot_threshold, len(self._dot_ids) - 1)
-            for j, (did, dcol) in enumerate(self._dot_ids):
-                self.canvas.itemconfig(did,
-                    fill=dcol if j <= dot_idx else C["bg_root"])
-
-            self.after(22, lambda: _step(i + 1))
-
-        _step()
-
-    def _animate_bar(self):
-        self._bar_step += 1
-        frac   = self._bar_step / self.BAR_STEPS
-        new_x2 = self._bar_x1 + int((self._bar_x2 - self._bar_x1) * frac)
-        self.canvas.coords(self._bar,
-                           self._bar_x1, self._bar_y,
-                           new_x2,       self._bar_y + 5)
-        if self._bar_step < self.BAR_STEPS:
-            self.after(10 + int(20 * frac), self._animate_bar)
-        else:
-            self.after(180, self._finish)
-
-    def _finish(self):
-        self.destroy()
-        self.on_done()
-
+# Back-compat aliases so the old FONT_* names used by AdminDashboard /
+# CashierDashboard continue to work.
+FONT_BRAND   = Font.BRAND
+FONT_HEAD    = Font.HEAD
+FONT_LABEL_B = Font.LABEL_B
+FONT_LABEL   = Font.LABEL
+FONT_ENTRY   = Font.ENTRY
+FONT_BTN     = Font.BTN
+FONT_SMALL   = Font.SMALL
+FONT_SECTION = Font.SECTION
+FONT_BTN_LG  = Font.BTN_LG
+FONT_TOTAL   = Font.TOTAL
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  Login Screen

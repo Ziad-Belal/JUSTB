@@ -5,9 +5,10 @@ Entry point.  Run with:   python main.py
 """
 
 import tkinter as tk
-from gui.login_screen import LoginScreen, SplashScreen
+from gui.login_screen import LoginScreen
+from gui.splash_screen import SplashScreen
 import os
-DATA_DIR = r"C:\Users\A\Desktop\JUSTB\data"
+DATA_DIR = r"C:\Users\A\OneDrive\Desktop"
 def main():
     root = tk.Tk()
     root.title("JustB — Retail Management System")
