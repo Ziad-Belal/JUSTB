@@ -1,4 +1,4 @@
-('C:\\Users\\Ziad\\JUSTB\\build\\JustB\\PYZ-00.pyz',
+('C:\\Users\\Ziad\\JUSTB\\build\\JUSTB\\PYZ-00.pyz',
  [('PIL',
    'C:\\Users\\Ziad\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\__init__.py',
    'PYMODULE'),

@@ -1,5 +1,5 @@
 #r"C:\Users\A\Desktop\JUSTB\data" this is the original path I will use when the project runs after the testing.
 
-python -m PyInstaller --onefile --windowed --icon="C:\Users\Ziad\JUSTB\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico" --add-data "gui;gui" --add-data "utils;utils" --name "JustB" main.
+python -m PyInstaller --onefile --windowed --icon="C:\Users\Ziad\JUSTB\WhatsApp Image 2025-12-16 at 12.28.37 AM.ico" --add-data "gui;gui" --add-data "utils;utils" --add-data "logo.png;." --name "JustB" main.py
 
 --C:\Users\A\OneDrive\Desktop 

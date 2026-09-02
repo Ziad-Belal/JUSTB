@@ -3,13 +3,16 @@ import tkinter as tk
 from tkinter import messagebox, ttk, simpledialog
 from utils.helpers import load_json, save_json, get_today_date
 import os
+import sys
 from datetime import datetime
 from gui.theme import C
 
 # ── Logo path (receipt printing) ───────────────────────────────────────────────
 # Dynamic: look for logo.png next to this file, then next to main.py, then fallback.
 def _find_logo():
+    bundle_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     candidates = [
+        os.path.join(bundle_dir, "logo.png"),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logo.png"),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png"),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "logo.png"),
