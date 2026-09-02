@@ -39,6 +39,7 @@ class Palette:
     # Surfaces
     bg_root    = "#F7F5FF"   # soft lavender-white canvas
     bg_card    = "#FFFFFF"   # pure white card
+    bg_header  = "#FFFFFF"   # header surface
     bg_panel   = "#F0EDFF"   # soft purple panel
     bg_input   = "#FFFFFF"   # input bg
     bg_row_alt = "#FAF8FF"   # alternating row tint
@@ -76,6 +77,29 @@ class Palette:
     # Order matters - first to last letter of "JustB"
     BRAND_COLORS: List[str] = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]
     BRAND_LETTERS: List[str] = list("JustB")
+
+    _LIGHT = {
+        "bg_root": "#F7F5FF", "bg_card": "#FFFFFF", "bg_panel": "#F0EDFF",
+        "bg_input": "#FFFFFF", "bg_row_alt": "#FAF8FF", "bg_hover": "#F4F0FF",
+        "bg_dim": "#EDEAFF", "text_dark": "#1A1035", "text_mid": "#6B6B8A",
+        "text_light": "#A8A8C0", "border": "#E8E4F8", "border_acc": "#C4B8F5",
+    }
+    _DARK = {
+        "bg_root": "#11131A", "bg_card": "#1B1F2A", "bg_header": "#1B1F2A", "bg_panel": "#242938",
+        "bg_input": "#151923", "bg_row_alt": "#202532", "bg_hover": "#2B3142",
+        "bg_dim": "#303748", "text_dark": "#F3F5FA", "text_mid": "#B5BBCB",
+        "text_light": "#858DA3", "border": "#343B4D", "border_acc": "#59647D",
+    }
+
+    @classmethod
+    def set_dark(cls, enabled: bool) -> None:
+        """Switch surface and text tokens while preserving brand accents."""
+        values = cls._DARK if enabled else cls._LIGHT
+        for name, value in values.items():
+            setattr(cls, name, value)
+        cls.is_dark = enabled
+
+    is_dark = False
 
 
 # Module-level constants so callers can do `from gui.theme import BRAND_COLORS`.

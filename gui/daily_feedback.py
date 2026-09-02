@@ -18,30 +18,9 @@ from tkinter.simpledialog import askstring
 from utils.helpers import load_json, get_today_date
 from datetime import date, timedelta, datetime
 import os
+from gui.theme import C
 
 # ══════════════════════════════════════════════════════════════════════════════
-C = {
-    "bg_root":    "#F7F5FF",
-    "bg_card":    "#FFFFFF",
-    "bg_header":  "#FFFFFF",
-    "bg_panel":   "#F0EDFF",
-    "bg_row_alt": "#FAF8FF",
-    "bg_input":   "#FFFFFF",
-    "teal":       "#1BBFBF",
-    "pink":       "#F0569A",
-    "orange":     "#F97316",
-    "purple":     "#8B5CF6",
-    "purple_dk":  "#7C3AED",
-    "green":      "#22C55E",
-    "text_dark":  "#1A1035",
-    "text_mid":   "#6B6B8A",
-    "text_light": "#A8A8C0",
-    "gold":       "#D97706",
-    "border":     "#E8E4F8",
-    "border_acc": "#C4B8F5",
-    "success":    "#16A34A",
-    "danger":     "#DC2626",
-}
 BRAND_COLORS = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]
 RANK_COLORS  = ["#D97706", "#9CA3AF", "#C2703A", "#8B5CF6", "#1BBFBF"]
 

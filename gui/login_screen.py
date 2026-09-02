@@ -356,13 +356,20 @@ class AdminDashboard:
                                                    admin=True).frame
         self.settings_tab = SettingsScreen(root, data_dir=self.data_dir,
                                             frame_parent=self.notebook,
-                                            user=self.user).frame
+                                            user=self.user,
+                                            on_theme_changed=self._refresh_theme).frame
 
         self.notebook.add(self.product_tab,  text="Products")
         self.notebook.add(self.promo_tab,    text="Promotions")
         self.notebook.add(self.feedback_tab, text="Feedback")
         self.notebook.add(self.receipt_tab,  text="Receipts")
         self.notebook.add(self.settings_tab, text="Settings")
+
+    def _refresh_theme(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.root.configure(bg=C["bg_root"])
+        AdminDashboard(self.root, self.data_dir, self.user)
 
     def _add_pos_tab(self):
         self._pos_count += 1

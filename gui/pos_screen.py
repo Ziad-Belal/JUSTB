@@ -4,6 +4,7 @@ from tkinter import messagebox, ttk, simpledialog
 from utils.helpers import load_json, save_json, get_today_date
 import os
 from datetime import datetime
+from gui.theme import C
 
 # ── Logo path (receipt printing) ───────────────────────────────────────────────
 # Dynamic: look for logo.png next to this file, then next to main.py, then fallback.
@@ -47,37 +48,6 @@ except ImportError:
 #  DESIGN TOKENS  — JustB Bright Luxury
 # ══════════════════════════════════════════════════════════════════════════════
 
-C = {
-    # Light backgrounds
-    "bg_root":    "#F7F5FF",   # soft lavender-white canvas
-    "bg_card":    "#FFFFFF",   # pure white cards
-    "bg_header":  "#FFFFFF",   # header
-    "bg_panel":   "#F0EDFF",   # soft purple panel
-    "bg_row_alt": "#FAF8FF",   # alternating row tint
-    "bg_input":   "#FFFFFF",   # input bg
-
-    # JustB brand colours (from logo)
-    "teal":       "#1BBFBF",   # J
-    "pink":       "#F0569A",   # U
-    "orange":     "#F97316",   # S
-    "purple":     "#8B5CF6",   # T
-    "green":      "#22C55E",   # B
-
-    # Text
-    "text_dark":  "#1A1035",   # near-black
-    "text_mid":   "#6B6B8A",   # mid grey
-    "text_light": "#A8A8C0",   # subtle
-
-    # Accents
-    "gold":       "#D97706",   # warm amber total
-    "border":     "#E8E4F8",   # soft border
-    "border_acc": "#C4B8F5",   # accent border
-
-    # Semantic
-    "success":    "#16A34A",
-    "danger":     "#DC2626",
-    "warning":    "#D97706",
-}
 
 # Brand letter colours list
 BRAND_COLORS = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]

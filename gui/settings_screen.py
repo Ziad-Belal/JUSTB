@@ -3,25 +3,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from utils.helpers import load_json, save_json
 from utils.security import verify_password, hash_password
+from gui.theme import C, Palette
 import os
 
 # ── Design tokens ──────────────────────────────────────────────────────────────
-C = {
-    "bg_root":    "#F7F5FF",
-    "bg_card":    "#FFFFFF",
-    "bg_panel":   "#F0EDFF",
-    "bg_row_alt": "#FAF8FF",
-    "purple":     "#8B5CF6",
-    "orange":     "#F97316",
-    "teal":       "#1BBFBF",
-    "green":      "#22C55E",
-    "danger":     "#DC2626",
-    "success":    "#16A34A",
-    "border":     "#E8E4F8",
-    "text_dark":  "#1A1035",
-    "text_mid":   "#6B6B8A",
-    "text_light": "#A8A8C0",
-}
 BRAND_COLORS = ["#1BBFBF", "#F0569A", "#F97316", "#8B5CF6", "#22C55E"]
 
 FONT_HEAD    = ("Georgia",  13, "bold")
@@ -86,10 +71,11 @@ def _set_status(label, msg, error=False):
 # ══════════════════════════════════════════════════════════════════════════════
 class SettingsScreen:
 
-    def __init__(self, root, data_dir, frame_parent=None, user=None):
+    def __init__(self, root, data_dir, frame_parent=None, user=None, on_theme_changed=None):
         self.root     = root
         self.data_dir = data_dir
         self.user     = user or {}
+        self.on_theme_changed = on_theme_changed
 
         # Scrollable container
         outer = tk.Frame(frame_parent or root, bg=C["bg_root"])
@@ -285,11 +271,28 @@ class SettingsScreen:
              C["orange"], "#D97706").grid(
                  row=3, column=0, columnspan=2, sticky="w", pady=(14, 4))
 
+        self.dark_mode_var = tk.BooleanVar(value=Palette.is_dark)
+        tk.Checkbutton(p, text="Dark mode", variable=self.dark_mode_var,
+                       command=self._toggle_dark_mode, font=FONT_LABEL_B,
+                       bg=C["bg_card"], fg=C["text_mid"],
+                       activebackground=C["bg_card"], activeforeground=C["text_dark"],
+                       selectcolor=C["bg_panel"], relief="flat").grid(
+                           row=4, column=0, columnspan=2, sticky="w", pady=(8, 0))
+
+    def _toggle_dark_mode(self):
+        enabled = self.dark_mode_var.get()
+        self.system_settings["dark_mode"] = enabled
+        save_json(self._settings_path(), self.system_settings)
+        Palette.set_dark(enabled)
+        if self.on_theme_changed:
+            self.on_theme_changed()
+
     def _load_system_settings(self):
         settings = load_json(self._settings_path())
         if not isinstance(settings, dict):
             settings = {}
         self.system_settings = settings
+        Palette.set_dark(bool(settings.get("dark_mode", False)))
         self.tax_rate_entry.delete(0, tk.END)
         self.tax_rate_entry.insert(0, str(settings.get("tax_pct", 0.0)))
 
