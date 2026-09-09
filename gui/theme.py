@@ -84,24 +84,6 @@ class Palette:
         "bg_dim": "#EDEAFF", "text_dark": "#1A1035", "text_mid": "#6B6B8A",
         "text_light": "#A8A8C0", "border": "#E8E4F8", "border_acc": "#C4B8F5",
     }
-    _DARK = {
-        "bg_root": "#11131A", "bg_card": "#1B1F2A", "bg_header": "#1B1F2A", "bg_panel": "#242938",
-        "bg_input": "#151923", "bg_row_alt": "#202532", "bg_hover": "#2B3142",
-        "bg_dim": "#303748", "text_dark": "#F3F5FA", "text_mid": "#B5BBCB",
-        "text_light": "#858DA3", "border": "#343B4D", "border_acc": "#59647D",
-    }
-
-    @classmethod
-    def set_dark(cls, enabled: bool) -> None:
-        """Switch surface and text tokens while preserving brand accents."""
-        values = cls._DARK if enabled else cls._LIGHT
-        for name, value in values.items():
-            setattr(cls, name, value)
-        cls.is_dark = enabled
-
-    is_dark = False
-
-
 # Module-level constants so callers can do `from gui.theme import BRAND_COLORS`.
 # These mirror Palette attributes; re-exporting at module level keeps the
 # existing `from gui.login_screen import BRAND_COLORS` import paths working.

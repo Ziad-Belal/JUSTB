@@ -1,10 +1,10 @@
 """
 receipt_database.py  —  JustB Retail Management System
 ======================================================
-Receipt Database - Browse individual transactions with hover previews
+Receipt Database - Browse individual transactions with click previews
 Dynamic features:
   • Live receipt list with time-sorted transactions
-  • Hover to preview formatted receipt
+  • Click a receipt to preview formatted receipt
   • Filter by date
   • Search receipts by ID, amount, product name, product barcode, or receipt barcode code (RCPT-XXXXXX)
   • Export receipt data
@@ -206,9 +206,8 @@ class ReceiptDatabaseScreen:
             self.tree.heading(col, text=col)
             self.tree.column(col, anchor="center", width=cw[col], minwidth=40)
 
-        # Hover preview binding
-        self.tree.bind("<Motion>", self._on_tree_hover)
-        self.tree.bind("<Leave>",  self._hide_preview)
+        # Click preview binding
+        self.tree.bind("<<TreeviewSelect>>", self._on_tree_select)
 
         vsb = ttk.Scrollbar(list_card, orient="vertical",
                              command=self.tree.yview)
@@ -245,18 +244,16 @@ class ReceiptDatabaseScreen:
                  font=("Segoe UI", 8),
                  bg=C["bg_root"], fg=C["text_light"]).pack(side="bottom", pady=4)
 
-    # ── Receipt hover preview ────────────────────────────────────────────────
+    # ── Receipt click preview ────────────────────────────────────────────────
 
-    def _on_tree_hover(self, event):
-        """Show receipt preview when hovering over a receipt."""
-        item = self.tree.identify_row(event.y)
-        if not item:
+    def _on_tree_select(self, event=None):
+        """Show receipt preview when a row is selected by clicking."""
+        selected = self.tree.selection()
+        if not selected:
+            self._hide_preview(event)
             return
 
-        values = self.tree.item(item)["values"]
-        receipt_id = values[0]
-
-        # Only update if hovering over a different receipt
+        receipt_id = self.tree.item(selected[0])["values"][0]
         if self.current_hover_receipt == receipt_id:
             return
 
@@ -264,7 +261,7 @@ class ReceiptDatabaseScreen:
         self._update_preview(receipt_id)
 
     def _hide_preview(self, event):
-        """Clear preview when mouse leaves tree."""
+        """Clear preview when no receipt is selected."""
         self.current_hover_receipt = None
         self.preview_text.config(state="normal")
         self.preview_text.delete(1.0, tk.END)

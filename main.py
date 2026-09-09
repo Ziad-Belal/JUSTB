@@ -4,14 +4,11 @@ import tkinter as tk
 from gui.login_screen import LoginScreen
 from gui.splash_screen import SplashScreen
 from gui.theme import Palette
-from utils.helpers import load_json
 import os
 
 DATA_DIR = r"C:\Users\Ziad\JUSTB\gui\data"
 
 def main():
-    settings = load_json(os.path.join(DATA_DIR, "system_settings.json"))
-    Palette.set_dark(bool(settings.get("dark_mode", False)) if isinstance(settings, dict) else False)
     root = tk.Tk()
     root.title("JustB — Retail Management System")
     root.geometry("1024x700")

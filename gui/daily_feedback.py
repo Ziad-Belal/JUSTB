@@ -623,6 +623,9 @@ class DailyFeedbackScreen:
         except Exception:
             return default
 
+    def _is_refunded_sale(self, sale):
+        return str(sale.get("status", "")).strip().lower() == "refunded"
+
     def _selected_bs_range(self):
         if self._custom_range:
             start = self._parse_date(self._custom_bs_start.get(), None)
@@ -669,6 +672,8 @@ class DailyFeedbackScreen:
         product_summary = {}
 
         for sale in sales:
+            if self._is_refunded_sale(sale):
+                continue
             sale_date = sale.get("date", "")
             if not (start <= sale_date <= end):
                 continue
@@ -707,6 +712,8 @@ class DailyFeedbackScreen:
         product_summary = {}
 
         for sale in sales:
+            if self._is_refunded_sale(sale):
+                continue
             sale_date = sale.get("date", "")
             if not (start <= sale_date <= end):
                 continue
@@ -756,6 +763,8 @@ class DailyFeedbackScreen:
         product_summary = {}
 
         for sale in sales:
+            if self._is_refunded_sale(sale):
+                continue
             if sale.get("date", "") != self.feedback_date:
                 continue
             sale_items = [item for item in sale.get("items", [])
