@@ -6,7 +6,7 @@ from gui.splash_screen import SplashScreen
 from gui.theme import Palette
 import os
 
-DATA_DIR = r"C:\Users\Ziad\JUSTB\gui\data"
+DATA_DIR = r"C:\Users\A\OneDrive\Desktop\JUSTB\data"
 
 def main():
     root = tk.Tk()
