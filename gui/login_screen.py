@@ -24,6 +24,7 @@ from gui.widgets import (
 )
 from gui.animation import Animator, Easing
 import os
+import traceback
 
 
 # Back-compat aliases so the old FONT_* names used by AdminDashboard /
@@ -336,33 +337,59 @@ class AdminDashboard:
         self.notebook = ttk.Notebook(outer)
         self.notebook.pack(fill="both", expand=True)
 
-        # Fixed first POS tab
-        first_pos = POSScreen(root, data_dir=self.data_dir,
+        # Register each tab immediately. A data problem in one screen must not
+        # prevent the remaining admin tabs from appearing.
+        self._pos_frames = []
+        first_pos = self._create_admin_tab(
+            "POS 1",
+            lambda: POSScreen(root, data_dir=self.data_dir,
                               frame_parent=self.notebook,
-                              user=self.user).frame
-        self.notebook.add(first_pos, text="POS 1")
-        self._pos_frames = [first_pos]
+                              user=self.user).frame)
+        self._pos_frames.append(first_pos)
 
-        # Other tabs
-        self.product_tab  = ProductManagementScreen(root, data_dir=self.data_dir,
-                                                     frame_parent=self.notebook).frame
-        self.promo_tab    = PromoManagementScreen(root, data_dir=self.data_dir,
-                                                   frame_parent=self.notebook).frame
-        self.feedback_tab = DailyFeedbackScreen(root, data_dir=self.data_dir,
-                                                 frame_parent=self.notebook,
-                                                 admin=True).frame
-        self.receipt_tab  = ReceiptDatabaseScreen(root, data_dir=self.data_dir,
-                                                   frame_parent=self.notebook,
-                                                   admin=True).frame
-        self.settings_tab = SettingsScreen(root, data_dir=self.data_dir,
-                                            frame_parent=self.notebook,
-                                            user=self.user).frame
+        self.product_tab = self._create_admin_tab(
+            "Products",
+            lambda: ProductManagementScreen(
+                root, data_dir=self.data_dir,
+                frame_parent=self.notebook).frame)
+        self.promo_tab = self._create_admin_tab(
+            "Promotions",
+            lambda: PromoManagementScreen(
+                root, data_dir=self.data_dir,
+                frame_parent=self.notebook).frame)
+        self.feedback_tab = self._create_admin_tab(
+            "Feedback",
+            lambda: DailyFeedbackScreen(
+                root, data_dir=self.data_dir,
+                frame_parent=self.notebook, admin=True).frame)
+        self.receipt_tab = self._create_admin_tab(
+            "Receipts",
+            lambda: ReceiptDatabaseScreen(
+                root, data_dir=self.data_dir,
+                frame_parent=self.notebook, admin=True).frame)
+        self.settings_tab = self._create_admin_tab(
+            "Settings",
+            lambda: SettingsScreen(
+                root, data_dir=self.data_dir,
+                frame_parent=self.notebook, user=self.user).frame)
 
-        self.notebook.add(self.product_tab,  text="Products")
-        self.notebook.add(self.promo_tab,    text="Promotions")
-        self.notebook.add(self.feedback_tab, text="Feedback")
-        self.notebook.add(self.receipt_tab,  text="Receipts")
-        self.notebook.add(self.settings_tab, text="Settings")
+    def _create_admin_tab(self, title, factory):
+        """Create and register one tab even if its screen has an init error."""
+        try:
+            frame = factory()
+        except Exception as error:
+            traceback.print_exc()
+            frame = tk.Frame(self.notebook, bg=C["bg_root"])
+            tk.Label(
+                frame,
+                text=f"{title} could not be loaded.\n{error}",
+                font=FONT_LABEL,
+                bg=C["bg_root"],
+                fg=C["danger"],
+                justify="center",
+            ).pack(expand=True)
+        self.notebook.add(frame, text=title)
+        return frame
 
     def _add_pos_tab(self):
         self._pos_count += 1
