@@ -51,6 +51,7 @@ class ReceiptDatabaseScreen:
         self.view_date  = get_today_date()
         self.current_hover_receipt = None
         self.preview_window = None
+        self.payment_filter = tk.StringVar(value="All payments")
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
         self.frame.pack(fill="both", expand=True)
@@ -144,11 +145,40 @@ class ReceiptDatabaseScreen:
                                 relief="solid", borderwidth=1)
         search_entry.pack(side="left", padx=(0, 8))
 
+        tk.Label(search_frame, text="Payment:",
+                 font=FONT_SMALL, bg=C["bg_root"],
+                 fg=C["text_mid"]).pack(side="left", padx=(10, 6))
+        payment_menu = ttk.Combobox(
+            search_frame,
+            textvariable=self.payment_filter,
+            values=("All payments", "Cash", "Visa", "Split"),
+            state="readonly", width=14)
+        payment_menu.pack(side="left", padx=(0, 8))
+        payment_menu.bind("<<ComboboxSelected>>", lambda e: self._filter_receipts())
+
         # Search hint label
         tk.Label(search_frame,
                  text="by ID · amount · product name · product barcode · receipt code (RCPT-000001)",
                  font=("Segoe UI", 8), bg=C["bg_root"],
                  fg=C["text_light"]).pack(side="left")
+
+        totals_frame = tk.Frame(self.frame, bg=C["bg_root"])
+        totals_frame.pack(fill="x", padx=14, pady=(8, 0))
+        self.payment_total_labels = {}
+        for payment_type, color in (("Cash", C["green"]),
+                                    ("Visa", C["purple"]),
+                                    ("Split", C["orange"]),
+                                    ("All", C["teal"])):
+            card = tk.Frame(totals_frame, bg=C["bg_card"],
+                            highlightthickness=1,
+                            highlightbackground=C["border"])
+            card.pack(side="left", fill="x", expand=True, padx=(0, 8))
+            tk.Label(card, text=payment_type.upper(), font=FONT_SECTION,
+                     bg=C["bg_card"], fg=C["text_mid"]).pack(anchor="w", padx=10, pady=(7, 0))
+            amount_label = tk.Label(card, text="EGP 0.00", font=FONT_LABEL_B,
+                                    bg=C["bg_card"], fg=color)
+            amount_label.pack(anchor="w", padx=10, pady=(0, 7))
+            self.payment_total_labels[payment_type] = amount_label
 
         # ── Main content: Receipts list + Preview ─────────────────────────────
         body = tk.Frame(self.frame, bg=C["bg_root"])
@@ -197,11 +227,12 @@ class ReceiptDatabaseScreen:
         ts.layout("RDB.Treeview",
                   [('Treeview.treearea', {'sticky': 'nswe'})])
 
-        cols = ("ID", "Time", "Items", "Total", "Status")
+        cols = ("ID", "Time", "Items", "Total", "Payment", "Status")
         self.tree = ttk.Treeview(list_card, columns=cols,
-                                  show="headings", selectmode="browse",
-                                  style="RDB.Treeview")
-        cw = {"ID": 60, "Time": 70, "Items": 50, "Total": 100, "Status": 100}
+                        show="headings", selectmode="browse",
+                        style="RDB.Treeview")
+        cw = {"ID": 60, "Time": 70, "Items": 50, "Total": 100,
+            "Payment": 90, "Status": 100}
         for col in cols:
             self.tree.heading(col, text=col)
             self.tree.column(col, anchor="center", width=cw[col], minwidth=40)
@@ -305,6 +336,7 @@ class ReceiptDatabaseScreen:
         lines.append(f"Date        : {receipt.get('date', 'N/A')}")
         lines.append(f"Time        : {receipt_time}")
         lines.append(f"Cashier     : {cashier}")
+        lines.append(f"Payment     : {self._payment_type(receipt)}")
         lines.append("-" * 42)
         lines.append("")
 
@@ -505,7 +537,11 @@ class ReceiptDatabaseScreen:
             self.tree.delete(item)
 
         if not search_term:
-            self._populate_receipts(self.receipts_data)
+            selected_payment = self.payment_filter.get()
+            filtered = [receipt for receipt in self.receipts_data
+                        if selected_payment == "All payments"
+                        or self._payment_type(receipt) == selected_payment]
+            self._populate_receipts(filtered)
             return
 
         # Strip RCPT- prefix so typing either form works
@@ -515,6 +551,10 @@ class ReceiptDatabaseScreen:
 
         filtered = []
         for receipt in self.receipts_data:
+            payment_type = self._payment_type(receipt)
+            selected_payment = self.payment_filter.get()
+            if selected_payment != "All payments" and payment_type != selected_payment:
+                continue
             receipt_id  = str(receipt.get("id", "")).lower()
             total       = str(receipt.get("total", "")).lower()
             rcpt_code   = f"rcpt-{receipt.get('id', 0):06d}"   # e.g. rcpt-000001
@@ -572,6 +612,8 @@ class ReceiptDatabaseScreen:
                     existing["subtotal"] = existing.get("subtotal", 0) + sale.get("subtotal", 0)
                     existing["discount_amt"] = existing.get("discount_amt", 0) + sale.get("discount_amt", 0)
                     existing["total"] = existing.get("total", 0) + sale.get("total", 0)
+                    if existing.get("payment_method") != sale.get("payment_method", "Cash"):
+                        existing["payment_method"] = "Split"
                     existing_status = str(existing.get("status", "")).lower()
                     sale_status = str(sale.get("status", "")).lower()
                     if "refunded" in (existing_status, sale_status):
@@ -591,6 +633,7 @@ class ReceiptDatabaseScreen:
                         "tax_amt": sale.get("tax_amt", 0),
                         "user": sale.get("user", "—"),
                         "promo_code": sale.get("promo_code", ""),
+                        "payment_method": sale.get("payment_method", "Cash"),
                         "status": sale.get("status", ""),
                     }
                     receipt_map[receipt_id] = receipt_dict
@@ -601,8 +644,28 @@ class ReceiptDatabaseScreen:
 
         # Clear search and populate
         self.search_var.set("")
-        self._populate_receipts(self.receipts_data)
+        self._update_payment_summary()
+        self._filter_receipts()
         self._hide_preview(None)
+
+    @staticmethod
+    def _payment_type(receipt):
+        """Return the display category for a saved payment method."""
+        method = str(receipt.get("payment_method", "Cash")).strip().lower()
+        if method.startswith("split"):
+            return "Split"
+        if method == "visa":
+            return "Visa"
+        return "Cash"
+
+    def _update_payment_summary(self):
+        totals = {"Cash": 0.0, "Visa": 0.0, "Split": 0.0, "All": 0.0}
+        for receipt in self.receipts_data:
+            total = float(receipt.get("total", 0) or 0)
+            totals[self._payment_type(receipt)] += total
+            totals["All"] += total
+        for payment_type, amount_label in self.payment_total_labels.items():
+            amount_label.config(text=f"EGP {totals[payment_type]:,.2f}")
 
     def _populate_receipts(self, receipts):
         """Populate tree with receipt list - one row per RECEIPT, not per item."""
@@ -622,6 +685,7 @@ class ReceiptDatabaseScreen:
                                      time_str,
                                      items_count,
                                      f"EGP {total:,.2f}",
+                             self._payment_type(r),
                                      status))
 
         # Update results counter
