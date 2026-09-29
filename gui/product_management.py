@@ -685,9 +685,11 @@ class ProductManagementScreen:
                     return
             for p in products:
                 if str(p["barcode"]) == str(old_barcode):
+                    current_qty = int(p.get("quantity", 0))
+                    submitted_qty = qty if qty != int(old_qty) else current_qty
                     p.update({"barcode": barcode, "name": name,
                                "category": category if category != "None" else "",
-                               "price": price, "quantity": qty})
+                               "price": price, "quantity": submitted_qty})
                     break
             save_json(self._products_path(), products)
             self.load_products()

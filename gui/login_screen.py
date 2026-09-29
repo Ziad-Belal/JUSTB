@@ -26,6 +26,12 @@ from gui.animation import Animator, Easing
 import os
 import traceback
 
+try:
+    from PIL import Image, ImageTk
+except ImportError:
+    Image = None
+    ImageTk = None
+
 
 # Back-compat aliases so the old FONT_* names used by AdminDashboard /
 # CashierDashboard continue to work.
@@ -46,9 +52,7 @@ FONT_TOTAL   = Font.TOTAL
 
 class LoginScreen:
     """
-    Bright JustB-themed login card.
-    Matches the system palette exactly: lavender-white bg, white card,
-    purple accents, coloured brand letters, Segoe UI typography.
+    Minimal JustB login card using the shared premium visual language.
     """
 
     def __init__(self, root, data_dir):
@@ -63,7 +67,7 @@ class LoginScreen:
 
         self.root.configure(bg=C["bg_root"])
 
-        # ── Soft background decoration ────────────────────────────────────────
+        # ── Quiet background surface ─────────────────────────────────────────
         self.bg_canvas = tk.Canvas(self.root, bg=C["bg_root"],
                                    highlightthickness=0)
         self.bg_canvas.place(relwidth=1, relheight=1)
@@ -78,7 +82,7 @@ class LoginScreen:
         self.card = tk.Frame(
             self.wrapper,
             bg=C["bg_card"],
-            padx=48, pady=36,
+            padx=52, pady=42,
             highlightbackground=C["border"],
             highlightthickness=1,
         )
@@ -91,28 +95,7 @@ class LoginScreen:
         self._slide_in()
 
     def _draw_background(self):
-        W = self.root.winfo_screenwidth()
-        H = self.root.winfo_screenheight()
-        cx, cy = W // 2, H // 2
-
-        # Soft lavender blobs
-        for r, col in [(420, "#EDEAFF"), (280, "#E8E4F8"), (160, "#DDD8F8")]:
-            self.bg_canvas.create_oval(cx-r, cy-r, cx+r, cy+r,
-                                       fill=col, outline="")
-
-        # Dot grid
-        for x in range(0, W, 40):
-            for y in range(0, H, 40):
-                self.bg_canvas.create_oval(x-1, y-1, x+1, y+1,
-                                           fill=C["border_acc"], outline="")
-
-        # Soft coloured blobs in the corners
-        for bx, by, col in [(0, 0, C["teal"]), (W, 0, C["pink"]),
-                             (0, H, C["orange"]), (W, H, C["green"])]:
-            r = 120
-            self.bg_canvas.create_oval(bx-r, by-r, bx+r, by+r,
-                                       fill=col, outline=col)
-
+        return
     def _slide_in(self):
         steps = 20
 
@@ -128,26 +111,25 @@ class LoginScreen:
 
     def _build_header(self):
         hdr = tk.Frame(self.card, bg=C["bg_card"])
-        hdr.pack(pady=(0, 26))
+        hdr.pack(pady=(0, 30))
 
-        # Coloured brand letters
-        letter_row = tk.Frame(hdr, bg=C["bg_card"])
-        letter_row.pack()
-        for ch, col in zip(BRAND_LETTERS, BRAND_COLORS):
-            tk.Label(letter_row, text=ch,
-                     font=FONT_BRAND, fg=col, bg=C["bg_card"]).pack(side="left")
+        logo_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "logo.png")
+        if Image is not None and ImageTk is not None and os.path.exists(logo_path):
+            logo_source = Image.open(logo_path).convert("RGBA")
+            logo_image = ImageTk.PhotoImage(
+                logo_source.resize((260, 173), Image.Resampling.LANCZOS))
+            self._logo_image = logo_image
+            tk.Label(hdr, image=logo_image, bg=C["bg_card"]).pack()
+        else:
+            tk.Label(hdr, text="JustB", font=("Georgia", 32, "bold"),
+                     fg=C["text_dark"], bg=C["bg_card"]).pack()
+            tk.Frame(hdr, bg=C["pink"], height=2, width=60).pack(pady=(12, 0))
 
         tk.Label(hdr,
-                 text="Retail Management System",
-                 font=("Segoe UI", 10, "italic"),
+                 text="RETAIL MANAGEMENT SYSTEM",
+                 font=FONT_SMALL,
                  fg=C["text_light"], bg=C["bg_card"]).pack(pady=(4, 0))
-
-        # Rainbow dot divider
-        dot_row = tk.Frame(hdr, bg=C["bg_card"])
-        dot_row.pack(pady=(10, 0))
-        for col in BRAND_COLORS:
-            tk.Label(dot_row, text="●", font=("Segoe UI", 8),
-                     fg=col, bg=C["bg_card"]).pack(side="left", padx=2)
 
     def _build_form(self):
         form = tk.Frame(self.card, bg=C["bg_card"])
@@ -302,6 +284,65 @@ def _tb_btn(parent, text, command, bg=C["purple"], hover=C["purple_dk"], fg="#FF
     return b
 
 
+def _configure_shell_styles():
+    style = ttk.Style()
+    style.configure(
+        "JustB.TNotebook",
+        background=C["bg_root"],
+        borderwidth=0,
+        tabmargins=(12, 8, 12, 0),
+    )
+    style.configure(
+        "JustB.TNotebook.Tab",
+        background=C["bg_root"],
+        foreground=C["text_light"],
+        font=("Segoe UI", 10, "bold"),
+        padding=(18, 9),
+        borderwidth=0,
+    )
+    style.map(
+        "JustB.TNotebook.Tab",
+        background=[("selected", C["bg_card"]), ("active", C["bg_hover"])],
+        foreground=[("selected", C["purple"]), ("active", C["text_dark"])],
+    )
+
+
+def _build_app_shell(outer, user, add_pos, remove_pos):
+    toolbar = tk.Frame(outer, bg=C["bg_card"],
+                       highlightthickness=1,
+                       highlightbackground=C["border"])
+    toolbar.pack(fill="x", side="top")
+
+    brand = tk.Frame(toolbar, bg=C["bg_card"])
+    brand.pack(side="left", padx=(18, 24), pady=8)
+    tk.Label(brand, text="JUSTB", font=("Georgia", 15, "bold"),
+             bg=C["bg_card"], fg=C["text_dark"]).pack(anchor="w")
+    tk.Label(brand, text="RETAIL OPERATIONS", font=("Segoe UI", 7, "bold"),
+             bg=C["bg_card"], fg=C["text_light"]).pack(anchor="w")
+
+    tk.Frame(toolbar, bg=C["border"], width=1, height=34).pack(
+        side="left", pady=7)
+    tk.Label(toolbar, text="POS STATIONS", font=("Segoe UI", 8, "bold"),
+             bg=C["bg_card"], fg=C["text_mid"]).pack(
+                 side="left", padx=(18, 8), pady=6)
+    _tb_btn(toolbar, "+ Add POS", add_pos,
+            bg=C["teal"], hover="#159F9F").pack(side="left", padx=(0, 4), pady=6)
+    _tb_btn(toolbar, "Remove POS", remove_pos,
+            bg=C["bg_panel"], hover=C["border_acc"],
+            fg=C["text_mid"]).pack(side="left", padx=(0, 12), pady=6)
+
+    identity = tk.Frame(toolbar, bg=C["bg_card"])
+    identity.pack(side="right", padx=18, pady=7)
+    username = user.get("username", "User")
+    role = user.get("role", "worker").strip().upper()
+    tk.Label(identity, text=username, font=("Segoe UI", 9, "bold"),
+             bg=C["bg_card"], fg=C["text_dark"]).pack(anchor="e")
+    tk.Label(identity, text=f"{role} SESSION", font=("Segoe UI", 8),
+             bg=C["bg_card"], fg=C["text_light"]).pack(anchor="e")
+
+    return ttk.Notebook(outer, style="JustB.TNotebook")
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 #  Admin Dashboard
 # ══════════════════════════════════════════════════════════════════════════════
@@ -312,29 +353,14 @@ class AdminDashboard:
         self.data_dir   = data_dir
         self.user       = user or {"username": "Admin", "role": "admin"}
         self._pos_count = 1   # how many POS tabs exist
+        _configure_shell_styles()
 
         # ── Outer frame holds toolbar + notebook ──────────────────────────────
         outer = tk.Frame(root, bg=C["bg_root"])
         outer.pack(fill="both", expand=True)
 
-        # ── Top toolbar ───────────────────────────────────────────────────────
-        toolbar = tk.Frame(outer, bg=C["bg_panel"],
-                           highlightthickness=1,
-                           highlightbackground=C["border"])
-        toolbar.pack(fill="x", side="top")
-
-        tk.Label(toolbar, text="  ➕ POS Stations:",
-                 font=("Segoe UI", 9), bg=C["bg_panel"],
-                 fg=C["text_mid"]).pack(side="left", padx=(8, 4), pady=6)
-
-        _tb_btn(toolbar, "+ Add POS", self._add_pos_tab,
-                bg=C["teal"], hover="#159F9F").pack(side="left", padx=(0, 4), pady=6)
-
-        _tb_btn(toolbar, "✕ Remove POS", self._remove_pos_tab,
-                bg=C["danger"], hover="#B91C1C").pack(side="left", padx=(0, 12), pady=6)
-
-        # ── Notebook ──────────────────────────────────────────────────────────
-        self.notebook = ttk.Notebook(outer)
+        self.notebook = _build_app_shell(
+            outer, self.user, self._add_pos_tab, self._remove_pos_tab)
         self.notebook.pack(fill="both", expand=True)
 
         # Register each tab immediately. A data problem in one screen must not
@@ -428,29 +454,14 @@ class CashierDashboard:
         self.data_dir   = data_dir
         self.user       = user or {"username": "Cashier", "role": "worker"}
         self._pos_count = 1
+        _configure_shell_styles()
 
         # ── Outer frame ───────────────────────────────────────────────────────
         outer = tk.Frame(root, bg=C["bg_root"])
         outer.pack(fill="both", expand=True)
 
-        # ── Top toolbar ───────────────────────────────────────────────────────
-        toolbar = tk.Frame(outer, bg=C["bg_panel"],
-                           highlightthickness=1,
-                           highlightbackground=C["border"])
-        toolbar.pack(fill="x", side="top")
-
-        tk.Label(toolbar, text="  ➕ POS Stations:",
-                 font=("Segoe UI", 9), bg=C["bg_panel"],
-                 fg=C["text_mid"]).pack(side="left", padx=(8, 4), pady=6)
-
-        _tb_btn(toolbar, "+ Add POS", self._add_pos_tab,
-                bg=C["teal"], hover="#159F9F").pack(side="left", padx=(0, 4), pady=6)
-
-        _tb_btn(toolbar, "✕ Remove POS", self._remove_pos_tab,
-                bg=C["danger"], hover="#B91C1C").pack(side="left", padx=(0, 12), pady=6)
-
-        # ── Notebook ──────────────────────────────────────────────────────────
-        self.notebook = ttk.Notebook(outer)
+        self.notebook = _build_app_shell(
+            outer, self.user, self._add_pos_tab, self._remove_pos_tab)
         self.notebook.pack(fill="both", expand=True)
 
         first_pos = POSScreen(root, data_dir=self.data_dir,

@@ -888,6 +888,7 @@ class POSScreen:
         self._remove_cart_item(idx)
 
     def _remove_cart_item(self, idx, remove_qty=None):
+        """Remove cart units without changing inventory until checkout."""
         item = self.cart[idx]
         item_name    = item["name"]
         item_barcode = item["barcode"]
@@ -917,15 +918,6 @@ class POSScreen:
         if not confirm:
             self._refocus()
             return
-
-        # Restore quantity in inventory
-        products = load_json(self._products_path())
-        for prod in products:
-            if str(prod.get("barcode", "")) == str(item_barcode):
-                prod["quantity"] = int(prod.get("quantity", 0)) + remove_qty
-                break
-        save_json(self._products_path(), products)
-        self._invalidate_product_cache()
 
         if remove_qty >= item_qty:
             self.cart.pop(idx)

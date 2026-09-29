@@ -2,7 +2,7 @@
 gui/splash_screen.py
 ====================
 
-Redesigned splash screen for JustB.
+Minimal premium splash screen for JustB.
 
 Same public API as before — ``SplashScreen(master, on_done)`` — so the
 existing ``main.py`` import only needs the import path changed::
@@ -11,14 +11,9 @@ existing ``main.py`` import only needs the import path changed::
 
 Visual sequence
 ---------------
-1. Background card + soft lavender glow oval paint once.
-2. Brand letters drop from y=-40 with ease_out_back, 80ms stagger.
-3. Shimmer sweep moves a translucent white polygon across the wordmark.
-4. Tagline fades from text_light -> text_dark over 320ms.
-5. Rainbow dots appear left-to-right with 50ms stagger.
-6. Progress bar fills with a 5-stop color gradient over 1400ms.
-7. Brief green flash on the bar at 100%.
-8. 240ms alpha fadeout, then ``on_done()``.
+1. A quiet white card fades in around the complete JustB logo.
+2. A single teal progress rule fills beneath it.
+3. The splash fades out into the application.
 
 Total runtime: ~3.0s.
 """
@@ -26,9 +21,16 @@ Total runtime: ~3.0s.
 from __future__ import annotations
 
 import math
+import os
 import time
 import tkinter as tk
 from typing import Callable, List, Optional
+
+try:
+    from PIL import Image, ImageTk
+except ImportError:
+    Image = None
+    ImageTk = None
 
 from gui.animation import Animator, Easing, lerp_color, lighten
 from gui.theme import (
@@ -44,7 +46,7 @@ from gui.theme import (
 class SplashScreen(tk.Toplevel):
     """Animated splash matching the new JustB visual system."""
 
-    WIDTH = 520
+    WIDTH = 500
     HEIGHT = 320
 
     def __init__(self, master: tk.Misc, on_done: Callable[[], None]):
@@ -75,110 +77,36 @@ class SplashScreen(tk.Toplevel):
         )
         self._canvas.pack(fill="both", expand=True)
 
-        # Soft lavender glow behind the wordmark
-        self._canvas.create_oval(
-            60, 30, W - 60, 200,
-            fill=lighten(Palette.purple, 0.82),
-            outline="",
-        )
-
-        # Card chrome (rounded background + border)
+        # Quiet white surface with a barely visible border.
         self._card_ids = draw_card_chrome(
-            self._canvas, W, H, radius=18,
-            fill=Palette.bg_card, border=Palette.border_acc, shadow=True,
+            self._canvas, W, H, radius=10,
+            fill=Palette.bg_card, border=Palette.border, shadow=False,
         )
 
-        # ── Wordmark letters — drawn in their final positions first, then
-        #    we move them off-screen and animate them back in.
-        self._letter_ids: List[int] = []
-        font_obj = None
-        try:
-            import tkinter.font as tkf
-            font_obj = tkf.Font(font=Font.BRAND)
-        except Exception:
-            font_obj = None
+        # Keep the supplied logo static and centered on the splash.
+        self._draw_static_logo()
 
-        total_w = 0
-        widths: List[int] = []
-        for ch in BRAND_LETTERS:
-            if font_obj is not None:
-                w = font_obj.measure(ch)
-            else:
-                w = 22
-            widths.append(w)
-            total_w += w
-        total_w += 4 * (len(BRAND_LETTERS) - 1)
-        start_x = (W - total_w) // 2
-        letter_y = 110
-        cursor = start_x
-        for i, (ch, color) in enumerate(zip(BRAND_LETTERS, BRAND_COLORS)):
-            cx = cursor + widths[i] // 2
-            iid = self._canvas.create_text(
-                cx, -40, text=ch, font=Font.BRAND,
-                fill=color, anchor="center",
-            )
-            self._letter_ids.append((iid, cx, letter_y, color))
-            cursor += widths[i] + 4
-
-        # ── Shimmer sweep (drawn under the letters, above the card bg)
-        self._shimmer_id = self._canvas.create_polygon(
-            -200, 60, -140, 60, -200, 200, -260, 200,
-            fill=Palette.text_white, stipple="gray12",
-            outline="", smooth=True,
-        )
-        self._canvas.tag_lower(self._shimmer_id)
-        for iid, _, _, _ in self._letter_ids:
-            self._canvas.tag_raise(iid)
-
-        # ── Tagline
         self._tag_id = self._canvas.create_text(
-            W // 2, 165,
-            text="Retail Management System",
+            W // 2, 260, text="RETAIL MANAGEMENT SYSTEM",
             font=Font.ITALIC, fill=Palette.bg_card,
             anchor="center",
         )
 
-        # ── Rainbow dot row
-        self._dot_ids: List[int] = []
-        dot_spacing = 18
-        dot_y = 200
-        dot_start = W // 2 - (len(BRAND_COLORS) - 1) * dot_spacing // 2
-        for i, col in enumerate(BRAND_COLORS):
-            iid = self._canvas.create_text(
-                dot_start + i * dot_spacing, dot_y,
-                text="●", font=("Segoe UI", 11, "bold"),
-                fill=Palette.bg_card, anchor="center",
-            )
-            self._dot_ids.append((iid, col))
-
-        # ── Progress bar
-        bar_y = H - 50
-        bar_h = 8
-        bar_x1 = 70
-        bar_x2 = W - 70
+        # Thin progress rule near the bottom of the card.
+        bar_y = H - 42
+        bar_h = 3
+        bar_x1 = 58
+        bar_x2 = W - 58
         self._canvas.create_rectangle(
             bar_x1, bar_y, bar_x2, bar_y + bar_h,
             fill=Palette.border, outline="",
         )
-        # 5 segments (one per brand color) for the gradient
         self._bar_segments: List[int] = []
-        seg_x1 = bar_x1
-        seg_full = bar_x2 - bar_x1
-        seg_w = seg_full // len(BRAND_COLORS)
-        for i in range(len(BRAND_COLORS)):
-            x2 = seg_x1 + seg_w if i < len(BRAND_COLORS) - 1 else bar_x2
-            iid = self._canvas.create_rectangle(
-                seg_x1, bar_y, seg_x1, bar_y + bar_h,
-                fill=BRAND_COLORS[i], outline="",
-            )
-            self._bar_segments.append((iid, seg_x1, x2))
-            seg_x1 = x2
-
-        # Version label
-        self._canvas.create_text(
-            W // 2, H - 18, text="v2.0  ·  JustB Retail",
-            font=Font.SMALL, fill=Palette.text_light, anchor="center",
+        iid = self._canvas.create_rectangle(
+            bar_x1, bar_y, bar_x1, bar_y + bar_h,
+            fill=Palette.teal, outline="",
         )
+        self._bar_segments.append((iid, bar_x1, bar_x2))
 
         # Animation engine
         self._animator = Animator(self, frame_budget_ms=16)
@@ -187,6 +115,87 @@ class SplashScreen(tk.Toplevel):
         self._fade_window_in(0.0, 1.0, 200)
         # Kick off the main sequence after the fade-in
         self.after(220, self._run_sequence)
+
+    def _draw_static_logo(self):
+        """Render the complete supplied logo without animation."""
+        source_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "logo.png")
+        if Image is not None and ImageTk is not None and os.path.exists(source_path):
+            source = Image.open(source_path).convert("RGBA")
+            image = source.resize((370, 247), Image.Resampling.LANCZOS)
+            self._logo_image = ImageTk.PhotoImage(image)
+            self._canvas.create_image(
+                self.WIDTH // 2, 126, image=self._logo_image, anchor="center")
+            return
+
+        self._draw_text_fallback()
+
+    def _draw_logo_composition(self):
+        """Animate separate logo artwork pieces into their final positions."""
+        if Image is None or ImageTk is None:
+            self._draw_text_fallback()
+            return
+
+        source_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "logo.png")
+        if not os.path.exists(source_path):
+            self._draw_text_fallback()
+            return
+
+        source = Image.open(source_path).convert("RGBA")
+        scale = 0.67
+        self._logo_images = []
+        self._stationery = []
+
+        # Source rectangles follow the actual illustrated logo: each sprite is
+        # rendered independently, so no full logo image ever appears.
+        pieces = [
+            ((100, 82, 222, 238), (65, 68), (-155, 45)),   # notebook
+            ((210, 68, 286, 180), (184, 42), (128, -72)),  # pencil
+            ((315, 67, 377, 185), (302, 43), (150, 72)),  # pens
+            ((370, 73, 516, 239), (342, 58), (150, -65)), # gift
+            ((205, 48, 326, 143), (176, 37), (-135, -85)),# stars
+            ((133, 128, 472, 253), (132, 74), (0, 92)),    # JUSTB wordmark
+            ((99, 231, 516, 320), (58, 190), (0, 115)),   # ribbon
+        ]
+        for crop_box, target, offset in pieces:
+            crop = source.crop(crop_box)
+            size = (max(1, int(crop.width * scale)),
+                    max(1, int(crop.height * scale)))
+            sprite = ImageTk.PhotoImage(crop.resize(size, Image.Resampling.LANCZOS))
+            self._logo_images.append(sprite)
+            item_id = self._canvas.create_image(
+                target[0] + offset[0], target[1] + offset[1],
+                image=sprite, anchor="nw")
+            self._stationery.append(([item_id], offset))
+
+    def _draw_text_fallback(self):
+        letters = "JUSTB"
+        for index, (letter, color) in enumerate(zip(letters, BRAND_COLORS)):
+            self._canvas.create_text(
+                166 + index * 38, 137, text=letter,
+                font=("Georgia", 34, "bold"), fill=color, anchor="center")
+        self._stationery = []
+
+    def _assemble_logo(self, duration_ms=720):
+        start = time.time() * 1000
+        previous_eased = 0.0
+
+        def step():
+            nonlocal previous_eased
+            elapsed = time.time() * 1000 - start
+            progress = min(1.0, elapsed / duration_ms)
+            eased = Easing.ease_out_back(progress)
+            for item_ids, offset in self._stationery:
+                current_x = offset[0] * (previous_eased - eased)
+                current_y = offset[1] * (previous_eased - eased)
+                for item_id in item_ids:
+                    self._canvas.move(item_id, current_x, current_y)
+            previous_eased = eased
+            if progress < 1.0:
+                self.after(32, step)
+
+        step()
 
     # ── Window fade-in/out ───────────────────────────────────────────────
 
@@ -347,10 +356,10 @@ class SplashScreen(tk.Toplevel):
 
     def _bar_flash(self) -> None:
         # Create a white overlay rect that fades out
-        bar_y = self.HEIGHT - 50
-        bar_h = 8
-        x1 = 70
-        x2 = self.WIDTH - 70
+        bar_y = self.HEIGHT - 42
+        bar_h = 3
+        x1 = 58
+        x2 = self.WIDTH - 58
         overlay = self._canvas.create_rectangle(
             x1, bar_y, x2, bar_y + bar_h,
             fill=Palette.text_white, stipple="gray25", outline="",
@@ -375,13 +384,8 @@ class SplashScreen(tk.Toplevel):
     # ── Main sequence ────────────────────────────────────────────────────
 
     def _run_sequence(self) -> None:
-        # All elements are already drawn; kick the animations.
-        self._drop_letters()
-        self._shimmer_sweep()
-        # Tagline + dots start when letters are mostly settled
-        self.after(900, lambda: (self._fade_tagline(), self._dots_appear()))
-        # Progress bar after the tagline starts
-        self.after(1100, self._fill_progress)
+        self._fade_tagline(260)
+        self.after(220, self._fill_progress)
 
     def _finalize(self) -> None:
         if self._closed:
