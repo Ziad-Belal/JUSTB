@@ -93,7 +93,10 @@ class DailyFeedbackScreen:
         self._custom_range      = False
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
-        self.frame.pack(fill="both", expand=True)
+        # Only pack when standalone. A Notebook manages its own tab pages;
+        # packing them as well makes tabs flicker / cover each other.
+        if frame_parent is None:
+            self.frame.pack(fill="both", expand=True)
 
         self._build_ui()
         self.load_data()
@@ -304,9 +307,20 @@ class DailyFeedbackScreen:
         bs_hdr = tk.Frame(bs_card, bg=C["bg_panel"], padx=14, pady=10)
         bs_hdr.grid(row=0, column=0, sticky="ew")
         tk.Frame(bs_hdr, bg=C["pink"], height=3).pack(fill="x", pady=(0, 6))
-        tk.Label(bs_hdr, text="🏆  BEST SELLING PRODUCTS",
+        hdr_row = tk.Frame(bs_hdr, bg=C["bg_panel"])
+        hdr_row.pack(fill="x")
+        tk.Label(hdr_row, text="🏆  BEST SELLING PRODUCTS",
                  font=FONT_SECTION, bg=C["bg_panel"],
-                 fg=C["text_mid"]).pack(anchor="w")
+                 fg=C["text_mid"]).pack(side="left")
+        # TOTAL of every product listed below (always visible, even on small screens)
+        self.bs_total_rev_lbl = tk.Label(hdr_row, text="EGP 0.00",
+                                         font=("Georgia", 12, "bold"),
+                                         bg=C["bg_panel"], fg=C["purple"])
+        self.bs_total_rev_lbl.pack(side="right")
+        self.bs_total_qty_lbl = tk.Label(hdr_row, text="Total: 0 units",
+                                         font=("Segoe UI", 9, "bold"),
+                                         bg=C["bg_panel"], fg=C["text_mid"])
+        self.bs_total_qty_lbl.pack(side="right", padx=(0, 12))
 
         # Time range selector buttons
         range_row = tk.Frame(bs_card, bg=C["bg_card"], padx=12, pady=8)
@@ -389,6 +403,7 @@ class DailyFeedbackScreen:
         self.bs_tree.grid(row=3, column=0, sticky="nsew")
         bs_vsb.grid(row=3, column=1, sticky="ns")
 
+
         # Highlight default range button
         self._select_bs_range("day")
 
@@ -466,6 +481,10 @@ class DailyFeedbackScreen:
         """Draw a horizontal bar chart for top-5 products."""
         canvas = self.chart_canvas
         canvas.delete("all")
+        # Generation token: stops animations of an older draw from painting
+        # ghost bars over the new one.
+        gen = getattr(canvas, "_chart_gen", 0) + 1
+        canvas._chart_gen = gen
         canvas.update_idletasks()
         W = canvas.winfo_width()
         H = canvas.winfo_height()
@@ -511,6 +530,11 @@ class DailyFeedbackScreen:
 
             # Animated bar
             def _anim(w=0):
+                try:
+                    if not canvas.winfo_exists() or canvas._chart_gen != gen:
+                        return
+                except tk.TclError:
+                    return
                 canvas.delete(f"bar{idx}")
                 canvas.create_rectangle(pad_l, y, pad_l + w, y + bar_h,
                                          fill=col, outline="",
@@ -694,11 +718,18 @@ class DailyFeedbackScreen:
         sorted_prods = sorted(product_summary.values(),
                               key=lambda x: x["revenue"], reverse=True)
 
-        rank_sym = ["🥇", "🥈", "🥉"] + ["·"] * 50
+        # Total of ALL listed products - set first so it always matches the list
+        t_qty = sum(int(p["qty"]) for p in sorted_prods)
+        t_rev = sum(float(p["revenue"]) for p in sorted_prods)
+        self.bs_total_qty_lbl.config(text=f"Total: {t_qty:,} unit{'s' if t_qty != 1 else ''}")
+        self.bs_total_rev_lbl.config(text=f"EGP {t_rev:,.2f}")
+
+        rank_sym = ["🥇", "🥈", "🥉"]
         for idx, item in enumerate(sorted_prods):
             tag = f"bs_rank{min(idx, len(RANK_COLORS)-1)}"
+            # (the old fixed-size symbol list crashed past ~53 products)
             self.bs_tree.insert("", "end", tags=(tag,),
-                                values=(rank_sym[idx],
+                                values=(rank_sym[idx] if idx < len(rank_sym) else "·",
                                         item["name"],
                                         item["qty"],
                                         f"EGP {item['revenue']:,.2f}"))
@@ -833,146 +864,7 @@ class DailyFeedbackScreen:
         dialog.configure(bg=C["bg_card"])
         dialog.grab_set()
 
-        pw, ph = 300, 160
-        sx = dialog.winfo_screenwidth()
-        sy = dialog.winfo_screenheight()
-        dialog.geometry(f"{pw}x{ph}+{(sx-pw)//2}+{(sy-ph)//2}")
-
-        tk.Frame(dialog, bg=C["purple"], height=3).pack(fill="x")
-        tk.Label(dialog, text="Export Report As",
-                 font=("Segoe UI", 11, "bold"),
-                 bg=C["bg_card"], fg=C["text_dark"]).pack(pady=(16, 12))
-
-        btn_row = tk.Frame(dialog, bg=C["bg_card"])
-        btn_row.pack(padx=20, fill="x")
-
-        def _do(fmt):
-            dialog.destroy()
-            if fmt == "txt":
-                self._export_txt()
-            elif fmt == "csv":
-                self._export_csv()
-
-        _btn(btn_row, "📄  TXT", lambda: _do("txt"),
-             C["text_mid"], C["text_dark"], padx=14, pady=10).pack(
-                 side="left", expand=True, fill="x", padx=(0, 8))
-        _btn(btn_row, "📊  CSV", lambda: _do("csv"),
-             C["teal"], "#159F9F", padx=14, pady=10).pack(
-                 side="left", expand=True, fill="x")
-
-    def _export_txt(self):
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=[("Text files", "*.txt")],
-            title="Save TXT Report",
-            initialfile=f"JustB_Report_{self.feedback_date}.txt"
-        )
-        if not file_path:
-            return
-
-        range_key = self._bs_range.get()
-        if self._custom_range:
-            range_label = "Custom Range"
-            start, end = self._selected_bs_range()
-        else:
-            range_label = next(lbl for lbl, k in TIME_RANGES if k == range_key)
-            start, end = _date_range_for(range_key)
-        best_sellers = self._get_best_sellers_data()
-
-        lines = [
-            "=" * 46,
-            f"  JustB Daily Report — {self.feedback_date}",
-            "=" * 46,
-            f"  Revenue:      {self.total_lbl.cget('text')}",
-            f"  Transactions: {self._kpi_sales.cget('text')}",
-            f"  Items Sold:   {self._kpi_items.cget('text')}",
-            f"  Avg Sale:     {self._kpi_avg.cget('text')}",
-            "-" * 46,
-            f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
-            "-" * 46,
-        ]
-        for item in self.tree.get_children():
-            v = self.tree.item(item)["values"]
-            lines.append(f"  {str(v[0]):<6} {str(v[1]):<24} {str(v[2]):>5}  {str(v[3]):>12}")
-
-        lines += [
-            "",
-            "=" * 46,
-            f"  BEST SELLING PRODUCTS — {range_label}",
-            f"  (Period: {start}  to  {end})",
-            "=" * 46,
-            f"  {'Rank':<6} {'Product':<24} {'Qty':>5}  {'Revenue':>12}",
-            "-" * 46,
-        ]
-        for idx, item in enumerate(best_sellers):
-            lines.append(
-                f"  #{idx+1:<5} {item['name']:<24} {item['qty']:>5}  "
-                f"EGP {item['revenue']:>9,.2f}"
-            )
-        if not best_sellers:
-            lines.append("  No sales data for this period.")
-        lines += ["-" * 46, "  justb-eg.com", "=" * 46]
-
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines))
-        messagebox.showinfo("Saved", f"TXT report saved:\n{file_path}")
-
-    def _export_csv(self):
-        """Export today's individual sale line-items to CSV."""
-        import csv
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv")],
-            title="Save CSV Report",
-            initialfile=f"JustB_Sales_{self.feedback_date}.csv"
-        )
-        if not file_path:
-            return
-
-        sales = load_json(self._sales_path())
-        day_sales = [s for s in sales if s.get("date", "") == self.feedback_date]
-
-        with open(file_path, "w", newline="", encoding="utf-8-sig") as f:
-            writer = csv.writer(f)
-            writer.writerow([
-                "Receipt ID", "Date", "Time", "Cashier",
-                "Item Barcode", "Item Name", "Qty", "Unit Price", "Line Total",
-                "Subtotal", "Discount %", "Discount Amt",
-                "Tax %", "Tax Amt", "Total",
-                "Promo Code", "Payment Method", "Status"
-            ])
-            for sale in day_sales:
-                for item in sale.get("items", []):
-                    qty   = int(item.get("quantity", 1))
-                    price = float(item.get("price", 0))
-                    writer.writerow([
-                        sale.get("id", ""),
-                        sale.get("date", ""),
-                        sale.get("time", ""),
-                        sale.get("user", ""),
-                        item.get("barcode", ""),
-                        item.get("name", ""),
-                        qty,
-                        f"{price:.2f}",
-                        f"{qty * price:.2f}",
-                        f"{sale.get('subtotal', 0):.2f}",
-                        sale.get("discount_pct", 0),
-                        f"{sale.get('discount_amt', 0):.2f}",
-                        sale.get("tax_pct", 0),
-                        f"{sale.get('tax_amt', 0):.2f}",
-                        f"{sale.get('total', 0):.2f}",
-                        sale.get("promo_code", ""),
-                        sale.get("payment_method", ""),
-                        sale.get("status", "Completed"),
-                    ])
-        messagebox.showinfo("Saved", f"CSV report saved:\n{file_path}")
-        dialog = tk.Toplevel(self.frame)
-        dialog.title("Export Daily Report")
-        dialog.resizable(False, False)
-        dialog.configure(bg=C["bg_card"])
-        dialog.grab_set()
-
-        pw, ph = 340, 220
+        pw, ph = 340, 200
         sx = dialog.winfo_screenwidth()
         sy = dialog.winfo_screenheight()
         dialog.geometry(f"{pw}x{ph}+{(sx-pw)//2}+{(sy-ph)//2}")
@@ -994,19 +886,18 @@ class DailyFeedbackScreen:
             elif fmt == "pdf":
                 self._export_pdf()
 
-        _btn(btn_row, "📄  TXT",  lambda: _do("txt"),
+        _btn(btn_row, "📄  TXT", lambda: _do("txt"),
              C["text_mid"], C["text_dark"], padx=14, pady=10).pack(
                  side="left", expand=True, fill="x", padx=(0, 6))
-        _btn(btn_row, "📊  CSV",  lambda: _do("csv"),
+        _btn(btn_row, "📊  CSV", lambda: _do("csv"),
              C["teal"], "#159F9F", padx=14, pady=10).pack(
                  side="left", expand=True, fill="x", padx=(0, 6))
-        _btn(btn_row, "📑  PDF",  lambda: _do("pdf"),
+        _btn(btn_row, "📑  PDF", lambda: _do("pdf"),
              C["purple"], C["purple_dk"], padx=14, pady=10).pack(
                  side="left", expand=True, fill="x")
-
         tk.Label(dialog, text="PDF requires reportlab  (pip install reportlab)",
                  font=("Segoe UI", 8), bg=C["bg_card"],
-                 fg=C["text_light"]).pack(pady=(14, 0))
+                 fg=C["text_light"]).pack(pady=(12, 0))
 
     # ─────────────────────────────────────────────────────────────────────────
     def _report_lines(self):

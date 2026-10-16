@@ -231,9 +231,38 @@ def _barcode_escpos(sale_id):
 #  Receipt assembler
 # ══════════════════════════════════════════════════════════════════════════════
 
+def _fmt_pct(p):
+    """12.0 -> '12', 12.5 -> '12.5' (the old int() cut 12.5% down to 12%)."""
+    p = float(p or 0)
+    return str(int(p)) if p == int(p) else f"{p:g}"
+
+
+def compute_totals(subtotal, discount_pct=0.0, tax_pct=0.0):
+    """Single source of truth for pricing. Every amount is rounded to 2 decimals
+    at each step so the lines printed on the receipt always add up exactly."""
+    subtotal = round(float(subtotal), 2)
+    disc_amt = round(subtotal * float(discount_pct or 0) / 100.0, 2)
+    taxable  = round(subtotal - disc_amt, 2)
+    tax_amt  = round(taxable * float(tax_pct or 0) / 100.0, 2)
+    total    = round(taxable + tax_amt, 2)
+    return {"subtotal": subtotal, "discount_amt": disc_amt,
+            "taxable": taxable, "tax_amt": tax_amt, "total": total}
+
+
+def _receipt_datetime(sale_record):
+    """Use the ORIGINAL sale date/time (so a reprint doesn't show today's date)."""
+    try:
+        d = datetime.strptime(str(sale_record.get("date", "")), "%Y-%m-%d")
+        t = str(sale_record.get("time", "") or "00:00")[:5]
+        hh, mm = t.split(":")
+        return d.replace(hour=int(hh), minute=int(mm)).strftime("%d/%m/%Y  %H:%M")
+    except Exception:
+        return datetime.now().strftime("%d/%m/%Y  %H:%M")
+
+
 def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code="", payment_method="Cash"):
     W        = RECEIPT_CHAR_WIDTH
-    date_str = datetime.now().strftime("%d/%m/%Y  %H:%M")
+    date_str = _receipt_datetime(sale_record)
     raw      = bytearray()
 
     raw += INIT
@@ -277,22 +306,14 @@ def build_receipt(sale_id, sale_record, cashier, discount_pct=0.0, promo_code=""
     raw += _divider('-')
     LW = W - 10
     raw += ALIGN_RIGHT
-    raw += _enc(f"{'Subtotal:':>{LW}}  {subtotal:>8.2f} EGP") + b'\n'
-
-    if discount_pct > 0:
-        disc_amt = subtotal * (discount_pct / 100.0)
-        taxable  = subtotal - disc_amt
-        raw += _enc(f"{'Discount (' + str(int(discount_pct)) + '%):':>{LW}} -{disc_amt:>8.2f} EGP") + b'\n'
-    else:
-        disc_amt = 0.0
-        taxable  = subtotal
-
-    if sale_record.get('tax_pct', 0):
-        tax_amt = taxable * (float(sale_record.get('tax_pct', 0)) / 100.0)
-        raw += _enc(f"{'Tax (' + str(int(float(sale_record.get('tax_pct', 0)))) + '%):':>{LW}} {tax_amt:>8.2f} EGP") + b'\n'
-        final = taxable + tax_amt
-    else:
-        final = taxable
+    tax_pct = float(sale_record.get('tax_pct', 0) or 0)
+    tt = compute_totals(subtotal, discount_pct, tax_pct)
+    disc_amt, tax_amt, final = tt["discount_amt"], tt["tax_amt"], tt["total"]
+    raw += _enc(f"{'Subtotal:':>{LW}}  {tt['subtotal']:>8.2f} EGP") + b'\n'
+    if disc_amt > 0:
+        raw += _enc(f"{'Discount (' + _fmt_pct(discount_pct) + '%):':>{LW}} -{disc_amt:>8.2f} EGP") + b'\n'
+    if tax_pct:
+        raw += _enc(f"{'Tax (' + _fmt_pct(tax_pct) + '%):':>{LW}} {tax_amt:>8.2f} EGP") + b'\n'
 
     raw += _divider('=')
     raw += BOLD_ON + DBL_HEIGHT
@@ -387,7 +408,10 @@ class POSScreen:
         self.user_name = self.user.get("username", "Unknown")
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
-        self.frame.pack(fill="both", expand=True)
+        # Only pack when standalone. A Notebook manages its own tab pages;
+        # packing them as well makes tabs flicker / cover each other.
+        if frame_parent is None:
+            self.frame.pack(fill="both", expand=True)
 
         self.cart          = []
         self._discount_pct = 0.0
@@ -395,6 +419,7 @@ class POSScreen:
         self._tax_pct      = self._load_tax_pct()
         self._logo_img     = None   # keep reference to avoid GC
         self._products_cache = None  # cache for speed
+        self._suggested_products = []
 
         self._build_ui()
         # Restore focus to barcode entry whenever it loses focus to a non-entry widget
@@ -409,6 +434,9 @@ class POSScreen:
     def _on_barcode_focus_out(self, event):
         """When barcode field loses focus, return it unless focus went to another Entry or popup."""
         def _check():
+            # Never grab focus while this POS tab is hidden behind another tab
+            if not self.barcode_entry.winfo_ismapped():
+                return
             focused = self.frame.focus_get()
             # Only steal back if focus went to a non-Entry widget (label, frame, treeview, etc.)
             # or went to nothing — never steal from Entry, Button, Combobox, or Toplevel
@@ -524,7 +552,7 @@ class POSScreen:
             row=0, column=0, columnspan=3, sticky="ew",
             padx=0, pady=(0, 10))
 
-        tk.Label(scan, text="SCAN / ENTER BARCODE",
+        tk.Label(scan, text="SCAN BARCODE OR SEARCH PRODUCT",
                  font=FONT_SECTION, bg=C["bg_card"],
                  fg=C["text_light"]).grid(
                      row=1, column=0, columnspan=3, sticky="w", pady=(0, 6))
@@ -537,12 +565,29 @@ class POSScreen:
         self.barcode_entry = _entry(scan, width=30)
         self.barcode_entry.grid(row=2, column=1, sticky="ew", ipady=7)
         self.barcode_entry.bind("<Return>", lambda e: self.add_to_cart())
+        self.barcode_entry.bind(
+            "<KeyRelease>", lambda e: self._update_product_suggestions())
+        self.barcode_entry.bind("<Down>", self._focus_product_suggestion)
         self.barcode_entry.focus()
 
         _btn(scan, "  ADD  ", self.add_to_cart,
              C["teal"], "#159F9F",
              font=FONT_BTN, padx=18, pady=7).grid(
                  row=2, column=2, padx=(10, 0))
+
+        self.product_suggestions = tk.Listbox(
+            scan, height=6, font=FONT_LABEL,
+            bg=C["bg_input"], fg=C["text_dark"],
+            selectbackground=C["purple"], selectforeground="#FFFFFF",
+            activestyle="none", relief="flat", highlightthickness=1,
+            highlightbackground=C["border"])
+        self.product_suggestions.grid(
+            row=3, column=1, columnspan=2, sticky="ew", pady=(6, 0))
+        self.product_suggestions.grid_remove()
+        self.product_suggestions.bind(
+            "<ButtonRelease-1>", self._select_product_suggestion)
+        self.product_suggestions.bind("<Return>", self._add_selected_suggestion)
+        self.product_suggestions.bind("<Escape>", self._hide_product_suggestions)
 
         # ── Cart treeview card ────────────────────────────────────────
         tree_card = tk.Frame(left, bg=C["bg_card"],
@@ -571,8 +616,7 @@ class POSScreen:
         self.item_count_lbl.pack(side="right")
 
         # Treeview style
-        style = ttk.Style()
-        style.theme_use("clam")
+        style = ttk.Style()   # theme is set once in login_screen._configure_shell_styles
         style.configure("JB.Treeview",
                          background=C["bg_card"],
                          foreground=C["text_dark"],
@@ -782,8 +826,11 @@ class POSScreen:
 
     def _tick_clock(self):
         now = datetime.now().strftime("%a  %d %b  %H:%M")
-        self.clock_lbl.config(text=now)
-        self.frame.after(30000, self._tick_clock)
+        try:
+            self.clock_lbl.config(text=now)
+            self.frame.after(30000, self._tick_clock)
+        except tk.TclError:
+            pass   # tab was removed
 
     # ── helpers ───────────────────────────────────────────────────────────────
     def _products_path(self): return os.path.join(self.data_dir, "products.json")
@@ -797,6 +844,67 @@ class POSScreen:
 
     def _invalidate_product_cache(self):
         self._products_cache = None
+
+    def _update_product_suggestions(self):
+        query = self.barcode_entry.get().strip().casefold()
+        if not query:
+            self._hide_product_suggestions()
+            return
+
+        products = self._load_products()
+        matches = [
+            product for product in products
+            if query in str(product.get("barcode", "")).casefold()
+            or query in str(product.get("name", "")).casefold()
+        ][:8]
+        self._suggested_products = matches
+        self.product_suggestions.delete(0, tk.END)
+        for product in matches:
+            self.product_suggestions.insert(
+                tk.END,
+                f"{product.get('name', '')}  —  {product.get('barcode', '')}")
+
+        if matches:
+            self.product_suggestions.grid()
+        else:
+            self.product_suggestions.grid_remove()
+
+    def _hide_product_suggestions(self, event=None):
+        self._suggested_products = []
+        if hasattr(self, "product_suggestions"):
+            self.product_suggestions.grid_remove()
+        if event is not None:
+            self.barcode_entry.focus_set()
+        return "break"
+
+    def _focus_product_suggestion(self, event=None):
+        if not self._suggested_products:
+            return
+        self.product_suggestions.focus_set()
+        self.product_suggestions.selection_clear(0, tk.END)
+        self.product_suggestions.selection_set(0)
+        self.product_suggestions.activate(0)
+        return "break"
+
+    def _add_selected_suggestion(self, event=None):
+        selection = self.product_suggestions.curselection()
+        if not selection:
+            return "break"
+        product = self._suggested_products[selection[0]]
+        self.barcode_entry.delete(0, tk.END)
+        self.barcode_entry.insert(0, str(product.get("barcode", "")))
+        self.add_to_cart()
+        return "break"
+
+    def _select_product_suggestion(self, event=None):
+        selection = self.product_suggestions.curselection()
+        if not selection:
+            return
+        product = self._suggested_products[selection[0]]
+        self.barcode_entry.delete(0, tk.END)
+        self.barcode_entry.insert(0, str(product.get("barcode", "")))
+        self._hide_product_suggestions()
+        self.barcode_entry.focus_set()
 
     def _check_low_stock_alert(self):
         """Show a non-blocking low-stock warning banner if any products are low."""
@@ -819,16 +927,45 @@ class POSScreen:
         barcode = self.barcode_entry.get().strip()
         if not barcode:
             return
-        products = self._load_products()
+        # Always read fresh stock: other POS tabs may have sold items meanwhile
+        products = self._load_products(force=True)
         product  = next((p for p in products
                          if str(p.get("barcode", "")) == barcode), None)
+        if product is None:
+            exact_name = [
+                p for p in products
+                if str(p.get("name", "")).casefold() == barcode.casefold()
+            ]
+            if len(exact_name) == 1:
+                product = exact_name[0]
+            else:
+                matches = [
+                    p for p in products
+                    if barcode.casefold() in str(p.get("name", "")).casefold()
+                    or barcode.casefold() in str(p.get("barcode", "")).casefold()
+                ]
+                if len(matches) == 1:
+                    product = matches[0]
+                elif matches:
+                    self._suggested_products = matches[:8]
+                    self.product_suggestions.delete(0, tk.END)
+                    for match in self._suggested_products:
+                        self.product_suggestions.insert(
+                            tk.END,
+                            f"{match.get('name', '')}  —  {match.get('barcode', '')}")
+                    self.product_suggestions.grid()
+                    self._focus_product_suggestion()
+                    return
         if not product:
             messagebox.showerror("Not Found",
-                "Product not in inventory.\nAdd it first in the Products tab.")
+                "No matching product was found.\n"
+                "Search by product name or enter its barcode.")
             self.barcode_entry.delete(0, tk.END)
+            self._hide_product_suggestions()
             self._refocus()
             return
 
+        barcode = str(product.get("barcode", ""))
         available = int(product.get("quantity", 0))
         in_cart   = sum(i["quantity"] for i in self.cart
                         if i["barcode"] == barcode)
@@ -837,6 +974,7 @@ class POSScreen:
             messagebox.showinfo("Out of Stock",
                 f"Maximum stock reached ({available} units).")
             self.barcode_entry.delete(0, tk.END)
+            self._hide_product_suggestions()
             self._refocus()
             return
 
@@ -846,6 +984,7 @@ class POSScreen:
             minvalue=1, maxvalue=remaining, parent=self.frame)
         if qty is None:
             self.barcode_entry.delete(0, tk.END)
+            self._hide_product_suggestions()
             self._refocus()
             return
 
@@ -855,6 +994,7 @@ class POSScreen:
                 self.update_tree()
                 self.update_total()
                 self.barcode_entry.delete(0, tk.END)
+                self._hide_product_suggestions()
                 self._refocus()
                 return
 
@@ -867,6 +1007,7 @@ class POSScreen:
         self.update_tree()
         self.update_total()
         self.barcode_entry.delete(0, tk.END)
+        self._hide_product_suggestions()
         self._refocus()
 
     def remove_selected_item(self):
@@ -960,10 +1101,9 @@ class POSScreen:
         self._tax_pct = self._load_tax_pct()
         subtotal = sum(float(i["price"]) * int(i["quantity"])
                        for i in self.cart)
-        disc_amt = subtotal * (self._discount_pct / 100.0)
-        taxable  = subtotal - disc_amt
-        tax_amt  = taxable * (self._tax_pct / 100.0)
-        final    = taxable + tax_amt
+        tt = compute_totals(subtotal, self._discount_pct, self._tax_pct)
+        subtotal, disc_amt = tt["subtotal"], tt["discount_amt"]
+        tax_amt, final     = tt["tax_amt"], tt["total"]
 
         self.subtotal_lbl.config(text=f"EGP {subtotal:.2f}")
         if disc_amt > 0:
@@ -977,18 +1117,20 @@ class POSScreen:
     def apply_promo(self):
         code   = self.promo_entry.get().strip()
         promos = load_json(os.path.join(self.data_dir, "promo_codes.json"))
+        # Codes are saved in UPPER case by Promotion Management, so match
+        # case-insensitively (typing "save10" used to be rejected).
         promo  = next((p for p in promos
-                       if p.get("code") == code
+                       if str(p.get("code", "")).strip().upper() == code.upper()
                        and int(p.get("uses_left", 0)) > 0), None)
         if not promo:
             self.promo_status.config(
                 text="✗  Invalid or expired code", fg=C["danger"])
             return
         pct = float(promo.get("discount_percentage", 0))
-        self._promo_code = code
+        self._promo_code = promo["code"]
         self.update_total(discount=pct)
         self.promo_status.config(
-            text=f"✓  {int(pct)}% discount applied!", fg=C["success"])
+            text=f"✓  {_fmt_pct(pct)}% discount applied!", fg=C["success"])
 
     def _ask_payment_method(self):
         """Popup — returns 'Cash', 'Visa', 'Split: EGP X cash / EGP Y visa', or None if cancelled."""
@@ -1104,48 +1246,86 @@ class POSScreen:
             messagebox.showinfo("Empty Cart", "Add items to the cart first.")
             return
 
+        # ── Re-check the promo right before charging. With several POS tabs
+        # open, another tab may have used the last remaining use meanwhile.
+        if self._promo_code:
+            _promos = load_json(os.path.join(self.data_dir, "promo_codes.json"))
+            _p = next((p for p in _promos if p.get("code") == self._promo_code), None)
+            if not _p or int(_p.get("uses_left", 0)) <= 0:
+                messagebox.showwarning(
+                    "Promo no longer valid",
+                    f"Promo code '{self._promo_code}' has no uses left.\n"
+                    "The discount was removed - please review the total.")
+                self._discount_pct = 0.0
+                self._promo_code   = ""
+                self.promo_entry.delete(0, tk.END)
+                self.promo_status.config(text="")
+                self.update_total()
+                return
+
         # ── Payment method popup ───────────────────────────────────────────
         payment_method = self._ask_payment_method()
         if payment_method is None:
             return  # user cancelled
 
         products = load_json(self._products_path())
+
+        # Re-check stock against the file right before charging (another POS
+        # tab may have sold the same units while this cart was open).
+        short = []
+        for item in self.cart:
+            prod = next((p for p in products
+                         if str(p.get("barcode", "")) == str(item["barcode"])), None)
+            have = int(prod.get("quantity", 0)) if prod else 0
+            if int(item["quantity"]) > have:
+                short.append(f"  • {item['name']}: in cart {item['quantity']}, in stock {have}")
+        if short:
+            self._invalidate_product_cache()
+            messagebox.showwarning(
+                "Not enough stock",
+                "Another station sold some of these items:\n\n"
+                + "\n".join(short)
+                + "\n\nPlease reduce the quantities in the cart and try again.")
+            self._refocus()
+            return
+
         for item in self.cart:
             prod = next((p for p in products
                          if str(p.get("barcode", "")) == str(item["barcode"])),
                         None)
             if prod:
-                prod["quantity"] = max(
-                    0, int(prod.get("quantity", 0)) - int(item["quantity"]))
+                prod["quantity"] = int(prod.get("quantity", 0)) - int(item["quantity"])
         save_json(self._products_path(), products)
         self._invalidate_product_cache()
 
         sales    = load_json(self._sales_path())
 
-        # Generate unique receipt ID - skip if already exists
-        sale_id  = len(sales) + 1
-        existing_ids = {s.get("id", 0) for s in sales}
-        while sale_id in existing_ids:
-            sale_id += 1
+        # Receipt numbers only ever go up: a saved counter remembers the highest
+        # number ever issued, so deleting the newest receipt can't cause reuse.
+        counter_path = os.path.join(self.data_dir, "receipt_counter.json")
+        counter = load_json(counter_path)
+        last_issued = int(counter.get("last_id", 0)) if isinstance(counter, dict) else 0
+        existing_ids = [s.get("id", 0) for s in sales if isinstance(s.get("id", 0), int)]
+        sale_id = max([last_issued] + existing_ids) + 1
+        save_json(counter_path, {"last_id": sale_id})
 
         subtotal = sum(float(i["price"]) * int(i["quantity"]) for i in self.cart)
-        disc_amt = subtotal * (self._discount_pct / 100.0)
-        taxable  = subtotal - disc_amt
-        # ensure tax pct is current and compute tax amount
+        # ensure tax pct is current, then compute everything in one place
         self._tax_pct = self._load_tax_pct()
-        tax_amt  = taxable * (self._tax_pct / 100.0)
-        final    = taxable + tax_amt
+        tt = compute_totals(subtotal, self._discount_pct, self._tax_pct)
+        subtotal, disc_amt = tt["subtotal"], tt["discount_amt"]
+        tax_amt, final     = tt["tax_amt"], tt["total"]
 
         sale_record = {
             "id":             sale_id,
             "user":           self.user_name,
             "items":          list(self.cart),
-            "subtotal":       round(subtotal, 2),
+            "subtotal":       subtotal,
             "discount_pct":   self._discount_pct,
-            "discount_amt":   round(disc_amt, 2),
+            "discount_amt":   disc_amt,
             "tax_pct":        round(self._tax_pct, 2),
-            "tax_amt":        round(tax_amt, 2),
-            "total":          round(final, 2),
+            "tax_amt":        tax_amt,
+            "total":          final,
             "promo_code":     self._promo_code,
             "payment_method": payment_method,
             "date":           get_today_date(),

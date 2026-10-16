@@ -69,7 +69,10 @@ class PromoManagementScreen:
         self._all_promos = []
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
-        self.frame.pack(fill="both", expand=True)
+        # Only pack when standalone. A Notebook manages its own tab pages;
+        # packing them as well makes tabs flicker / cover each other.
+        if frame_parent is None:
+            self.frame.pack(fill="both", expand=True)
 
         self._build_ui()
         self.load_codes()

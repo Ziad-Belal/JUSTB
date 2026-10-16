@@ -54,7 +54,10 @@ class ReceiptDatabaseScreen:
         self.payment_filter = tk.StringVar(value="All payments")
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
-        self.frame.pack(fill="both", expand=True)
+        # Only pack when standalone. A Notebook manages its own tab pages;
+        # packing them as well makes tabs flicker / cover each other.
+        if frame_parent is None:
+            self.frame.pack(fill="both", expand=True)
 
         self._build_ui()
         self.load_data()
@@ -155,6 +158,12 @@ class ReceiptDatabaseScreen:
             state="readonly", width=14)
         payment_menu.pack(side="left", padx=(0, 8))
         payment_menu.bind("<<ComboboxSelected>>", lambda e: self._filter_receipts())
+
+        # Remove ONE item from the selected receipt
+        _btn(search_frame, "✂  Remove Item from Receipt",
+             self._remove_item,
+             C["orange"], "#E05F00",
+             padx=12, pady=4).pack(side="right", padx=(8, 0))
 
         # Search hint label
         tk.Label(search_frame,
@@ -381,6 +390,13 @@ class ReceiptDatabaseScreen:
         if promo:
             lines.append(f"Promo Code  : {promo}")
 
+        removed = receipt.get("removed_items", [])
+        if removed:
+            lines.append("")
+            lines.append("Removed from this receipt:")
+            for r in removed:
+                lines.append(f"  - {r.get('name', '?')}  x{r.get('quantity', 1)}")
+
         status = str(receipt.get("status", "")).lower()
         if status == "refunded":
             lines.append("Status      : REFUNDED")
@@ -485,6 +501,165 @@ class ReceiptDatabaseScreen:
         messagebox.showinfo("Refund Complete",
                             f"Receipt #{receipt_id} has been refunded and inventory updated.")
         self.load_data()
+
+    def _remove_item(self):
+        """Remove ONE item (or some units of it) from the selected receipt,
+        recalculate discount / tax / total, and optionally return it to stock."""
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showinfo("Select Receipt", "Select a receipt first.")
+            return
+        if len(selected) > 1:
+            messagebox.showinfo("Select One", "Please select only one receipt at a time.")
+            return
+
+        receipt_id = self.tree.item(selected[0])["values"][0]
+        sales = load_json(self._sales_path())
+        matching = [s for s in sales if str(s.get("id", "")) == str(receipt_id)]
+        if not matching:
+            messagebox.showerror("Not Found", "Receipt could not be found in sales records.")
+            return
+        if any(str(s.get("status", "")).lower() == "refunded" for s in matching):
+            messagebox.showinfo("Refunded Receipt",
+                                "This receipt is already refunded and cannot be edited.")
+            return
+
+        # Flat list of (sale_record, index_in_that_record) in display order
+        entries = [(s, i) for s in matching for i in range(len(s.get("items", [])))]
+        total_units = sum(int(s["items"][i].get("quantity", 1)) for s, i in entries)
+        if not entries:
+            messagebox.showinfo("No Items", "This receipt has no items.")
+            return
+        if total_units <= 1:
+            messagebox.showinfo(
+                "Last Item",
+                "This receipt only has one unit left.\n"
+                "Use 'Process Return' to refund the whole receipt instead.")
+            return
+
+        dlg = tk.Toplevel(self.frame)
+        dlg.title(f"Remove item - Receipt #{receipt_id}")
+        dlg.configure(bg=C["bg_card"])
+        dlg.resizable(False, False)
+        dlg.transient(self.frame.winfo_toplevel())
+        dlg.grab_set()
+
+        tk.Frame(dlg, bg=C["orange"], height=3).pack(fill="x")
+        tk.Label(dlg, text=f"Receipt #{receipt_id}  -  choose the item to remove",
+                 font=FONT_LABEL_B, bg=C["bg_card"],
+                 fg=C["text_dark"]).pack(anchor="w", padx=16, pady=(14, 8))
+
+        lb = tk.Listbox(dlg, font=("Courier New", 9), height=min(10, len(entries)),
+                        width=58, activestyle="none", exportselection=False,
+                        selectbackground=C["purple"], selectforeground="#FFFFFF",
+                        relief="solid", borderwidth=1)
+        lb.pack(padx=16)
+        for s, i in entries:
+            it = s["items"][i]
+            q, p = int(it.get("quantity", 1)), float(it.get("price", 0))
+            lb.insert(tk.END, f"{str(it.get('name', '?'))[:26]:<26} x{q:<3} @ {p:>8.2f} = {q * p:>9.2f}")
+
+        row = tk.Frame(dlg, bg=C["bg_card"])
+        row.pack(fill="x", padx=16, pady=(10, 0))
+        tk.Label(row, text="Units to remove:", font=FONT_SMALL,
+                 bg=C["bg_card"], fg=C["text_mid"]).pack(side="left")
+        units_var = tk.IntVar(value=1)
+        spin = tk.Spinbox(row, from_=1, to=1, width=5, textvariable=units_var,
+                          font=FONT_LABEL, state="readonly")
+        spin.pack(side="left", padx=(8, 0))
+        restock_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(dlg, text="Return the removed unit(s) to stock",
+                       variable=restock_var, font=FONT_SMALL,
+                       bg=C["bg_card"], fg=C["text_dark"],
+                       activebackground=C["bg_card"]).pack(anchor="w", padx=16, pady=(8, 0))
+
+        def on_pick(_e=None):
+            sel = lb.curselection()
+            if not sel:
+                return
+            s, i = entries[sel[0]]
+            qty = int(s["items"][i].get("quantity", 1))
+            spin.config(state="normal", to=qty)
+            units_var.set(qty)          # default: remove the whole line
+            spin.config(state="readonly")
+        lb.bind("<<ListboxSelect>>", on_pick)
+
+        def confirm():
+            sel = lb.curselection()
+            if not sel:
+                messagebox.showinfo("Select Item", "Click the item you want to remove.", parent=dlg)
+                return
+            sale, idx = entries[sel[0]]
+            item = sale["items"][idx]
+            qty = int(item.get("quantity", 1))
+            try:
+                remove_qty = int(units_var.get())
+            except Exception:
+                remove_qty = 0
+            if remove_qty < 1 or remove_qty > qty:
+                messagebox.showerror("Invalid", f"Enter a number between 1 and {qty}.", parent=dlg)
+                return
+            if remove_qty >= total_units:
+                messagebox.showinfo(
+                    "Last Item",
+                    "That would empty the receipt.\nUse 'Process Return' to refund the whole receipt.",
+                    parent=dlg)
+                return
+            name = item.get("name", "?")
+            if not messagebox.askyesno(
+                    "Confirm",
+                    f"Remove {remove_qty} x '{name}' from receipt #{receipt_id}?\n"
+                    "The receipt total will be recalculated.", parent=dlg):
+                return
+
+            from gui.pos_screen import compute_totals   # same maths as the POS
+
+            price = float(item.get("price", 0))
+            removed_row = {"name": name, "barcode": item.get("barcode", ""),
+                           "quantity": remove_qty, "price": price,
+                           "removed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            if remove_qty >= qty:
+                sale["items"].pop(idx)
+            else:
+                item["quantity"] = qty - remove_qty
+            sale.setdefault("removed_items", []).append(removed_row)
+
+            sub = sum(float(i.get("price", 0)) * int(i.get("quantity", 1)) for i in sale["items"])
+            t = compute_totals(sub, sale.get("discount_pct", 0), sale.get("tax_pct", 0))
+            sale["subtotal"]     = t["subtotal"]
+            sale["discount_amt"] = t["discount_amt"]
+            sale["tax_amt"]      = t["tax_amt"]
+            sale["total"]        = t["total"]
+
+            if not sale["items"]:   # that record is now empty (receipt had split records)
+                sales[:] = [s for s in sales if s is not sale]
+
+            if restock_var.get():
+                pp = os.path.join(self.data_dir, "products.json")
+                products = load_json(pp)
+                for prod in products:
+                    if str(prod.get("barcode", "")) == str(item.get("barcode", "")):
+                        prod["quantity"] = int(prod.get("quantity", 0)) + remove_qty
+                        break
+                save_json(pp, products)
+            save_json(self._sales_path(), sales)
+
+            dlg.destroy()
+            messagebox.showinfo("Item Removed",
+                                f"Removed {remove_qty} x '{name}'.\n"
+                                f"New receipt total: EGP {t['total']:,.2f}")
+            self.current_hover_receipt = None
+            self.load_data()
+
+        btns = tk.Frame(dlg, bg=C["bg_card"])
+        btns.pack(fill="x", padx=16, pady=14)
+        _btn(btns, "Remove", confirm, C["danger"], "#B91C1C",
+             padx=18, pady=8).pack(side="left", padx=(0, 8))
+        _btn(btns, "Cancel", dlg.destroy, C["text_light"], "#9CA3AF",
+             padx=18, pady=8).pack(side="left")
+
+        lb.selection_set(0)
+        on_pick()
 
     def _delete_receipt(self):
         selected = self.tree.selection()
@@ -611,6 +786,8 @@ class ReceiptDatabaseScreen:
                     existing["items"].extend(sale.get("items", []))
                     existing["subtotal"] = existing.get("subtotal", 0) + sale.get("subtotal", 0)
                     existing["discount_amt"] = existing.get("discount_amt", 0) + sale.get("discount_amt", 0)
+                    existing["tax_amt"] = existing.get("tax_amt", 0) + sale.get("tax_amt", 0)
+                    existing["removed_items"].extend(sale.get("removed_items", []))
                     existing["total"] = existing.get("total", 0) + sale.get("total", 0)
                     if existing.get("payment_method") != sale.get("payment_method", "Cash"):
                         existing["payment_method"] = "Split"
@@ -635,6 +812,7 @@ class ReceiptDatabaseScreen:
                         "promo_code": sale.get("promo_code", ""),
                         "payment_method": sale.get("payment_method", "Cash"),
                         "status": sale.get("status", ""),
+                        "removed_items": list(sale.get("removed_items", [])),
                     }
                     receipt_map[receipt_id] = receipt_dict
 

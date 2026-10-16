@@ -58,6 +58,7 @@ class LoginScreen:
     def __init__(self, root, data_dir):
         self.root     = root
         self.data_dir = data_dir
+        self._install_text_shortcuts()
 
         for w in self.root.winfo_children():
             try:
@@ -93,6 +94,73 @@ class LoginScreen:
         self._build_footer()
 
         self._slide_in()
+
+    def _install_text_shortcuts(self):
+        if getattr(self.root, "_justb_text_shortcuts_installed", False):
+            return
+
+        def select_all_widget(widget):
+            if isinstance(widget, tk.Text):
+                widget.tag_add(tk.SEL, "1.0", "end-1c")
+                widget.mark_set(tk.INSERT, "1.0")
+            else:
+                widget.selection_range(0, tk.END)
+                widget.icursor(tk.END)
+
+        def select_all(event):
+            select_all_widget(event.widget)
+            return "break"
+
+        def show_context_menu(event):
+            widget = event.widget
+            context_menu = getattr(widget, "_justb_text_context_menu", None)
+            if context_menu is None:
+                context_menu = tk.Menu(widget, tearoff=False)
+                context_menu.add_command(
+                    label="Cut",
+                    command=lambda w=widget: w.event_generate("<<Cut>>"))
+                context_menu.add_command(
+                    label="Copy",
+                    command=lambda w=widget: w.event_generate("<<Copy>>"))
+                context_menu.add_command(
+                    label="Paste",
+                    command=lambda w=widget: w.event_generate("<<Paste>>"))
+                context_menu.add_separator()
+                context_menu.add_command(
+                    label="Select All",
+                    command=lambda w=widget: select_all_widget(w))
+                widget._justb_text_context_menu = context_menu
+
+            try:
+                state = str(widget.cget("state"))
+            except tk.TclError:
+                state = "normal"
+
+            editable = state not in ("disabled", "readonly")
+            try:
+                has_selection = (
+                    bool(widget.tag_ranges(tk.SEL))
+                    if isinstance(widget, tk.Text)
+                    else bool(widget.selection_present()))
+            except tk.TclError:
+                has_selection = False
+
+            context_menu.entryconfigure(
+                "Cut", state="normal" if editable and has_selection else "disabled")
+            context_menu.entryconfigure(
+                "Copy", state="normal" if has_selection else "disabled")
+            context_menu.entryconfigure(
+                "Paste", state="normal" if editable else "disabled")
+            context_menu.tk_popup(event.x_root, event.y_root)
+            return "break"
+
+        for widget_class in ("Entry", "Text", "TEntry", "TCombobox",
+                             "Spinbox", "TSpinbox"):
+            self.root.bind_class(widget_class, "<Control-a>", select_all)
+            self.root.bind_class(widget_class, "<Control-A>", select_all)
+            self.root.bind_class(
+                widget_class, "<Button-3>", show_context_menu, add="+")
+        self.root._justb_text_shortcuts_installed = True
 
     def _draw_background(self):
         return
@@ -284,27 +352,82 @@ def _tb_btn(parent, text, command, bg=C["purple"], hover=C["purple_dk"], fg="#FF
     return b
 
 
+_TAB_IMAGES = []     # keep references so Tk does not garbage-collect the images
+
+
+def _make_tab_images():
+    """Draw rounded-top tab backgrounds (normal / hover / selected) with Pillow."""
+    from PIL import Image, ImageDraw, ImageTk
+    S, W, H, GAP, R = 4, 48, 40, 2, 10      # supersample, size, side gap, radius
+
+    def build(fill, outline, accent=None):
+        big = Image.new("RGBA", (W * S, H * S), (0, 0, 0, 0))
+        d = ImageDraw.Draw(big)
+        box = [GAP * S, 0, (W - GAP) * S - 1, H * S + R * S]   # bottom corners cut off
+        d.rounded_rectangle(box, radius=R * S, fill=outline)
+        inner = [box[0] + S, S, box[2] - S, box[3]]
+        d.rounded_rectangle(inner, radius=(R - 1) * S, fill=fill)
+        if accent:
+            bar = Image.new("RGBA", big.size, (0, 0, 0, 0))
+            ImageDraw.Draw(bar).rounded_rectangle(box, radius=R * S, fill=accent)
+            mask = Image.new("L", big.size, 0)
+            ImageDraw.Draw(mask).rectangle([0, 0, W * S, 3 * S], fill=255)
+            bar.putalpha(Image.composite(bar.getchannel("A"), Image.new("L", big.size, 0), mask))
+            big = Image.alpha_composite(big, bar)
+        return ImageTk.PhotoImage(big.resize((W, H), Image.LANCZOS))
+
+    return (build(C["bg_panel"], C["border"]),
+            build("#E9E2FF", C["border_acc"]),
+            build(C["bg_card"], C["border_acc"], accent=C["purple"]))
+
+
 def _configure_shell_styles():
     style = ttk.Style()
+    # Set the theme ONCE, before any style is configured. Styles are stored
+    # per-theme, so switching theme later (the POS screen used to do this every
+    # time a POS tab was created) wipes the tab styling and makes tabs glitch.
+    if style.theme_use() != "clam":
+        style.theme_use("clam")
     style.configure(
         "JustB.TNotebook",
         background=C["bg_root"],
+        bordercolor=C["bg_root"], lightcolor=C["bg_root"], darkcolor=C["bg_root"],
         borderwidth=0,
         tabmargins=(12, 8, 12, 0),
     )
     style.configure(
         "JustB.TNotebook.Tab",
-        background=C["bg_root"],
-        foreground=C["text_light"],
+        background=C["bg_panel"],
+        foreground=C["text_mid"],
         font=("Segoe UI", 10, "bold"),
-        padding=(18, 9),
+        padding=(16, 8),
         borderwidth=0,
     )
     style.map(
         "JustB.TNotebook.Tab",
         background=[("selected", C["bg_card"]), ("active", C["bg_hover"])],
         foreground=[("selected", C["purple"]), ("active", C["text_dark"])],
+        expand=[("selected", (0, 0, 0, 0))],
     )
+
+    # Rounded tab shapes. Falls back to the flat style above if Pillow is missing.
+    try:
+        if not _TAB_IMAGES:
+            _TAB_IMAGES.extend(_make_tab_images())
+        normal, hover, selected = _TAB_IMAGES
+        try:
+            style.element_create(
+                "JB.tab", "image", normal,
+                ("selected", selected), ("active", hover),
+                border=(14, 12, 14, 2), sticky="nsew")
+        except tk.TclError:
+            pass   # element already exists (dashboard re-opened after logout)
+        style.layout("JustB.TNotebook.Tab", [
+            ("JB.tab", {"sticky": "nswe", "children": [
+                ("Notebook.padding", {"side": "top", "sticky": "nswe", "children": [
+                    ("Notebook.label", {"side": "top", "sticky": ""})]})]})])
+    except Exception as exc:
+        print(f"[theme] rounded tabs unavailable, using flat tabs: {exc}")
 
 
 def _build_app_shell(outer, user, add_pos, remove_pos):

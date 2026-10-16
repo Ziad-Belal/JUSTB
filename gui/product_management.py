@@ -11,11 +11,13 @@ Dynamic features:
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import filedialog, ttk, messagebox
 from utils.helpers import load_json, save_json
 import os
+import shutil
 import tempfile
 import subprocess
+from datetime import datetime
 from gui.theme import C
 
 try:
@@ -240,7 +242,10 @@ class ProductManagementScreen:
         self._pulse_jobs  = {}   # iid → after-job id for low-stock pulse
 
         self.frame = tk.Frame(frame_parent or root, bg=C["bg_root"])
-        self.frame.pack(fill="both", expand=True)
+        # Only pack when standalone. A Notebook manages its own tab pages;
+        # packing them as well makes tabs flicker / cover each other.
+        if frame_parent is None:
+            self.frame.pack(fill="both", expand=True)
 
         self._build_ui()
         self.load_products()
@@ -248,6 +253,48 @@ class ProductManagementScreen:
     # ── path helper ───────────────────────────────────────────────────────────
     def _products_path(self):
         return os.path.join(self.data_dir, "products.json")
+
+    def backup_products(self):
+        source = self._products_path()
+        if not os.path.isfile(source):
+            messagebox.showerror(
+                "Backup Failed", "The products file could not be found.",
+                parent=self.root)
+            return
+
+        suggested_name = (
+            f"products_backup_{datetime.now():%Y%m%d_%H%M%S}.json")
+        destination = filedialog.asksaveasfilename(
+            parent=self.root,
+            title="Back Up Products",
+            initialdir=os.path.dirname(source),
+            initialfile=suggested_name,
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")])
+        if not destination:
+            return
+
+        if os.path.normcase(os.path.abspath(destination)) == os.path.normcase(
+                os.path.abspath(source)):
+            messagebox.showerror(
+                "Backup Failed",
+                "Choose a different destination so the original products file "
+                "is not overwritten.",
+                parent=self.root)
+            return
+
+        try:
+            shutil.copy2(source, destination)
+        except OSError as exc:
+            messagebox.showerror(
+                "Backup Failed", f"Could not save the products backup:\n{exc}",
+                parent=self.root)
+            return
+
+        messagebox.showinfo(
+            "Backup Complete",
+            f"Products backup saved to:\n{destination}",
+            parent=self.root)
 
     # ══════════════════════════════════════════════════════════════════════════
     #  UI build
@@ -347,6 +394,10 @@ class ProductManagementScreen:
         _btn(acts, "🖨  Print",
              self.print_product,
              C["purple"], C["purple_dk"]).pack(side="left", padx=(0, 8))
+
+        _btn(acts, "⬇  Backup Products",
+             self.backup_products,
+             C["teal"], "#159F9F").pack(side="left", padx=(0, 8))
 
         _btn(acts, "⟳  Refresh",
              self.load_products,
